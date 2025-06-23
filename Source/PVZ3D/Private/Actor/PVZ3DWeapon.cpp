@@ -10,9 +10,10 @@
 #include"GameFramework/Controller.h"
 #include"Engine/DamageEvents.h"
 #include"Camera/CameraComponent.h"
+#include "Clustering/FaceNormalClustering.h"
 
 
-DEFINE_LOG_CATEGORY_STATIC(LogWeapon,All,All)
+DEFINE_LOG_CATEGORY_STATIC(LogWeapon, All, All)
 
 APVZ3DWeapon::APVZ3DWeapon()
 {
@@ -33,9 +34,7 @@ void APVZ3DWeapon::BeginPlay()
 
 void APVZ3DWeapon::StartFire()
 {
-	MakeShot();
-	GetWorldTimerManager().SetTimer(ShotTimerHandle, this, &APVZ3DWeapon::MakeShot, TimeBetweenShots, true,0.3);
-	
+   UE_LOG(LogTemp, Display, TEXT("Start Fire!"));
 }
 
 void APVZ3DWeapon::StopFire()
@@ -101,22 +100,16 @@ FVector APVZ3DWeapon::GetMuzzleWorldLocation()const
 
 bool APVZ3DWeapon::GetTraceData(FVector& TraceStart, FVector& TraceEnd) const
 {
-	// 获取Camera组件
 	UCameraComponent* Camera = GetOwner()->FindComponentByClass<UCameraComponent>();
 	if (!Camera) {
 		UE_LOG(LogWeapon, Error, TEXT("未找到Camera组件！"));
 		return false;
 	}
 
-	// 射线起点 = Camera位置
 	TraceStart = Camera->GetComponentLocation();
-    
-	// 射线方向 = Camera旋转方向 + 随机散布
+	
 	FRotator CameraRotation = Camera->GetComponentRotation();
-	const float HalfRad = FMath::DegreesToRadians(BulletSpread);
-	const FVector ShootDirection = FMath::VRandCone(CameraRotation.Vector(), HalfRad);
-
-	// 射线终点 = 起点 + 方向 * 最大射程
+	const FVector ShootDirection = CameraRotation.Vector();
 	TraceEnd = TraceStart + ShootDirection * TraceMaxDistance;
 	return true;
 }

@@ -4,6 +4,7 @@
 #include "Actor/PVZ3DPeaWeapon.h"
 #include"Engine/World.h"
 #include "Actor/PVZ3DBullet.h"
+#include"Camera/CameraComponent.h"
 
 void APVZ3DPeaWeapon::BeginPlay()
 {
@@ -90,6 +91,7 @@ APVZ3DBullet* APVZ3DPeaWeapon::GetProjectileFromPool()
 
 void APVZ3DPeaWeapon::StartFire()
 {
+	MakeShot();
 	GetWorldTimerManager().SetTimer(ShotTimerHandle, this, &APVZ3DPeaWeapon::MakeShot, TimeBetweenShots, true,0.3);
 }
 
@@ -153,13 +155,16 @@ void APVZ3DPeaWeapon::MakeShot()
 
 bool APVZ3DPeaWeapon::GetTraceData(FVector& TraceStart, FVector& TraceEnd)const
 {
-	FVector ViewLocation;
-	FRotator ViewRotation;
-	if(!GetPlayerViewPoint(ViewLocation, ViewRotation)) return false;
+	UCameraComponent* Camera = GetOwner()->FindComponentByClass<UCameraComponent>();
+	if (!Camera) {
+		UE_LOG(LogTemp, Error, TEXT("未找到Camera组件！"));
+		return false;
+	}
 
-	TraceStart = ViewLocation;
-	const auto HalfRad = FMath::DegreesToRadians(BulletSpread);
-	const FVector ShootDirection =FMath::VRandCone(ViewRotation.Vector(),HalfRad);
+	TraceStart = Camera->GetComponentLocation();
+	
+	FRotator CameraRotation = Camera->GetComponentRotation();
+	const FVector ShootDirection = CameraRotation.Vector();
 	TraceEnd = TraceStart + ShootDirection * TraceMaxDistance;
 	return true;
 }

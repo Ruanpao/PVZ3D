@@ -65,14 +65,7 @@ void APVZ3DTower::Interact()
 void APVZ3DTower::UpdateCurrentWeaponID()
 {
 	Super::UpdateCurrentWeaponID();
-	if (CurrentWeaponID==0)
-	{
-		CurrentWeaponID=1;
-	}
-	else
-	{
-		CurrentWeaponID=0;
-	}
+	
 }
 
 void APVZ3DTower::SwitchTower()

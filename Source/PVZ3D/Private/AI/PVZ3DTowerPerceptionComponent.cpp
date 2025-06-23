@@ -38,7 +38,7 @@ AActor* UPVZ3DTowerPerceptionComponent::GetLastSeenTarget()
 	}
 
 	float BestDistance = MAX_FLT;
-	AActor* BestTarget = nullptr;
+	BestTarget = nullptr;
 	for (const auto SeenActor : SeenActors)
 	{
 		// 检查 SeenActor 是否为空

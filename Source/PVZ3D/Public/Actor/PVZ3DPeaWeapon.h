@@ -20,7 +20,7 @@ public:
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	float TimeBetweenShots = 0.1f;
+	float TimeBetweenShots = 0.3f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	float BulletSpread = 1.5f;

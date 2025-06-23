@@ -156,6 +156,6 @@ void APVZ3DEnemy::OnDeath()
 	IsDead=1;
 	
 	SetLifeSpan(5.0f);
-	if (Controller)
+	//if (Controller)
 
 }

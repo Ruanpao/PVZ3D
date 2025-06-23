@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "PVZ3DBullet.h"
 #include "PVZ3DWeapon.generated.h"
 
 class USkeletalMeshComponent;
