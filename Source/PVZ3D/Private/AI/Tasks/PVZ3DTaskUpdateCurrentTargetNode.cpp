@@ -24,7 +24,6 @@ EBTNodeResult::Type UPVZ3DTaskUpdateCurrentTargetNode::ExecuteTask(UBehaviorTree
 			APVZ3DRouteManager* RouteManager = Cast<APVZ3DRouteManager>(UGameplayStatics::GetActorOfClass(GetWorld(), APVZ3DRouteManager::StaticClass()));
 			if (RouteManager)
 			{
-				// 获取当前路径的节点数组
 				int RouteID = Enemy->RouteID;
 				TArray<APVZ3DRouteNode*> RouteNodes = RouteManager->GetRouteNodesByID(RouteID);
 				
@@ -36,12 +35,7 @@ EBTNodeResult::Type UPVZ3DTaskUpdateCurrentTargetNode::ExecuteTask(UBehaviorTree
 					BlackboardComp->SetValueAsInt(TargetNodeIndexKey.SelectedKeyName, NextTargetNodeIndex);
 					return EBTNodeResult::Succeeded;
 				}
-    
-				// 获取安全的路径点数组
 				return EBTNodeResult::Failed;	
-
-
-				
 			}
 		}
 	}

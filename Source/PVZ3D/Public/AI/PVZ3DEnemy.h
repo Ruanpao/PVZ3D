@@ -53,6 +53,7 @@ public:
 	int AggroValue=0;
 	int CurrentNodeIndex=0;
 	int Vecolity=100;
+	bool BeAttracted=false;
 
 	FGenericTeamId TeamID;
 	TArray<FGenericTeamId> FriendlyTeamIDs;
