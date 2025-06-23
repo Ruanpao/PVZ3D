@@ -50,20 +50,15 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	float DamageAmount = 100.0f;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	float TimeBetweenShots = 0.1f;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	float BulletSpread = 1.5f;
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite,Category="Weapon")
-	FAmmoData DefaultAmmo{15,10,false};
+	FAmmoData DefaultAmmo{150,100,false};
 
-	void MakeShot();
+	virtual void MakeShot();
+	virtual bool GetTraceData(FVector& TraceStart, FVector& TraceEnd)const;
+	
 	APlayerController* GetPlayerController() const;
 	bool GetPlayerViewPoint(FVector& ViewLocation, FRotator& ViewRotation) const;
 	FVector GetMuzzleWorldLocation() const;
-	bool GetTraceData(FVector& TraceStart, FVector& TraceEnd)const;
 	void MakeHit(FHitResult& HitResult, const FVector& TraceStart, FVector& TraceEnd) const;
 	void MakeDamage(const FHitResult& HitResult);
 

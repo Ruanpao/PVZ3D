@@ -42,7 +42,6 @@ void UPVZ3DInventoryMainWidget::NativePreConstruct()
 void UPVZ3DInventoryMainWidget::UpdateMainWidget()
 {
 	Grid->ClearChildren();
-
 	NativePreConstruct();
 }
 

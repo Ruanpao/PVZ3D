@@ -18,6 +18,8 @@ public:
 
 	void StartFire();
 	void StopFire();
+
+	void DestroyWeapon();
 	
 protected:
 	virtual void BeginPlay() override;

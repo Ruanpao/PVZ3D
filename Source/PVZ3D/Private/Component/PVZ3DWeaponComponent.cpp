@@ -48,6 +48,15 @@ void UPVZ3DWeaponComponent::SpawnWeapon()
 	UE_LOG(LogTemp, Warning, TEXT("Weapon attached to: %s"), *WeaponAttachPointName.ToString());
 }
 
+void UPVZ3DWeaponComponent::DestroyWeapon()
+{
+	if (CurrentWeapon)
+	{
+		CurrentWeapon->Destroy(); 
+		CurrentWeapon = nullptr;  
+	}
+}
+
 void UPVZ3DWeaponComponent::StartFire()
 {
 	if (!CurrentWeapon) return;

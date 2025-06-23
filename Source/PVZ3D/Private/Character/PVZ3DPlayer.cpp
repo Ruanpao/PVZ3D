@@ -44,6 +44,8 @@ APVZ3DPlayer::APVZ3DPlayer()
 	SetGenericTeamId(TeamID);
 
 	WeaponComponent = CreateDefaultSubobject<UPVZ3DWeaponComponent>("WeaponComponent");
+
+	GetCharacterMovement()->MaxWalkSpeed = NormalSpeed;
 }
 
 void APVZ3DPlayer::BeginPlay()
@@ -70,6 +72,9 @@ void APVZ3DPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
         
 		PlayerInputComponent->BindAction("ChangeViewpoint", IE_Pressed, this, &APVZ3DPlayer::ChangeViewpoint);
 
+		PlayerInputComponent->BindAction("Run", IE_Pressed, this, &APVZ3DPlayer::StartRun);
+		PlayerInputComponent->BindAction("Run", IE_Released, this, &APVZ3DPlayer::StopRun);
+		
 		if (WeaponComponent && PlayerInputComponent)
 		{
 			PlayerInputComponent->BindAction("Attack", IE_Pressed, WeaponComponent, &UPVZ3DWeaponComponent::StartFire);
@@ -161,12 +166,20 @@ void APVZ3DPlayer::Interact()
 
 void APVZ3DPlayer::StartRun()
 {
-	Super::StartRun();
+	if(GetCharacterMovement()&&!bIsRunning)
+	{
+		bIsRunning = true;
+		GetCharacterMovement()->MaxWalkSpeed = RunningSpeed;	
+	}
 }
 
 void APVZ3DPlayer::StopRun()
 {
-	Super::StopRun();
+	if(GetCharacterMovement()&&bIsRunning)
+	{
+		bIsRunning = false;
+		GetCharacterMovement()->MaxWalkSpeed = NormalSpeed;	
+	}
 }
 
 void APVZ3DPlayer::UpdateCurrentWeaponID()
@@ -265,7 +278,6 @@ void APVZ3DPlayer::ChangeViewpoint()
 		SpringArmComponent->bInheritYaw = false;
 		SpringArmComponent->bInheritRoll = false;
 		
-		
 		return;
 	}
 	if(ViewType==1)// 重新绑定鼠标输入
@@ -309,6 +321,13 @@ void APVZ3DPlayer::OnDeath()
 	GetCharacterMovement()->DisableMovement();
 
 	SetLifeSpan(5.0f);
+	if (WeaponComponent)
+	{
+		WeaponComponent->DestroyWeapon(); 
+		WeaponComponent->DestroyComponent(); 
+		WeaponComponent = nullptr;
+	}
+	
 	if (Controller)
 	{
 		Controller->ChangeState(NAME_Spectating);

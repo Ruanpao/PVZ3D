@@ -51,6 +51,15 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Animation")
 	bool bIsAttacking = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement")
+	bool bIsRunning = false;  
+
+	UPROPERTY(EditAnywhere, Category = "Movement")
+	float NormalSpeed = 1000.0f;  
+
+	UPROPERTY(EditAnywhere, Category = "Movement")
+	float RunningSpeed = 2000.0f;
 	
 public:
 	APVZ3DPlayer();
@@ -102,4 +111,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Animation")
 	void StopAttack();
+
+	UFUNCTION(BlueprintCallable, Category = "Movement")
+	bool IsRunning() const { return bIsRunning; }
 };

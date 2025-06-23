@@ -48,6 +48,8 @@ void  UPVZ3DHealthComponent::OnTakeAnyDamage(AActor* DamagedActor, float Damage,
 	if (IsDead())
 	{
 		OnDeath.Broadcast();
+		GetWorld()->GetTimerManager().ClearTimer(HealTimerHandle); // 停止治疗定时器
+		return; 
 	}
 	else if(AutoHeal.IsAutoHeal)
 	{

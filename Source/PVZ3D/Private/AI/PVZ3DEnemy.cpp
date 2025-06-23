@@ -23,6 +23,8 @@ APVZ3DEnemy::APVZ3DEnemy()
 	HealthTextComponent= CreateDefaultSubobject<UTextRenderComponent>(TEXT("HealthTextComponent"));	//测试血量
 	HealthTextComponent->SetupAttachment(GetRootComponent());
 
+	Tags.Add(FName("Enemy"));
+
 	//BehaviorTreeComponent=CreateDefaultSubobject<UBehaviorTreeComponent>(TEXT("BehaviorTreeComponent"));
 	//BlackboardComponent=CreateDefaultSubobject<UBlackboardComponent>(TEXT("BlackboardComponent"));
 }
@@ -155,7 +157,5 @@ void APVZ3DEnemy::OnDeath()
 	
 	SetLifeSpan(5.0f);
 	if (Controller)
-	{
-		Controller->ChangeState(NAME_Spectating);
-	}
+
 }

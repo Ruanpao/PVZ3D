@@ -30,8 +30,6 @@ public:
 	UPROPERTY(visibleAnywhere, Category = "Component")
 	UPVZ3DTowerPerceptionComponent* TowerAIPerception;
 
-	
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
 	FName TargetKeyName = "Target";
 	
@@ -39,7 +37,6 @@ public:
 	virtual void OnPossess(APawn* InPawn) override;
 
 	virtual void UpdateTowerControllerImformation();
-	
 
 private:
 	AActor* GetTargetActor() const;
