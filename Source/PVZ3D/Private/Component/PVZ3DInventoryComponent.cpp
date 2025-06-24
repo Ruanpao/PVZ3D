@@ -122,8 +122,8 @@ void UPVZ3DInventoryComponent::UpdateSlot()
 		NewSlot.Quantity = 0;
 		
 		Slot.Add(NewSlot);
-		UE_LOG(LogInventory,Warning, TEXT("%s"), *NewSlot.ID.ToString());
-		UE_LOG(LogInventory,Warning, TEXT("%d"), NewSlot.Quantity);
+		//UE_LOG(LogInventory,Warning, TEXT("%s"), *NewSlot.ID.ToString());
+		//UE_LOG(LogInventory,Warning, TEXT("%d"), NewSlot.Quantity);
 	}
 	OnInventoryUpdate.Broadcast();
 }

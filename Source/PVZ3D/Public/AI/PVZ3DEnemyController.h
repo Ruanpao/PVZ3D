@@ -36,7 +36,8 @@ public:
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void OnPossess(APawn* InPawn) override;
 
-	
+	UFUNCTION(BlueprintCallable,Category="AI")
+	void RunPVZ3DEnemyBehaviorTree(int BehaviorTreeID);
 
 private:
 	AActor* GetTargetActor() const;

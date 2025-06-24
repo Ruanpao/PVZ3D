@@ -1,9 +1,9 @@
 #pragma once
 #include "Engine/DataTable.h"
-#include "PVZ3DTowerCoreTypes.generated.h"
+#include "PVZ3DEnemyWavesInfo.generated.h"
 
 USTRUCT(BlueprintType)
-struct FTowerBasicInfo : public FTableRowBase
+struct FPVZ3DEnemyWavesInfo : public FTableRowBase
 {
 	GENERATED_BODY()
 

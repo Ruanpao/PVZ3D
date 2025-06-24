@@ -23,5 +23,19 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	
+	float CooldownTime = 5.0f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Route")
+	TSubclassOf<APVZ3DEnemy> EnemyClass;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Route")
+	int RouteID;
+
+	UFUNCTION(BlueprintCallable, Category="AI", meta=(WorldContext="WorldContextObject", UnsafeDuringActorConstruction="true", AdvancedDisplay = "Owner"))
+	ACharacter* PVZ3DSpawnEnemyFromClass(UObject* WorldContextObject, TSubclassOf<APVZ3DEnemy> PVZ3DEnemyClass, FVector Location, int EnemyRouteID, int BehaviortreeID, FRotator Rotation = FRotator::ZeroRotator, bool bNoCollisionFail = false);
+
+
+	
+	
 };

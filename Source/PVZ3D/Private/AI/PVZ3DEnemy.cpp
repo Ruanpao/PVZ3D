@@ -40,7 +40,7 @@ void APVZ3DEnemy::BeginPlay()
 		UE_LOG(LogTemp, Warning, TEXT("RouteManager: %d"), RouteManager->GetRouteNodesByID(1)[0]->OrderIndex);
 	}
 	CurrentRouteNodes=RouteManager->GetRouteNodesByID(RouteID);
-	UE_LOG(LogTemp, Warning, TEXT("CurrentRouteNodes: %d"), CurrentRouteNodes[1]->OrderIndex);
+	UE_LOG(LogTemp, Warning, TEXT("CurrentRouteNodes: %d"), CurrentRouteNodes[0]->OrderIndex);
 
 	check(HealthComponent);
 	check(HealthTextComponent);

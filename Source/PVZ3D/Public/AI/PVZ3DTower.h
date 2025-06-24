@@ -52,7 +52,7 @@ public:
 	virtual void UpdateTower();
 	virtual void NotifyActorOnClicked(FKey ButtonPressed) override;
 	
-	FName CurrentWeaponID = "0001";
+	FName CurrentWeaponID = "0002";
 	int AggroValue=-1;
 	double AttackRange=1000.0f;
 	FRotator InitialOrientation;
@@ -76,6 +76,9 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category="AI")
 	UBehaviorTree* TowerBehaviorTree3;
+
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category="AI")
+	UBehaviorTree* TowerBehaviorTree4;
 
 	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="Component")
 	UCameraComponent* CameraComponent;

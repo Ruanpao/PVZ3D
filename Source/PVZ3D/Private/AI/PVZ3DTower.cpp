@@ -14,7 +14,8 @@ void APVZ3DTower::BeginPlay()
 {
 	Super::BeginPlay();
 	FGenericTeamId InitialTeamID = FGenericTeamId(2);
-	UpdateTowerImformation();
+	TeamID= InitialTeamID;
+	//UpdateTowerImformation();
 	InitialOrientation= GetActorRotation();
 
 	UpdateTower();
@@ -73,7 +74,7 @@ void APVZ3DTower::SwitchTower()
 	UpdateCurrentWeaponID();
 }
 
-void APVZ3DTower::UpdateTower()
+void APVZ3DTower::UpdateTower()//根据CurrentWeaponID更新塔的属性
 {
 	if(TowerDataTable)
 	{
@@ -92,6 +93,7 @@ void APVZ3DTower::UpdateTower()
 			UE_LOG(LogTemp, Warning, TEXT("AttackRange: %f"), AttackRange);
 			UE_LOG(LogTemp, Warning, TEXT("AggroValue: %d"), AggroValue);
 			UE_LOG(LogTemp, Warning, TEXT("TowerBehaviorTreeNow: %s"), *TowerBehaviorTreeNow.ToString());
+			//TeamID
 		} else {
 			// 处理未找到行的情况
 			UE_LOG(LogTemp, Error, TEXT("找不到的数据"));
@@ -109,7 +111,10 @@ void APVZ3DTower::UpdateTower()
 	}
 
 	
-	//后面写	
+	//后面写	只写了LOG,没有任何实际效果
+	//还应该在这里更新塔的行为树,更新阵营
+	//在controller中更新阵营和行为树
+	//需要一个东西更新WeaponID
 }
 
 void APVZ3DTower::NotifyActorOnClicked(FKey ButtonPressed)
@@ -154,6 +159,6 @@ ETeamAttitude::Type APVZ3DTower::GetTeamAttitudeTowards(const AActor& Other) con
 void APVZ3DTower::UpdateTowerImformation()
 {
 	//从表中读取塔的信息(阵营,武器,模型),Land 2,Platform 3
-	SetGenericTeamId(FGenericTeamId(3));
+	SetGenericTeamId(TeamID);
 
 }

@@ -64,12 +64,21 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Route")
 	int RouteID;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Route")
+	int EnemyBehaviorTreeID;
+
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Route")
 	TArray<APVZ3DRouteNode*> CurrentRouteNodes;
 	
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category="AI")
-	UBehaviorTree* EnemyBehaviorTree;
+	UBehaviorTree* EnemyBehaviorTree1;
 
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category="AI")
+	UBehaviorTree* EnemyBehaviorTree2;
+
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category="AI")
+	UBehaviorTree* EnemyBehaviorTree3;
+	
 	UPROPERTY(EditDefaultsOnly,Category="Animation")
 	UAnimMontage* AttackAnimMontage;
 

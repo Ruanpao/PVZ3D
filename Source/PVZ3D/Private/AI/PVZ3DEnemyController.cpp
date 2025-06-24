@@ -67,11 +67,9 @@ void APVZ3DEnemyController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
 	APVZ3DEnemy* Enemy = Cast<APVZ3DEnemy>(InPawn);
+	RunPVZ3DEnemyBehaviorTree(Enemy->EnemyBehaviorTreeID);
 	if (Enemy)
 	{
-		// Initialize the enemy's perception component
-		RunBehaviorTree(Enemy->EnemyBehaviorTree);
-
 		FGenericTeamId EnemyTeamID = Enemy->GetGenericTeamId();
 		SetGenericTeamId(EnemyTeamID);
 
@@ -92,6 +90,24 @@ void APVZ3DEnemyController::OnPossess(APawn* InPawn)
 
 	
 	
+}
+
+void APVZ3DEnemyController::RunPVZ3DEnemyBehaviorTree(int BehaviorTreeID)
+{
+	APVZ3DEnemy* Enemy = Cast<APVZ3DEnemy>(GetPawn());
+	if (!Enemy)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("APVZ3DEnemyController::RunPVZ3DEnemyBehaviorTree: Enemy is null!"));
+		return;
+	}
+	if(Enemy->EnemyBehaviorTreeID==1)
+		RunBehaviorTree(Enemy->EnemyBehaviorTree1);
+	else if(Enemy->EnemyBehaviorTreeID==2)
+		RunBehaviorTree(Enemy->EnemyBehaviorTree2);
+	else if(Enemy->EnemyBehaviorTreeID==3)
+		RunBehaviorTree(Enemy->EnemyBehaviorTree3);
+	else
+		RunBehaviorTree(Enemy->EnemyBehaviorTree1);//默认行为树
 }
 
 AActor* APVZ3DEnemyController::GetTargetActor() const

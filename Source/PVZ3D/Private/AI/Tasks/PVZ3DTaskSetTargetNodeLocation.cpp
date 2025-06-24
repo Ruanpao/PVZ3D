@@ -20,6 +20,7 @@ EBTNodeResult::Type UPVZ3DTaskSetTargetNodeLocation::ExecuteTask(UBehaviorTreeCo
 	APVZ3DEnemy* Enemy = Cast<APVZ3DEnemy>(OwnerComp.GetAIOwner()->GetPawn());
 	if (!IsValid(Enemy)) return EBTNodeResult::Failed;
 	int RouteID = Enemy->RouteID;
+	UE_LOG(LogTemp, Warning, TEXT("UPVZ3DTaskSetTargetNodeLocation: Enemy RouteID: %d"), RouteID);
 	UBlackboardComponent* BlackboardComp = OwnerComp.GetBlackboardComponent();
 	if(!IsValid(BlackboardComp)) return EBTNodeResult::Failed;
 	const FVector CurrentLocation = Enemy->GetActorLocation();
