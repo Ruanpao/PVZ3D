@@ -20,19 +20,28 @@ APVZ3DEnemySpawnPoint::APVZ3DEnemySpawnPoint()
 void APVZ3DEnemySpawnPoint::BeginPlay()
 {
 	Super::BeginPlay();
-	PVZ3DSpawnEnemyFromClass(this, EnemyClass, GetActorLocation(), RouteID, 1 ,GetActorRotation(), true);
+	
+	//PVZ3DSpawnEnemyFromClass(this, EnemyClass, GetActorLocation(), RouteID, EnemyID, BehaviorTreeID ,GetActorRotation(), true);
 }
 
 // Called every frame
 void APVZ3DEnemySpawnPoint::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+}
 
+void APVZ3DEnemySpawnPoint::NotifyActorOnClicked(FKey ButtonPressed)
+{
+	Super::NotifyActorOnClicked(ButtonPressed);
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Point Clicked"));
+	UE_LOG(LogTemp, Warning, TEXT("%s"), *EnemyID.ToString());
+	PVZ3DSpawnEnemyFromClass(this, EnemyClass, GetActorLocation(), RouteID, BehaviorTreeID, EnemyID  ,GetActorRotation(), true);
+	
 }
 
 ACharacter* APVZ3DEnemySpawnPoint::PVZ3DSpawnEnemyFromClass(UObject* WorldContextObject,
-TSubclassOf<APVZ3DEnemy> PVZ3DEnemyClass, FVector Location, int EnemyRouteID, int BehaviortreeID, FRotator Rotation,
-bool bNoCollisionFail)
+                                                            TSubclassOf<APVZ3DEnemy> PVZ3DEnemyClass, FVector Location, int EnemyRouteID, FName EnemyBehaviortreeID,
+                                                            FName SpawnEnemyID, FRotator Rotation, bool bNoCollisionFail)
 {
 	ACharacter* NewCharacter = NULL;
 
@@ -46,7 +55,16 @@ bool bNoCollisionFail)
 
 		if (NewCharacter != NULL)
 		{
+			//UE_LOG(LogTemp, Warning, TEXT("APVZ3DEnemySpawnPoint: 000Spawned Enemy with ID: %s"), *SpawnEnemyID.ToString());
 			Cast<APVZ3DEnemy>(NewCharacter)->RouteID= EnemyRouteID;
+			Cast<APVZ3DEnemy>(NewCharacter)->CurrentRouteNodes=Cast<APVZ3DEnemy>(NewCharacter)->RouteManager->GetRouteNodesByID(RouteID);
+			Cast<APVZ3DEnemy>(NewCharacter)->EnemyID = SpawnEnemyID;
+			UE_LOG(LogTemp, Warning, TEXT("APVZ3DEnemySpawnPoint: Spawned Enemy with ID: %s"), *Cast<APVZ3DEnemy>(NewCharacter)->EnemyID.ToString());
+			UE_LOG(LogTemp, Warning, TEXT("APVZ3DEnemySpawnPoint: Spawned Enemy with SpawnEnemyID: %s"), *SpawnEnemyID.ToString());
+			//UE_LOG(LogTemp, Warning, TEXT("APVZ3DEnemySpawnPoint: 111Spawned Enemy with ID: %s"), *Cast<APVZ3DEnemy>(NewCharacter)->EnemyID.ToString());
+			Cast<APVZ3DEnemy>(NewCharacter)->UpdateEnemyImformation();
+
+			
 			UE_LOG(LogTemp, Warning, TEXT("APVZ3DEnemySpawnPoint: Spawned Enemy with RouteID: %d"), EnemyRouteID);
 
 			if (NewCharacter->Controller == NULL)
@@ -58,7 +76,7 @@ bool bNoCollisionFail)
 
 			if (AIController != NULL)
 			{
-				Cast<APVZ3DEnemyController>(AIController)->RunPVZ3DEnemyBehaviorTree(BehaviortreeID);
+				Cast<APVZ3DEnemyController>(AIController)->RunPVZ3DEnemyBehaviorTree(EnemyBehaviortreeID);
 			}
 		}
 	}

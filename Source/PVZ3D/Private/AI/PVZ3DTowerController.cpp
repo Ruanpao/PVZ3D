@@ -69,7 +69,7 @@ void APVZ3DTowerController::UpdateTowerControllerImformation()
 		FGenericTeamId TowerTeamID = Tower->GetGenericTeamId();
 		SetGenericTeamId(TowerTeamID);
 
-		//Land 2 Platform 3
+		//Land 2 Platform 3 (TEAM?)
 		if(Tower->TowerBehaviorTreeNow==FName("1"))
 		{
 			RunBehaviorTree(Tower->TowerBehaviorTree1);

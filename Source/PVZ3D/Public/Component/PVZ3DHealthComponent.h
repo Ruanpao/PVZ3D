@@ -22,6 +22,8 @@ public:
 
 	float GetMaxHealth() const {return MaxHealth;}
 
+	void SetMaxHealth(float NewMaxHealth) {MaxHealth=NewMaxHealth;}
+
 	float GetHealthPercent() const {return CurrentHealth / MaxHealth;}
 	
 	UFUNCTION(BlueprintCallable)

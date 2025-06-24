@@ -26,14 +26,23 @@ public:
 	
 	float CooldownTime = 5.0f;
 
+	virtual void NotifyActorOnClicked(FKey ButtonPressed) override;
+
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Route")
 	TSubclassOf<APVZ3DEnemy> EnemyClass;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Route")
 	int RouteID;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Route")
+	FName BehaviorTreeID;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Route")
+	FName EnemyID;
+
 	UFUNCTION(BlueprintCallable, Category="AI", meta=(WorldContext="WorldContextObject", UnsafeDuringActorConstruction="true", AdvancedDisplay = "Owner"))
-	ACharacter* PVZ3DSpawnEnemyFromClass(UObject* WorldContextObject, TSubclassOf<APVZ3DEnemy> PVZ3DEnemyClass, FVector Location, int EnemyRouteID, int BehaviortreeID, FRotator Rotation = FRotator::ZeroRotator, bool bNoCollisionFail = false);
+	ACharacter* PVZ3DSpawnEnemyFromClass(UObject* WorldContextObject, TSubclassOf<APVZ3DEnemy> PVZ3DEnemyClass, FVector Location, int EnemyRouteID, FName EnemyBehaviortreeID, FName SpawnEnemyID, FRotator Rotation = FRotator::ZeroRotator, bool bNoCollisionFail = false);
 
 
 	

@@ -49,11 +49,12 @@ public:
    	bool IsMovingForward = false;
 	bool IsMovingRight = false;
 	bool IsDead = false;
-	int CurrentWeaponID;
+	FName CurrentWeaponID;
 	int AggroValue=0;
 	int CurrentNodeIndex=0;
 	int Vecolity=100;
 	bool BeAttracted=false;
+	float AttackRange;
 
 	FGenericTeamId TeamID;
 	TArray<FGenericTeamId> FriendlyTeamIDs;
@@ -65,8 +66,12 @@ public:
 	int RouteID;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Route")
-	int EnemyBehaviorTreeID;
+	FName EnemyBehaviorTreeID;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
+	FName EnemyID;
+
+	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Route")
 	TArray<APVZ3DRouteNode*> CurrentRouteNodes;
 	
@@ -85,14 +90,8 @@ public:
 	UPROPERTY(EditDefaultsOnly,Category="Animation")
 	UAnimMontage* DeathAnimMontage;
 	
-	//UPROPERTY(EditDefaultsOnly,Category="AI")
-	//UBehaviorTree* EnemyBehaviorTree;
-
-	//UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="AI")
-	//UBehaviorTreeComponent* BehaviorTreeComponent;
-
-	//UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="AI")
-	//UBlackboardComponent* BlackboardComponent;
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category="DataTable")
+	UDataTable* EnemyDataTable;
 	
 	UFUNCTION(BlueprintCallable,Category="Route")
 	virtual void SetRouteID(int NewRouteID);
@@ -106,9 +105,14 @@ public:
 
 	UFUNCTION(BlueprintCallable,Category="Movement")
 	float GetMovementDirection() const;
+
+	UFUNCTION(BlueprintCallable,Category="AI")
+	void UpdateEnemyImformation();
+
+	UFUNCTION(BlueprintCallable, Category = "AI")
+	void UpdateEnemy();
 	
 private:
-	void UpdateNextTargetNode();
 
 	void OnHealthChanged(float CurrentHealth, float MaxHealth, float HealthPercent);
 	

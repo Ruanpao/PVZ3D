@@ -6,6 +6,9 @@
 #include "GameFramework/Actor.h"
 #include "PVZ3DEnemySpawnPointManager.generated.h"
 
+class APVZ3DEnemySpawnPoint;
+
+
 UCLASS()
 class PVZ3D_API APVZ3DEnemySpawnPointManager : public AActor
 {
@@ -14,6 +17,15 @@ class PVZ3D_API APVZ3DEnemySpawnPointManager : public AActor
 public:	
 	// Sets default values for this actor's properties
 	APVZ3DEnemySpawnPointManager();
+
+	virtual void NotifyActorOnClicked(FKey ButtonPressed) override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
+	APVZ3DEnemySpawnPoint* EnemySpawnPoint1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
+	APVZ3DEnemySpawnPoint* EnemySpawnPoint2;
+
 
 protected:
 	// Called when the game starts or when spawned

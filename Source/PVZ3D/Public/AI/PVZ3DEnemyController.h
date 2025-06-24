@@ -37,7 +37,10 @@ public:
 	virtual void OnPossess(APawn* InPawn) override;
 
 	UFUNCTION(BlueprintCallable,Category="AI")
-	void RunPVZ3DEnemyBehaviorTree(int BehaviorTreeID);
+	void RunPVZ3DEnemyBehaviorTree(FName BehaviorTreeID);
+
+	UFUNCTION(BlueprintCallable, Category = "AI")
+	void UpdateEnemyControllerinformation();
 
 private:
 	AActor* GetTargetActor() const;
