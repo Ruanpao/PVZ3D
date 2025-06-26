@@ -33,4 +33,7 @@ struct FTowerBasicInfo : public FTableRowBase
 
 	UPROPERTY(EditDefaultsOnly,Blueprintable, Category="TowerInfo")
 	int AggroValue = 0;
+
+	UPROPERTY(EditDefaultsOnly,Blueprintable, Category="TowerInfo")
+	FName TeamID = "0";
 };

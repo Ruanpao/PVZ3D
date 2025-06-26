@@ -67,11 +67,45 @@ void APVZ3DEnemyController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
 	APVZ3DEnemy* Enemy = Cast<APVZ3DEnemy>(InPawn);
+	UpdateEnemyControllerinformation();
+	
+}
+
+void APVZ3DEnemyController::RunPVZ3DEnemyBehaviorTree(FName BehaviorTreeID)
+{
+	APVZ3DEnemy* Enemy = Cast<APVZ3DEnemy>(GetPawn());
+	if (!Enemy)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("APVZ3DEnemyController::RunPVZ3DEnemyBehaviorTree: Enemy is null!"));
+		return;
+	}
+	if(Enemy->EnemyBehaviorTreeID==FName("1"))
+		RunBehaviorTree(Enemy->EnemyBehaviorTree1);
+	else if(Enemy->EnemyBehaviorTreeID==FName("2"))
+		RunBehaviorTree(Enemy->EnemyBehaviorTree2);
+	else if(Enemy->EnemyBehaviorTreeID==FName("3"))
+		RunBehaviorTree(Enemy->EnemyBehaviorTree3);
+	else
+		RunBehaviorTree(Enemy->EnemyBehaviorTree1);//默认行为树
+}
+
+void APVZ3DEnemyController::UpdateEnemyControllerinformation()
+{
+	APVZ3DEnemy* Enemy = Cast<APVZ3DEnemy>(GetPawn());
 	if (Enemy)
 	{
-		// Initialize the enemy's perception component
-		RunBehaviorTree(Enemy->EnemyBehaviorTree);
-
+		//根据表的数据设置敌人的行为树以及Controller阵营
+		FGenericTeamId EnemyTeamID = Enemy->GetGenericTeamId();
+		SetGenericTeamId(EnemyTeamID);
+		
+		RunPVZ3DEnemyBehaviorTree(Enemy->EnemyBehaviorTreeID);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("APVZ3DEnemyController::UpdateEnemyControllerinformation: Enemy is null!"));
+	}
+	if (Enemy)
+	{
 		FGenericTeamId EnemyTeamID = Enemy->GetGenericTeamId();
 		SetGenericTeamId(EnemyTeamID);
 
@@ -80,18 +114,14 @@ void APVZ3DEnemyController::OnPossess(APawn* InPawn)
 		{
 			FriendlyTeamID={FGenericTeamId(3),FGenericTeamId(4),FGenericTeamId(5)};
 			HostileTeamID={FGenericTeamId(1),FGenericTeamId(2)};
-			//RunBehaviorTree(Enemy->EnemyBehaviorTree1);
 		}
 		if(EnemyTeamID==FGenericTeamId(5))
 		{
 			FriendlyTeamID={FGenericTeamId(4),FGenericTeamId(5)};
 			HostileTeamID={FGenericTeamId(1),FGenericTeamId(2),FGenericTeamId(3)};
-			//RunBehaviorTree(Enemy->EnemyBehaviorTree2);
 		}
 	}
-
-	
-	
+	UE_LOG(LogTemp, Warning, TEXT("EnemyController update done"));
 }
 
 AActor* APVZ3DEnemyController::GetTargetActor() const

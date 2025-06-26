@@ -66,23 +66,29 @@ void APVZ3DTowerController::UpdateTowerControllerImformation()
 	{
 		Tower->UpdateTowerImformation();
 		//根据表的数据设置塔的行为树以及Controller阵营
-		//RunBehaviorTree(Tower->TowerBehaviorTree1);
 		FGenericTeamId TowerTeamID = Tower->GetGenericTeamId();
 		SetGenericTeamId(TowerTeamID);
 
-		//Land 2 Platform 3
+		//Land 2 Platform 3 (TEAM?)
 		if(Tower->TowerBehaviorTreeNow==FName("1"))
 		{
 			RunBehaviorTree(Tower->TowerBehaviorTree1);
+			UE_LOG(LogTemp,Warning,TEXT("TowerController使用行为树1"));
 		}
 		else if(Tower->TowerBehaviorTreeNow==FName("2"))
 		{
 			RunBehaviorTree(Tower->TowerBehaviorTree2);
+			UE_LOG(LogTemp,Warning,TEXT("TowerController使用行为树2"));
 		}
 		else if(Tower->TowerBehaviorTreeNow==FName("3"))
 		{
 			RunBehaviorTree(Tower->TowerBehaviorTree3);
+			UE_LOG(LogTemp,Warning,TEXT("TowerController使用行为树3"));
 		}
+		else if(Tower->TowerBehaviorTreeNow==FName("4"))
+		{
+			RunBehaviorTree(Tower->TowerBehaviorTree3);
+			UE_LOG(LogTemp,Warning,TEXT("TowerController使用行为树4"));}
 		else
 		{
 			//默认行为树
