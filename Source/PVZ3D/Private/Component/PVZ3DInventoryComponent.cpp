@@ -1,5 +1,7 @@
 
 #include "Component/PVZ3DInventoryComponent.h"
+#include "UI/PVZ3DPlayerHUD.h"
+#include "Kismet/GameplayStatics.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogInventory, All, All);
 
@@ -16,9 +18,14 @@ void UPVZ3DInventoryComponent::BeginPlay()
 	Super::BeginPlay();
 
 	UpdateSlot();
+
+	if(APVZ3DPlayerHUD* HUD = Cast<APVZ3DPlayerHUD>(UGameplayStatics::GetPlayerController(this,0)->GetHUD()))
+	{
+		HUD->Buy.AddUObject(this, &UPVZ3DInventoryComponent::Buy);
+	}
 }
 
-void UPVZ3DInventoryComponent::AddToInventory(const FName Item_ID, int32 Quantity)
+bool UPVZ3DInventoryComponent::AddToInventory(const FName Item_ID, int32 Quantity)
 {
 	UE_LOG(LogInventory, Warning, TEXT("Now Calling AddToInventory"));
 	
@@ -53,8 +60,8 @@ void UPVZ3DInventoryComponent::AddToInventory(const FName Item_ID, int32 Quantit
 			LocalHasFailed = true;
 		}
 	}
-	
-	
+
+	return LocalHasFailed;
 }
 
 FFindSlot UPVZ3DInventoryComponent::FindSlot(FName Item_ID)
@@ -118,7 +125,7 @@ void UPVZ3DInventoryComponent::UpdateSlot()
 	while(Slot.Num() < SlotSize)
 	{
 		FItemInInventory NewSlot;
-		NewSlot.ID = "0004";
+		NewSlot.ID = "0000";
 		NewSlot.Quantity = 0;
 		
 		Slot.Add(NewSlot);
@@ -128,6 +135,31 @@ void UPVZ3DInventoryComponent::UpdateSlot()
 	OnInventoryUpdate.Broadcast();
 }
 
+void UPVZ3DInventoryComponent::Buy(FName ID , int32 Quantity , int32 Price)
+{
+	if(ID != "0000")
+	{
+		if(Gold >= Price)
+		{
+			if(AddToInventory(ID , Quantity) == false)
+			{
+				Gold -= Price;
 
+				OnGoldChanged.Broadcast(Gold);
+			}
+			else
+			{
+				UE_LOG(LogInventory, Error, TEXT("INVENTORY IS FULL, CANNOT ADD ITEM: %s"), *ID.ToString());
+			}
+		}
+		else
+		{
+			UE_LOG(LogInventory , Error, TEXT("NOT ENOUGH GOLD TO BUY ITEM: %s"), *ID.ToString());
+		}
+	}
+}
 
-
+int32 UPVZ3DInventoryComponent::GetCurrentGold()
+{
+	return Gold;
+}

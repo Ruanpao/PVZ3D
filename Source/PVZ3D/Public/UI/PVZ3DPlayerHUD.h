@@ -10,6 +10,9 @@
 
 DECLARE_MULTICAST_DELEGATE_TwoParams(FSendInfo, FName , int32)
 
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FBuy , FName, int32 , int32)
+
+
 UCLASS()
 class PVZ3D_API APVZ3DPlayerHUD : public AHUD
 {
@@ -18,8 +21,15 @@ class PVZ3D_API APVZ3DPlayerHUD : public AHUD
 public:
 	virtual void DrawHUD() override;
 
-protected:
+	void InventoryInformationVisibility();
+
+	void ShopVisibility();
+
+	FBuy Buy;
+	
 	FSendInfo SendInfo;
+
+protected:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite , Category = "UI")
 	TSubclassOf<UUserWidget> PlayerDetailWidgetClass;
@@ -33,20 +43,27 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite , Category = "UI")
 	TSubclassOf<UUserWidget> InventoryInformationWidgetClass;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite , Category = "UI")
+	TSubclassOf<UUserWidget> ShopWidgetClass;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite , Category = "UIInstance")
 	UUserWidget* InventoryInformationWidget;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite , Category = "UIInstance")
+	UUserWidget* ShopWidget;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite , Category = "UIInstance")
 	UUserWidget* InventoryMainWidget;
-
-	void DisplayInventoryInformationWidget();
-
-	void RemoveInventoryInformationWidget();
-
+	
 	UFUNCTION(BlueprintCallable)
 	void ReceivedInfo(FName P_ID, int32 P_Quantity);
 
+	UFUNCTION(BlueprintCallable)
+	void ReceivedInfo_2(FName P_ID, int32 P_Quantity , int32 P_Price);
+
 	virtual void BeginPlay() override;
+
+	
 
 private:
 	void DrawCrossHair();

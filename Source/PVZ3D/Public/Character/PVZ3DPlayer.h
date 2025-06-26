@@ -76,14 +76,15 @@ public:
 	virtual void UpdateCurrentWeaponID();
 	virtual void ChangeViewpoint();
 	virtual void PlayerMouseClick();
-	void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 	virtual void Tick(float DeltaTime) override;
+
+	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 	
 	void OnDeath();
 	
 	bool IsMovingForward = false;
 	bool IsMovingRight = false;
-
+	
 	int CurrentWeaponID = 0;
 	int AggroValue=0;
 	int ViewType=0; // 0为第一人称，1为第三人称
