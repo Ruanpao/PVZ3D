@@ -1,13 +1,31 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
+// PVZ3DEnemySpawnPointManager.h
 #pragma once
-
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "PVZ3D/CoreTypes/PVZ3DWavesInfo.h"
 #include "PVZ3DEnemySpawnPointManager.generated.h"
 
 class APVZ3DEnemySpawnPoint;
 
+USTRUCT(BlueprintType)
+struct FWaveDataRow : public FTableRowBase
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WaveData")
+	FName LevelID;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WaveData")
+	int WaveID;         // 使用int类型
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WaveData")
+	int RouteID;        // 使用int类型
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WaveData")
+	FString EnemiesToSpawn;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WaveData")
+	float SpawnInterval;
+};
 
 UCLASS()
 class PVZ3D_API APVZ3DEnemySpawnPointManager : public AActor
@@ -15,25 +33,54 @@ class PVZ3D_API APVZ3DEnemySpawnPointManager : public AActor
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
 	APVZ3DEnemySpawnPointManager();
-
 	virtual void NotifyActorOnClicked(FKey ButtonPressed) override;
 
+protected:
+	virtual void BeginPlay() override;
+	virtual void BeginDestroy() override;
+
+private:
+	/** 核心状态管理 */
+	bool bIsSpawning;              // 是否正在生成敌人
+	int TotalEnemiesInWave;        // 当前波次总敌人数（int类型）
+	int SpawnedEnemiesCount;       // 已生成敌人数（int类型）
+	int CurrentWaveID;             // 当前波次ID（int类型）
+	
+	/** 路线数据管理 */
+	TArray<FWaveDataRow*> AllWaveRows;          // 从数据表加载的所有行
+	TMap<int, TArray<FWaveDataRow*>> RouteWaves; // 按RouteID分组的波次数据（int类型键）
+	
+	/** 定时器管理 */
+	FTimerHandle TimerHandle_SpawnNextEnemy;
+	int GetUniqueTimerKeySuffix();               // 返回int类型
+
+	/** 敌人生成逻辑 */
+	void OnWaveSpawnComplete();
+
+public:	
+	/** 公开接口 */
+	UFUNCTION(BlueprintCallable, Category = "Spawn")
+	void LoadWaveDataFromDataTable();
+	
+	UFUNCTION(BlueprintCallable, Category = "Wave")
+	void NextWave();
+	
+	UFUNCTION(BlueprintCallable, Category = "Wave")
+	void StartWave(int WaveID); // int类型参数
+
+	/** 可编辑属性 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
 	APVZ3DEnemySpawnPoint* EnemySpawnPoint1;
-
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
 	APVZ3DEnemySpawnPoint* EnemySpawnPoint2;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
+	UDataTable* WavesInfoDataTable;
 
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WaveStatus")
+	int CurrentRouteID;      // 当前处理的路线ID（int类型）
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WaveStatus")
+	bool bCanNextWave;
 };

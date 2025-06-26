@@ -1,10 +1,10 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
+// PVZ3DEnemySpawnPoint.h
 #pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "PVZ3DEnemy.h"
+#include "AI/PVZ3DEnemySpawnPointManager.h"
 #include "PVZ3DEnemySpawnPoint.generated.h"
 
 UCLASS()
@@ -13,19 +13,14 @@ class PVZ3D_API APVZ3DEnemySpawnPoint : public AActor
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
 	APVZ3DEnemySpawnPoint();
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 public:	
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	
-	float CooldownTime = 5.0f;
-
 	virtual void NotifyActorOnClicked(FKey ButtonPressed) override;
 
 
@@ -33,18 +28,27 @@ public:
 	TSubclassOf<APVZ3DEnemy> EnemyClass;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Route")
-	int RouteID;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Route")
-	FName BehaviorTreeID;
+	int RouteID;       // 使用int类型
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Route")
 	FName EnemyID;
 
-	UFUNCTION(BlueprintCallable, Category="AI", meta=(WorldContext="WorldContextObject", UnsafeDuringActorConstruction="true", AdvancedDisplay = "Owner"))
-	ACharacter* PVZ3DSpawnEnemyFromClass(UObject* WorldContextObject, TSubclassOf<APVZ3DEnemy> PVZ3DEnemyClass, FVector Location, int EnemyRouteID, FName EnemyBehaviortreeID, FName SpawnEnemyID, FRotator Rotation = FRotator::ZeroRotator, bool bNoCollisionFail = false);
+	UFUNCTION(BlueprintCallable, Category="AI")
+	ACharacter* PVZ3DSpawnEnemyFromClass(UObject* WorldContextObject, TSubclassOf<APVZ3DEnemy> PVZ3DEnemyClass, FVector Location, int EnemyRouteID, FName SpawnEnemyID, FRotator Rotation = FRotator::ZeroRotator, bool bNoCollisionFail = false);
 
+	UPROPERTY()
+	TArray<FWaveDataRow> AssignedWaves; // 分配给本SpawnPoint的波次数据，使用结构体引用
 
-	
-	
+	int CurrentWaveIndex;
+
+	void StartWave(int WaveID);
+	void SpawnNextEnemy();
+	void OnWaveSpawnComplete();
+	FTimerHandle EnemySpawnTimer;
+
+	bool SpawnCompleted;
+
+private:
+	int SpawnedEnemiesCount;
+	TArray<FName> EnemiesToSpawn;
 };
