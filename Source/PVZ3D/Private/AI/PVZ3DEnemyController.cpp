@@ -113,12 +113,12 @@ void APVZ3DEnemyController::UpdateEnemyControllerinformation()
 		if(EnemyTeamID==FGenericTeamId(4))
 		{
 			FriendlyTeamID={FGenericTeamId(3),FGenericTeamId(4),FGenericTeamId(5)};
-			HostileTeamID={FGenericTeamId(1),FGenericTeamId(2)};
+			HostileTeamID={FGenericTeamId(1),FGenericTeamId(2),FGenericTeamId(6)};
 		}
 		if(EnemyTeamID==FGenericTeamId(5))
 		{
 			FriendlyTeamID={FGenericTeamId(4),FGenericTeamId(5)};
-			HostileTeamID={FGenericTeamId(1),FGenericTeamId(2),FGenericTeamId(3)};
+			HostileTeamID={FGenericTeamId(1),FGenericTeamId(2),FGenericTeamId(3),FGenericTeamId(6)};
 		}
 	}
 	UE_LOG(LogTemp, Warning, TEXT("EnemyController update done"));

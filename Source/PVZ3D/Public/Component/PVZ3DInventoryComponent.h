@@ -35,7 +35,7 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	int32 Gold = 10;
+	int32 Gold = 1000;
 
 	int32 GetCurrentGold();
 	
