@@ -88,8 +88,6 @@ void APVZ3DPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	}
 }
 
-
-
 void APVZ3DPlayer::MoveForward(const float Val)
 {
 	MovementInput.Y = Val;

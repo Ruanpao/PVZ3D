@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
 #include "GenericTeamAgentInterface.h"
+#include "UI/PVZ3DPlayerHUD.h"
 #include "PVZ3DPlayerController.generated.h"
 
 /**
@@ -18,4 +19,17 @@ class PVZ3D_API APVZ3DPlayerController : public APlayerController
 	
 public:
 	APVZ3DPlayerController();
+
+	virtual void SetupInputComponent() override;
+
+	void ToggleInventoryInformationVisibility();
+
+	void ToggleShopVisibility();
+	
+protected:
+	APVZ3DPlayerHUD* MyHUD;
+
+	virtual void BeginPlay() override;
+
+	void InitializeHUD();
 };

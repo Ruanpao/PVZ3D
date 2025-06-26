@@ -3,6 +3,7 @@
 
 #include "UI/PVZ3DPlayerHUD.h"
 #include "Engine/Canvas.h"
+#include "../UI/PVZ3DShopWidget.h"
 #include "../UI/PVZ3DInventoryMainWidget.h"
 #include "Blueprint/UserWidget.h"
 
@@ -22,6 +23,10 @@ void APVZ3DPlayerHUD::BeginPlay()
 	
 	auto LevelWidget = CreateWidget<UUserWidget>(GetWorld(), LevelWidgetClass);
 
+	ShopWidget = CreateWidget<UUserWidget>(GetWorld(), ShopWidgetClass);
+
+	InventoryInformationWidget = CreateWidget<UUserWidget>(GetWorld(), InventoryInformationWidgetClass);
+
 	InventoryMainWidget = CreateWidget<UUserWidget>(GetWorld(), InventoryMainWidgetClass);
 	
 	if(PlayerDetailWidget)
@@ -34,6 +39,22 @@ void APVZ3DPlayerHUD::BeginPlay()
 		LevelWidget->AddToViewport();
 	}
 
+	if(InventoryInformationWidget)
+	{
+		InventoryInformationWidget->AddToViewport();
+	}
+
+	if(ShopWidget)
+	{
+		ShopWidget->AddToViewport();
+
+		if (UPVZ3DShopWidget* ShopWidgetInstance = Cast<UPVZ3DShopWidget>(ShopWidget))
+		{
+			ShopWidgetInstance->ReceivedInfo_2.AddUObject(this, &APVZ3DPlayerHUD::ReceivedInfo_2);
+		}
+		
+	}
+	
 	if(InventoryMainWidget)
 	{
 		InventoryMainWidget->AddToViewport();
@@ -42,38 +63,6 @@ void APVZ3DPlayerHUD::BeginPlay()
         {
             InventoryMainWidgetInstance->Received.AddUObject(this, &APVZ3DPlayerHUD::ReceivedInfo);
         }
-	}
-
-
-	
-	
-	InventoryInformationWidget = CreateWidget<UUserWidget>(GetWorld(), InventoryInformationWidgetClass);
-	
-	if(InventoryInformationWidget)
-	{
-		InventoryInformationWidget->AddToViewport();
-	}
-
-
-
-	
-}
-
-void APVZ3DPlayerHUD::DisplayInventoryInformationWidget()
-{
-	InventoryInformationWidget = CreateWidget<UUserWidget>(GetWorld(), InventoryInformationWidgetClass);
-	
-	if(InventoryInformationWidget)
-	{
-		InventoryInformationWidget->AddToViewport();
-	}
-}
-
-void APVZ3DPlayerHUD::RemoveInventoryInformationWidget()
-{
-	if(InventoryInformationWidget)
-	{
-		InventoryInformationWidget->RemoveFromParent();
 	}
 }
 
@@ -85,6 +74,41 @@ void APVZ3DPlayerHUD::ReceivedInfo(FName P_ID, int32 P_Quantity)
 			{
 				ShowInfoInterface->ShowInfo(P_ID, P_Quantity);
 			}
+	}
+}
+
+void APVZ3DPlayerHUD::ReceivedInfo_2(FName P_ID, int32 P_Quantity , int32 P_Price)
+{
+	Buy.Broadcast(P_ID , P_Quantity , P_Price);
+}
+
+void APVZ3DPlayerHUD::InventoryInformationVisibility()
+{
+	if (InventoryInformationWidget)
+	{
+		if(InventoryInformationWidget->IsVisible())
+		{
+			InventoryInformationWidget->SetVisibility(ESlateVisibility::Hidden);
+		}
+		else
+		{
+			InventoryInformationWidget->SetVisibility(ESlateVisibility::Visible);
+		}
+	}
+}
+
+void APVZ3DPlayerHUD::ShopVisibility()
+{
+	if(ShopWidget)
+	{
+		if(ShopWidget->IsVisible())
+		{
+			ShopWidget->SetVisibility(ESlateVisibility::Hidden);
+		}
+		else
+		{
+			ShopWidget->SetVisibility(ESlateVisibility::Visible);
+		}
 	}
 }
 
@@ -100,7 +124,6 @@ void APVZ3DPlayerHUD::DrawCrossHair()
 	DrawLine(Center.Min - HalfLineSize, Center.Max , Center.Min + HalfLineSize,Center.Max, LineColor,LineThickness);
 	DrawLine(Center.Min, Center.Max - HalfLineSize, Center.Min, Center.Max + HalfLineSize, LineColor,LineThickness);
 }
-
 
 
 

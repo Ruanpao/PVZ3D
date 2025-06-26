@@ -36,6 +36,9 @@ struct FItemBasicInfo : public FTableRowBase
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="ItemInfo")
 	FText ItemType = FText::FromString("Invalid ItemType");
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="ItenInfo")
+	int32 Price = 0;
 };
 
 USTRUCT(BlueprintType)
@@ -48,4 +51,37 @@ struct FItemInInventory
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="SlotInfo")
 	int32 Quantity = 0;
+};
+
+USTRUCT(BlueprintType)
+struct FShopStack : public FTableRowBase
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="ShopStack")
+	FName LevelName = "00";
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="ShopStack")
+	FName Stack01 = "0000";
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="ShopStack")
+	FName Stack02 = "0000";
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="ShopStack")
+	FName Stack03 = "0000";
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="ShopStack")
+	FName Stack04 = "0000";
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="ShopStack")
+	FName Stack05 = "0000";
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="ShopStack")
+	FName Stack06 = "0000";
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="ShopStack")
+	FName Stack07 = "0000";
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="ShopStack")
+	FName Stack08 = "0000";
 };

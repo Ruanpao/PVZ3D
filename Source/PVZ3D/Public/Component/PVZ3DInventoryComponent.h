@@ -9,6 +9,8 @@
 
 DECLARE_MULTICAST_DELEGATE(FOnInventoryUpdate)
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnGoldChanged , int32)
+
 USTRUCT()
 struct FFindSlot
 {
@@ -27,10 +29,16 @@ class PVZ3D_API UPVZ3DInventoryComponent : public UActorComponent
 public:	
 	UPVZ3DInventoryComponent();
 
+	FOnGoldChanged OnGoldChanged;
+
 protected:
 	virtual void BeginPlay() override;
 
 public:
+	int32 Gold = 10;
+
+	int32 GetCurrentGold();
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="DataTable")
 	UDataTable* Datatable;
 
@@ -42,7 +50,7 @@ public:
 
 	FOnInventoryUpdate OnInventoryUpdate;
 	
-	void AddToInventory(const FName Item_ID, int32 Quantity);
+	bool AddToInventory(const FName Item_ID, int32 Quantity);
 
 	FFindSlot FindSlot(FName Item_ID);
 
@@ -53,4 +61,6 @@ public:
 	void CreateNewSlot(FName Item_ID, int32 Index);
 
 	void UpdateSlot();
+
+	void Buy(FName ID , int32 Quantity , int32 Price);
 };
