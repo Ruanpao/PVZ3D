@@ -27,13 +27,13 @@ void UPVZ3DInventoryComponent::BeginPlay()
 		HUD->Buy.AddUObject(this, &UPVZ3DInventoryComponent::Buy);
 
 		HUD->OnHoledSlotChanged.AddUObject(this, &UPVZ3DInventoryComponent::UpdateHoldedSlot);
+
+		HUD->Remove.AddUObject(this, &UPVZ3DInventoryComponent::RemoveFromInventory);
 	}
 }
 
 bool UPVZ3DInventoryComponent::AddToInventory(const FName Item_ID, int32 Quantity)
 {
-	UE_LOG(LogInventory, Warning, TEXT("Now Calling AddToInventory"));
-	
 	int32 LocalQuantityRemaining = Quantity;
 
 	bool LocalHasFailed = false;
@@ -44,6 +44,8 @@ bool UPVZ3DInventoryComponent::AddToInventory(const FName Item_ID, int32 Quantit
 		
 		if(FindSlotResult.FindSlot)
 		{
+			UE_LOG(LogInventory , Error , TEXT("I have found a %s %d"),*Slot[FindSlotResult.SlotIndex].ID.ToString(), Slot[FindSlotResult.SlotIndex].Quantity);
+			
 			AddOne(FindSlotResult.SlotIndex, 1);
 
 			OnInventoryUpdate.Broadcast();
@@ -85,10 +87,6 @@ FFindSlot UPVZ3DInventoryComponent::FindSlot(FName Item_ID)
 				{
 					ReturnResult.FindSlot = true;
 					ReturnResult.SlotIndex = index;
-					return ReturnResult;
-				}
-				else
-				{
 					return ReturnResult;
 				}
 			}
@@ -139,6 +137,46 @@ void UPVZ3DInventoryComponent::UpdateSlot()
 	}
 	OnInventoryUpdate.Broadcast();
 }
+
+void UPVZ3DInventoryComponent::RemoveFromInventory(int32 Index, bool RemoveAll, bool IsConsumed)
+{
+	if(Slot[Index].Quantity == 1 or RemoveAll)
+	{
+		if(IsConsumed)
+		{
+			DestroyAOldSlot(Index);
+			UE_LOG(LogInventory, Error ,TEXT("I am Consumed"));
+		}
+		else
+		{
+			DestroyAOldSlot(Index);
+		}
+	}
+	else
+	{
+		if(IsConsumed)
+		{
+			RemoveOne(Index , 1);
+			UE_LOG(LogInventory, Error ,TEXT("I am Consumed"));
+		}
+		else
+		{
+			RemoveOne(Index, 1);
+		}
+	}
+}
+
+void UPVZ3DInventoryComponent::RemoveOne(int32 Index , int32 Quantity)
+{
+	Slot[Index].Quantity -= Quantity;
+}
+
+void UPVZ3DInventoryComponent::DestroyAOldSlot(int32 Index)
+{
+	Slot[Index].ID = "0000";
+	Slot[Index].Quantity = 0;
+}
+
 
 void UPVZ3DInventoryComponent::Buy(FName ID , int32 Quantity , int32 Price)
 {

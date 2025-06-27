@@ -10,6 +10,8 @@
 
 DECLARE_MULTICAST_DELEGATE_ThreeParams(FReceived , FName , int32 , int32)
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FReceivedRemove ,  int32)
+
 UCLASS()
 class PVZ3D_API UPVZ3DInventoryMainWidget : public UUserWidget
 {
@@ -17,6 +19,8 @@ class PVZ3D_API UPVZ3DInventoryMainWidget : public UUserWidget
 	
 public:
 	FReceived Received;
+
+	FReceivedRemove ReceivedRemove;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite , Category = "CellUI")
 	TSubclassOf<UPVZ3DInventoryCellWidget> InventoryCellWidgetClass;
@@ -29,6 +33,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void BrushWhite();
+
+	UFUNCTION(BlueprintCallable)
+	void ReceivedRemoveInfo(int32 P_SlotIndex);
 
 protected:
 	virtual void NativePreConstruct() override;

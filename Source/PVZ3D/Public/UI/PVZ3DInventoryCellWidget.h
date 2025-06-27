@@ -10,6 +10,8 @@
 
 DECLARE_MULTICAST_DELEGATE_ThreeParams(FReceived ,FName, int32 , int32)
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FRemove , int32)
+
 DECLARE_MULTICAST_DELEGATE(FBrushWhite)
 
 UCLASS()
@@ -21,6 +23,8 @@ public:
 	FReceived Received;
 	
 	FBrushWhite BrushWhite;
+
+	FRemove Remove;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="DataTable")
 	UDataTable* Datatable;
@@ -50,6 +54,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void OnButtonPressed();
+
+	UFUNCTION(BlueprintCallable)
+	void OnMouseButtonDown_Right();
 
 protected:
 	virtual void NativeOnInitialized() override;

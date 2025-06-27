@@ -32,6 +32,8 @@ void UPVZ3DInventoryMainWidget::NativePreConstruct()
 
 						InventoryCellWidget->BrushWhite.AddUObject(this, &UPVZ3DInventoryMainWidget::BrushWhite);
 
+						InventoryCellWidget->Remove.AddUObject(this, )
+
 						Grid->AddChildToWrapBox(InventoryCellWidget);
 
 						Index += 1;
@@ -65,6 +67,11 @@ void UPVZ3DInventoryMainWidget::BrushWhite()
 			}
 		}
 	}
+}
+
+void UPVZ3DInventoryMainWidget::ReceivedRemoveInfo(int32 P_SlotIndex)
+{
+	ReceivedRemove.Broadcast(P_SlotIndex);
 }
 
 

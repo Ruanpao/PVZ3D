@@ -65,6 +65,12 @@ public:
 
 	void UpdateSlot();
 
+	void RemoveFromInventory(int32 Index , bool RemoveAll , bool IsConsumed);
+
+	void RemoveOne(int32 Index, int32 Quantity);
+
+	void DestroyAOldSlot(int32 Index);
+
 	void Buy(FName ID , int32 Quantity , int32 Price);
 
 	void UpdateHoldedSlot(int32 Index);

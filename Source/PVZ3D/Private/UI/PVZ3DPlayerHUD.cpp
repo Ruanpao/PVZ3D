@@ -5,9 +5,11 @@
 #include "Engine/Canvas.h"
 #include "../UI/PVZ3DShopWidget.h"
 #include "../UI/PVZ3DInventoryMainWidget.h"
+#include "BehaviorTree/BehaviorTreeTypes.h"
 #include "Blueprint/UserWidget.h"
+#include "UI/PVZ3DDisposalPopWidget.h"
 
-DEFINE_LOG_CATEGORY_STATIC(LogHUD,All,All);
+DEFINE_LOG_CATEGORY_STATIC(LogHUD, All, All);
 
 void APVZ3DPlayerHUD::DrawHUD()
 {
@@ -62,6 +64,8 @@ void APVZ3DPlayerHUD::BeginPlay()
 		if (UPVZ3DInventoryMainWidget* InventoryMainWidgetInstance = Cast<UPVZ3DInventoryMainWidget>(InventoryMainWidget))
         {
             InventoryMainWidgetInstance->Received.AddUObject(this, &APVZ3DPlayerHUD::ReceivedInfo);
+
+			InventoryMainWidgetInstance->ReceivedRemove.AddUObject(this, &APVZ3DPlayerHUD::RemoveRequest);
         }
 	}
 }
@@ -114,6 +118,28 @@ void APVZ3DPlayerHUD::ShopVisibility()
 	}
 }
 
+void APVZ3DPlayerHUD::RemoveRequest(int32 Index)
+{
+	RemoveIndex =  Index;
+	
+	DisposalPopWidget = CreateWidget<UUserWidget>(GetWorld(), DisposalPopWidgetClass);
+
+	if(DisposalPopWidget)
+	{
+		DisposalPopWidget->AddToViewport();
+
+		if(UPVZ3DDisposalPopWidget* DisposalPopWidgetInstance = Cast<UPVZ3DDisposalPopWidget>(DisposalPopWidget))
+		{
+			DisposalPopWidgetInstance->Remove.AddUObject(this, &APVZ3DPlayerHUD::RemoveRequest_2);
+		}
+	}
+	
+}
+
+void APVZ3DPlayerHUD::RemoveRequest_2(bool RemoveAll)
+{
+	Remove.Broadcast(RemoveIndex , RemoveAll , false);
+}
 
 void APVZ3DPlayerHUD::DrawCrossHair()
 {
