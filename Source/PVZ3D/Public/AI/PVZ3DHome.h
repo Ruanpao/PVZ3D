@@ -19,6 +19,7 @@ class UCameraComponent;
 class UTextRenderComponent;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FHomeDeathDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHomeHealthChanged, float, NewHealth);
 
 UCLASS()
 class PVZ3D_API APVZ3DHome : public APVZ3DBaseEntity,public IGenericTeamAgentInterface
@@ -77,6 +78,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Home")
 	float GetHomeCurrentHealth();
+	
 	// UFUNCTION(BlueprintCallable,Category="AI")
 	// void UpdateTowerImformation();
 
@@ -85,6 +87,10 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FHomeDeathDelegate HomeDeathDelegate;
+
+	UPROPERTY(BlueprintAssignable, Category = "Home")
+	FOnHomeHealthChanged OnHomeHealthChanged;
+
 
 	UPROPERTY(VisibleAnywhere,BlueprintReadWrite, Category = "Events")
 	AGameModeBase* Gamemode;

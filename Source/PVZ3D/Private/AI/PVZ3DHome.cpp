@@ -6,6 +6,7 @@
 #include "Components/TextRenderComponent.h"		//测试血量
 #include "PVZ3DHealthComponent.h"
 #include "Gamemode/PVZ3DGamemode.h"
+#include "Gamemode/PVZ3DGameState.h"
 #include "Kismet/GameplayStatics.h"
 
 
@@ -19,11 +20,26 @@ void APVZ3DHome::BeginPlay()
 
 	HealthComponent->OnDeath.AddUObject(this, &APVZ3DHome::OnHomeDeath);
 	HealthComponent->OnHealthChanged.AddUObject(this, &APVZ3DHome::OnHealthChanged);
+	HealthTextComponent->SetText(FText::FromString(FString::Printf(TEXT("%.0f"), GetHomeCurrentHealth())));
+
+	APVZ3DGameState* GameState = Cast<APVZ3DGameState>(UGameplayStatics::GetGameState(GetWorld()));
+	if (GameState)
+	{
+		GameState->UpdateHomeHealth(GetHomeCurrentHealth());
+		UE_LOG(LogTemp, Warning, TEXT("AND Gamestate tried APVZ3DHome::BeginPlay - Home Health: %.0f"), GetHomeCurrentHealth());
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("APVZ3DHome::BeginPlay - GameState is null!"));
+	}
+
 }
 
 void APVZ3DHome::OnHealthChanged(float CurrentHealth, float MaxHealth, float HealthPercent)
 {
 	HealthTextComponent->SetText(FText::FromString(FString::Printf(TEXT("%.0f"), CurrentHealth)));
+
+	OnHomeHealthChanged.Broadcast(CurrentHealth);
 }
 
 float APVZ3DHome::GetHomeCurrentHealth()
@@ -94,7 +110,19 @@ ETeamAttitude::Type APVZ3DHome::GetTeamAttitudeTowards(const AActor& Other) cons
 void APVZ3DHome::OnHomeDeath()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Home has been destroyed!"));
-	
+    
+	// 更新GameState中的血量
+	APVZ3DGameState* GameState = Cast<APVZ3DGameState>(UGameplayStatics::GetGameState(GetWorld()));
+	if (GameState)
+	{
+		GameState->UpdateHomeHealth(0.f);
+        
+		// 触发关卡失败
+		if (GameState->IsLevelInProgress())
+		{
+			GameState->ServerFailLevel();
+		}
+	}
+    
 	HomeDeathDelegate.Broadcast(); // 触发事件
-
 }
