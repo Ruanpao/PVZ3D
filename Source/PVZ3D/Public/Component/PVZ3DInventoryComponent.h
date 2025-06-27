@@ -35,7 +35,7 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	int32 Gold = 10;
+	int32 Gold = 100;
 
 	int32 GetCurrentGold();
 	
@@ -49,6 +49,9 @@ public:
 	int32 SlotSize = 10;
 
 	FOnInventoryUpdate OnInventoryUpdate;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="HoldedItem")
+	FItemInInventory HoldedItem;
 	
 	bool AddToInventory(const FName Item_ID, int32 Quantity);
 
@@ -63,4 +66,6 @@ public:
 	void UpdateSlot();
 
 	void Buy(FName ID , int32 Quantity , int32 Price);
+
+	void UpdateHoldedSlot(int32 Index);
 };

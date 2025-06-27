@@ -12,6 +12,8 @@ DECLARE_MULTICAST_DELEGATE_TwoParams(FSendInfo, FName , int32)
 
 DECLARE_MULTICAST_DELEGATE_ThreeParams(FBuy , FName, int32 , int32)
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnHoledSlotChanged , int32)
+
 
 UCLASS()
 class PVZ3D_API APVZ3DPlayerHUD : public AHUD
@@ -28,6 +30,8 @@ public:
 	FBuy Buy;
 	
 	FSendInfo SendInfo;
+
+	FOnHoledSlotChanged OnHoledSlotChanged;
 
 protected:
 	
@@ -56,7 +60,7 @@ protected:
 	UUserWidget* InventoryMainWidget;
 	
 	UFUNCTION(BlueprintCallable)
-	void ReceivedInfo(FName P_ID, int32 P_Quantity);
+	void ReceivedInfo(FName P_ID, int32 P_Quantity, int32 P_SlotIndex);
 
 	UFUNCTION(BlueprintCallable)
 	void ReceivedInfo_2(FName P_ID, int32 P_Quantity , int32 P_Price);

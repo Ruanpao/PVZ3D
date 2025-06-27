@@ -2,6 +2,7 @@
 #include "Component/PVZ3DInventoryComponent.h"
 #include "UI/PVZ3DPlayerHUD.h"
 #include "Kismet/GameplayStatics.h"
+#include "WorldPartition/ContentBundle/ContentBundleLog.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogInventory, All, All);
 
@@ -19,9 +20,13 @@ void UPVZ3DInventoryComponent::BeginPlay()
 
 	UpdateSlot();
 
+	HoldedItem = Slot[0];
+
 	if(APVZ3DPlayerHUD* HUD = Cast<APVZ3DPlayerHUD>(UGameplayStatics::GetPlayerController(this,0)->GetHUD()))
 	{
 		HUD->Buy.AddUObject(this, &UPVZ3DInventoryComponent::Buy);
+
+		HUD->OnHoledSlotChanged.AddUObject(this, &UPVZ3DInventoryComponent::UpdateHoldedSlot);
 	}
 }
 
@@ -162,4 +167,11 @@ void UPVZ3DInventoryComponent::Buy(FName ID , int32 Quantity , int32 Price)
 int32 UPVZ3DInventoryComponent::GetCurrentGold()
 {
 	return Gold;
+}
+
+void UPVZ3DInventoryComponent::UpdateHoldedSlot(int Index)
+{
+	HoldedItem = Slot[Index];
+	UE_LOG(LogInventory , Display , TEXT("Now I Hold %d --- %s"), HoldedItem.Quantity, *HoldedItem.ID.ToString());
+	
 }

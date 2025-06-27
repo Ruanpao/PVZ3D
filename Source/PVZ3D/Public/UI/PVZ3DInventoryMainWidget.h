@@ -8,7 +8,7 @@
 #include "PVZ3DInventoryCellWidget.h"
 #include "PVZ3DInventoryMainWidget.generated.h"
 
-DECLARE_MULTICAST_DELEGATE_TwoParams(FReceived , FName , int32)
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FReceived , FName , int32 , int32)
 
 UCLASS()
 class PVZ3D_API UPVZ3DInventoryMainWidget : public UUserWidget
@@ -25,9 +25,9 @@ public:
 	UWrapBox* Grid;
 	
 	UFUNCTION(BlueprintCallable)
-	void ReceivedInfo(FName P_ID, int32 P_Quantity);
+	void ReceivedInfo(FName P_ID, int32 P_Quantity , int32 P_SlotIndex);
 
-	UFUNCTION(Blueprintcallable)
+	UFUNCTION(BlueprintCallable)
 	void BrushWhite();
 
 protected:
