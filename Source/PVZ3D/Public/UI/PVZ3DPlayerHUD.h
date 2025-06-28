@@ -14,7 +14,7 @@ DECLARE_MULTICAST_DELEGATE_ThreeParams(FBuy , FName, int32 , int32)
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnHoledSlotChanged , int32)
 
-DECLARE_MULTICAST_DELEGATE_ThreeParams(FRemove , int32 , bool , bool)
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FRemoveItem , int32 , bool , bool)
 
 
 UCLASS()
@@ -41,7 +41,7 @@ public:
 
 	FOnHoledSlotChanged OnHoledSlotChanged;
 
-	FRemove Remove;
+	FRemoveItem RemoveItem;
 
 protected:
 	
@@ -62,6 +62,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite , Category = "UI")
 	TSubclassOf<UUserWidget> DisposalPopWidgetClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category =  "UI")
+	TSubclassOf<UUserWidget> HoldedItemWidgetClass;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite , Category = "UIInstance")
 	UUserWidget* InventoryInformationWidget;

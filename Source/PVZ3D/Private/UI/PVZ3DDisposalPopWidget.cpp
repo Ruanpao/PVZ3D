@@ -36,21 +36,21 @@ void UPVZ3DDisposalPopWidget::NativeOnInitialized()
 
 void UPVZ3DDisposalPopWidget::OnButton_0Clicked()
 {
-	Remove.Broadcast(false);
+	Remove_2.Broadcast(false);
 
 	this->RemoveFromParent();
 }
 
 void UPVZ3DDisposalPopWidget::OnButton_1Clicked()
 {
-	Remove.Broadcast(true);
+	Remove_2.Broadcast(true);
 
 	this->RemoveFromParent();
 }
 
-void UPVZ3DDisposalPopWidget::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
+void UPVZ3DDisposalPopWidget::OnMouseLeave_1()
 {
-	Super::NativeOnMouseLeave(InMouseEvent);
-	
 	this->RemoveFromParent();
 }
+
+

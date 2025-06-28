@@ -11,6 +11,8 @@ DECLARE_MULTICAST_DELEGATE(FOnInventoryUpdate)
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnGoldChanged , int32)
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FHoldedChanged , FItemInInventory)
+
 USTRUCT()
 struct FFindSlot
 {
@@ -49,6 +51,8 @@ public:
 	int32 SlotSize = 10;
 
 	FOnInventoryUpdate OnInventoryUpdate;
+
+	FHoldedChanged HoldedChanged;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="HoldedItem")
 	FItemInInventory HoldedItem;

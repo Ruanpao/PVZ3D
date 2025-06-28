@@ -9,7 +9,7 @@
 #include "Blueprint/UserWidget.h"
 #include "PVZ3DDisposalPopWidget.generated.h"
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FRemove , bool)
+DECLARE_MULTICAST_DELEGATE_OneParam(FRemove_2 , bool)
 
 UCLASS()
 class PVZ3D_API UPVZ3DDisposalPopWidget : public UUserWidget
@@ -17,7 +17,7 @@ class PVZ3D_API UPVZ3DDisposalPopWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	FRemove Remove;
+	FRemove_2 Remove_2;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite , Category = "UI" ,  meta = (BindWidget))
 	UButton* Button_0;
@@ -38,7 +38,7 @@ public:
 	void OnButton_1Clicked();
 
 	UFUNCTION(BlueprintCallable)
-	virtual void NativeOnMouseLeave(const FPointerEvent& InMouseEvent) override;
+	void OnMouseLeave_1();
 	
 protected:
 	virtual void NativeOnInitialized() override;

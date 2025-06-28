@@ -62,7 +62,10 @@ void UPVZ3DInventoryCellWidget::OnButtonPressed()
 
 void UPVZ3DInventoryCellWidget::OnMouseButtonDown_Right()
 {
-	Remove.Broadcast(SlotIndex);
+	if(ID != "0000")
+	{
+		Remove.Broadcast(SlotIndex);
+	}
 }
 
 

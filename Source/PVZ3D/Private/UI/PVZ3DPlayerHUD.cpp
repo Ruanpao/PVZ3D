@@ -25,6 +25,8 @@ void APVZ3DPlayerHUD::BeginPlay()
 	
 	auto LevelWidget = CreateWidget<UUserWidget>(GetWorld(), LevelWidgetClass);
 
+	auto HoldedItemWidget = CreateWidget<UUserWidget>(GetWorld(), HoldedItemWidgetClass);
+
 	ShopWidget = CreateWidget<UUserWidget>(GetWorld(), ShopWidgetClass);
 
 	InventoryInformationWidget = CreateWidget<UUserWidget>(GetWorld(), InventoryInformationWidgetClass);
@@ -39,6 +41,11 @@ void APVZ3DPlayerHUD::BeginPlay()
 	if(LevelWidget)
 	{
 		LevelWidget->AddToViewport();
+	}
+
+	if(HoldedItemWidget)
+	{
+		HoldedItemWidget->AddToViewport();
 	}
 
 	if(InventoryInformationWidget)
@@ -121,7 +128,7 @@ void APVZ3DPlayerHUD::ShopVisibility()
 void APVZ3DPlayerHUD::RemoveRequest(int32 Index)
 {
 	RemoveIndex =  Index;
-	
+
 	DisposalPopWidget = CreateWidget<UUserWidget>(GetWorld(), DisposalPopWidgetClass);
 
 	if(DisposalPopWidget)
@@ -130,7 +137,7 @@ void APVZ3DPlayerHUD::RemoveRequest(int32 Index)
 
 		if(UPVZ3DDisposalPopWidget* DisposalPopWidgetInstance = Cast<UPVZ3DDisposalPopWidget>(DisposalPopWidget))
 		{
-			DisposalPopWidgetInstance->Remove.AddUObject(this, &APVZ3DPlayerHUD::RemoveRequest_2);
+			DisposalPopWidgetInstance->Remove_2.AddUObject(this, &APVZ3DPlayerHUD::RemoveRequest_2);
 		}
 	}
 	
@@ -138,7 +145,9 @@ void APVZ3DPlayerHUD::RemoveRequest(int32 Index)
 
 void APVZ3DPlayerHUD::RemoveRequest_2(bool RemoveAll)
 {
-	Remove.Broadcast(RemoveIndex , RemoveAll , false);
+	RemoveItem.Broadcast(RemoveIndex , RemoveAll , false);
+
+	UE_LOG(LogHUD , Warning , TEXT("RemoveIndex : %d , RemoveAll : %s"), RemoveIndex, RemoveAll ? TEXT("true") : TEXT("false"));
 }
 
 void APVZ3DPlayerHUD::DrawCrossHair()

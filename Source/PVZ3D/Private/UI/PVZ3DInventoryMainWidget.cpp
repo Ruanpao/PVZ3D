@@ -32,7 +32,7 @@ void UPVZ3DInventoryMainWidget::NativePreConstruct()
 
 						InventoryCellWidget->BrushWhite.AddUObject(this, &UPVZ3DInventoryMainWidget::BrushWhite);
 
-						InventoryCellWidget->Remove.AddUObject(this, )
+						InventoryCellWidget->Remove.AddUObject(this, &UPVZ3DInventoryMainWidget::ReceivedRemoveInfo);
 
 						Grid->AddChildToWrapBox(InventoryCellWidget);
 
@@ -72,6 +72,8 @@ void UPVZ3DInventoryMainWidget::BrushWhite()
 void UPVZ3DInventoryMainWidget::ReceivedRemoveInfo(int32 P_SlotIndex)
 {
 	ReceivedRemove.Broadcast(P_SlotIndex);
+
+	UE_LOG(LogMainWidget , Warning, TEXT("OnMouseButtonDown_Right SlotIndex: %d"), P_SlotIndex);
 }
 
 

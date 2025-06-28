@@ -28,7 +28,7 @@ void UPVZ3DInventoryComponent::BeginPlay()
 
 		HUD->OnHoledSlotChanged.AddUObject(this, &UPVZ3DInventoryComponent::UpdateHoldedSlot);
 
-		HUD->Remove.AddUObject(this, &UPVZ3DInventoryComponent::RemoveFromInventory);
+		HUD->RemoveItem.AddUObject(this, &UPVZ3DInventoryComponent::RemoveFromInventory);
 	}
 }
 
@@ -44,11 +44,14 @@ bool UPVZ3DInventoryComponent::AddToInventory(const FName Item_ID, int32 Quantit
 		
 		if(FindSlotResult.FindSlot)
 		{
-			UE_LOG(LogInventory , Error , TEXT("I have found a %s %d"),*Slot[FindSlotResult.SlotIndex].ID.ToString(), Slot[FindSlotResult.SlotIndex].Quantity);
-			
 			AddOne(FindSlotResult.SlotIndex, 1);
 
 			OnInventoryUpdate.Broadcast();
+
+			if(FindSlotResult.SlotIndex == HoldedItem.Index)
+			{
+				UpdateHoldedSlot(FindSlotResult.SlotIndex);
+			}
 
 			LocalQuantityRemaining -= 1;
 		}
@@ -59,6 +62,11 @@ bool UPVZ3DInventoryComponent::AddToInventory(const FName Item_ID, int32 Quantit
 			CreateNewSlot(Item_ID, EmptySlotIndex);
 
 			OnInventoryUpdate.Broadcast();
+
+			if(EmptySlotIndex == HoldedItem.Index)
+			{
+				UpdateHoldedSlot(EmptySlotIndex);
+			}
 
 			LocalQuantityRemaining -= 1;
 		}
@@ -125,15 +133,18 @@ void UPVZ3DInventoryComponent::CreateNewSlot(FName Item_ID, int32 Index)
 
 void UPVZ3DInventoryComponent::UpdateSlot()
 {
+	int32 SlotIndex = 0;
+	
 	while(Slot.Num() < SlotSize)
 	{
 		FItemInInventory NewSlot;
 		NewSlot.ID = "0000";
 		NewSlot.Quantity = 0;
+		NewSlot.Index = SlotIndex;
 		
 		Slot.Add(NewSlot);
-		UE_LOG(LogInventory,Warning, TEXT("%s"), *NewSlot.ID.ToString());
-		UE_LOG(LogInventory,Warning, TEXT("%d"), NewSlot.Quantity);
+
+		SlotIndex += 1;
 	}
 	OnInventoryUpdate.Broadcast();
 }
@@ -146,10 +157,26 @@ void UPVZ3DInventoryComponent::RemoveFromInventory(int32 Index, bool RemoveAll, 
 		{
 			DestroyAOldSlot(Index);
 			UE_LOG(LogInventory, Error ,TEXT("I am Consumed"));
+
+			OnInventoryUpdate.Broadcast();
+
+			if(Index == HoldedItem.Index)
+			{
+				UpdateHoldedSlot(Index);
+			}
 		}
 		else
 		{
 			DestroyAOldSlot(Index);
+
+			OnInventoryUpdate.Broadcast();
+
+			if(Index == HoldedItem.Index)
+			{
+				UpdateHoldedSlot(Index);
+
+				UE_LOG(LogInventory , Warning , TEXT(" %d %d --- %s %d"),Index, HoldedItem.Index , *HoldedItem.ID.ToString(), HoldedItem.Quantity);
+			}
 		}
 	}
 	else
@@ -158,10 +185,26 @@ void UPVZ3DInventoryComponent::RemoveFromInventory(int32 Index, bool RemoveAll, 
 		{
 			RemoveOne(Index , 1);
 			UE_LOG(LogInventory, Error ,TEXT("I am Consumed"));
+
+			OnInventoryUpdate.Broadcast();
+
+			if(Index == HoldedItem.Index)
+			{
+				UpdateHoldedSlot(Index);
+			}
 		}
 		else
 		{
 			RemoveOne(Index, 1);
+
+			OnInventoryUpdate.Broadcast();
+			
+			if(Index == HoldedItem.Index)
+			{
+				UpdateHoldedSlot(Index);
+
+				UE_LOG(LogInventory , Warning , TEXT(" %d %d --- %s %d"),Index, HoldedItem.Index , *HoldedItem.ID.ToString(), HoldedItem.Quantity);
+			}
 		}
 	}
 }
@@ -210,6 +253,10 @@ int32 UPVZ3DInventoryComponent::GetCurrentGold()
 void UPVZ3DInventoryComponent::UpdateHoldedSlot(int Index)
 {
 	HoldedItem = Slot[Index];
-	UE_LOG(LogInventory , Display , TEXT("Now I Hold %d --- %s"), HoldedItem.Quantity, *HoldedItem.ID.ToString());
 	
+	HoldedChanged.Broadcast(HoldedItem);
+
+	UE_LOG(LogInventory , Warning , TEXT("HoldedItem Changed, ID : %s , Quantity : %d"), *HoldedItem.ID.ToString(), HoldedItem.Quantity);
 }
+
+

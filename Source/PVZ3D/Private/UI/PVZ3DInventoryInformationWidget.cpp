@@ -47,7 +47,7 @@ void UPVZ3DInventoryInformationWidget::ShowInfo(FName P_ID, int32 P_Quantity)
 				MaxStackNum = FoundItemInfo->MaxStackNum;
 				Description = FoundItemInfo->Description;
 				Information = FoundItemInfo->Information;
-				ItemType = FoundItemInfo->ItemType;
+				ItemType = FText::FromName(FoundItemInfo->ItemType);
 			}
 
 			if(DetailBox && DescriptionBox && InformationBox)
