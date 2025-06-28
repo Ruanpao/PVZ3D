@@ -15,6 +15,7 @@
 #include "Actor/PVZ3DPlayerSpawnPoint.h"
 #include "Gamemode/PVZ3DGamemode.h"
 #include "Kismet/GameplayStatics.h"
+#include "Actor/PVZ3DPlayerSpawnPoint.h"
 
 DEFINE_LOG_CATEGORY_STATIC(PVZ3DPlayerLog, All, All);
 
@@ -57,19 +58,37 @@ void APVZ3DPlayer::BeginPlay()
 	Super::BeginPlay();
 
 	check(HealthComponent);
-	HealthComponent->OnDeath.AddUObject(this, &APVZ3DPlayer::OnDeath);
+	//HealthComponent->OnDeath.AddUObject(this, &APVZ3DPlayer::OnDeath);
+
+	HealthComponent->OnDeath.AddUObject(this, &APVZ3DPlayer::OnDeathInitiated); 
+	
 	//InputComponent->BindAction(TEXT("Fire"), IE_Pressed, WeaponComponent, &USTUWeaponComponent::Fire);
 
-	APVZ3DGamemode* GameMode = Cast<APVZ3DGamemode>(GetWorld()->GetAuthGameMode());
-	if (GameMode)
+	// APVZ3DGamemode* GameMode = Cast<APVZ3DGamemode>(GetWorld()->GetAuthGameMode());
+	// if (GameMode)
+	// {
+	// 	OnPlayerDied.AddDynamic(GameMode, &APVZ3DGamemode::OnPlayerDied);
+	// 	UE_LOG(PVZ3DPlayerLog, Warning, TEXT("Player: 已绑定死亡委托到GameMode"));
+	// }
+	// else
+	// {
+	// 	UE_LOG(PVZ3DPlayerLog, Error, TEXT("Player: 找不到GameMode，无法绑定委托"));
+	// }
+	TArray<AActor*> SpawnPoints;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APVZ3DPlayerSpawnPoint::StaticClass(), SpawnPoints);
+    
+	if (SpawnPoints.Num() > 0)
 	{
-		OnPlayerDied.AddDynamic(GameMode, &APVZ3DGamemode::OnPlayerDied);
-		UE_LOG(PVZ3DPlayerLog, Warning, TEXT("Player: 已绑定死亡委托到GameMode"));
+		APVZ3DPlayerSpawnPoint* TheSpawnPoint = Cast<APVZ3DPlayerSpawnPoint>(SpawnPoints[0]);
+		if (TheSpawnPoint)
+		{
+			SpawnPointLocation = TheSpawnPoint->GetActorLocation();            
+			UE_LOG(LogTemp, Warning, TEXT("APVZ3DGameState::BeginPlay - Home found and events bound!"));
+		}
 	}
-	else
-	{
-		UE_LOG(PVZ3DPlayerLog, Error, TEXT("Player: 找不到GameMode，无法绑定委托"));
-	}}
+
+	
+}
 
 void APVZ3DPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -352,4 +371,120 @@ void APVZ3DPlayer::OnDeath()
     
 	GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 	SetLifeSpan(5.0f);
+}
+
+void APVZ3DPlayer::OnDeathInitiated()
+{
+    if (CurrentState != EPlayerState::Alive) return;
+    UE_LOG(PVZ3DPlayerLog, Warning, TEXT("Player: 开始死亡流程"));
+
+    CurrentState = EPlayerState::Dying;
+    DeathLocation = GetActorLocation();
+    DeathRotation = GetActorRotation();
+    SavedHealth = HealthComponent ? HealthComponent->GetCurrentHealth() : 100.0f;
+    
+    // if (InventoryComponent) // 缓存物品（假设InventoryComponent支持）
+    // {
+    //     SavedInventory = InventoryComponent->GetCurrentInventory(); 
+    // }
+
+    if (DeathAnimMontage)
+    {
+        PlayAnimMontage(DeathAnimMontage);
+    }
+
+    GetCharacterMovement()->DisableMovement();
+    GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+    if (WeaponComponent)
+    {
+        WeaponComponent->StopFire(); // 停止攻击
+    }
+
+    EnterSpectatorMode();
+
+    StartRespawnTimer();
+}
+
+void APVZ3DPlayer::EnterSpectatorMode()
+{
+    APlayerController* PC = Cast<APlayerController>(GetController());
+    if (!PC) return;
+
+    LastCameraRotation = SpringArmComponent->GetComponentRotation();
+
+    SpringArmComponent->TargetArmLength = 3000.0f;
+    SpringArmComponent->SetRelativeRotation(FRotator(-85, 0, 0));
+
+    PC->SetInputMode(FInputModeGameAndUI());
+    PC->bShowMouseCursor = true;
+    PC->bEnableClickEvents = true;
+
+    CurrentState = EPlayerState::Spectating;
+    UE_LOG(PVZ3DPlayerLog, Warning, TEXT("Player: 进入旁观者模式"));
+}
+
+void APVZ3DPlayer::StartRespawnTimer()
+{
+    GetWorldTimerManager().SetTimer(
+        RespawnTimerHandle,
+        this,
+        &APVZ3DPlayer::RespawnCharacter,
+        RespawnDelay,
+        false
+    );
+    UE_LOG(PVZ3DPlayerLog, Warning, TEXT("Player: 复活计时器启动（%fs后复活）"), RespawnDelay);
+}
+
+
+void APVZ3DPlayer::RespawnCharacter()
+{
+    if (CurrentState != EPlayerState::Spectating) return;
+    UE_LOG(PVZ3DPlayerLog, Warning, TEXT("Player: 开始复活流程"));
+
+    ExitSpectatorMode();
+
+    CurrentState = EPlayerState::Respawning;
+    SetActorLocationAndRotation(SpawnPointLocation, DeathRotation); // 恢复位置
+
+    if (HealthComponent) HealthComponent->SetCurrentHealth(HealthComponent->GetMaxHealth());
+
+    //  启用控制与碰撞
+    GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+    GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
+
+    //  播放复活动画
+    // if (RespawnAnimMontage)
+    // {
+    //     PlayAnimMontage(RespawnAnimMontage);
+    // }
+
+    GetWorldTimerManager().SetTimer(
+        RespawnTimerHandle,
+        [this]()
+        {
+            CurrentState = EPlayerState::Alive;
+            UE_LOG(PVZ3DPlayerLog, Warning, TEXT("Player: 复活完成"));
+        },
+        1.5f, // 复活动画持续时间（根据实际调整）
+        false
+    );
+	// PlayAnimMontage(AttackAnimMontage, 1.0f,NAME_None); 
+	// StopAnimMontage(AttackAnimMontage);
+		StopAnimMontage(DeathAnimMontage);
+	
+}
+
+void APVZ3DPlayer::ExitSpectatorMode()
+{
+    APlayerController* PC = Cast<APlayerController>(GetController());
+    if (!PC) return;
+
+    SpringArmComponent->SetRelativeRotation(LastCameraRotation);
+    SpringArmComponent->TargetArmLength = 0.0f; // 恢复第一人称视角
+
+    PC->SetInputMode(FInputModeGameOnly());
+    PC->bShowMouseCursor = false;
+    PC->bEnableClickEvents = false;
+
+    UE_LOG(PVZ3DPlayerLog, Warning, TEXT("Player: 退出旁观者模式"));
 }

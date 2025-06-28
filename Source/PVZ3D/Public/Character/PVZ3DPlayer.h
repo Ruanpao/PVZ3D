@@ -18,6 +18,15 @@ class APVZ3DWeapon;
 class UPVZ3DWeaponComponent;
 class APVZ3DPlayerSpawnPoint;
 
+UENUM(BlueprintType)
+enum class EPlayerState : uint8
+{
+	Alive,         // 存活
+	Dying,         // 死亡动画播放中
+	Spectating,    // 旁观者模式
+	Respawning     // 复活中
+};
+
 /**
  * 
  */
@@ -128,4 +137,30 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnPlayerDied OnPlayerDied;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Respawn")
+	EPlayerState CurrentState = EPlayerState::Alive;
+
+	UPROPERTY(Transient) float SavedHealth; // 缓存血量
+	//UPROPERTY(Transient) TArray<FInventoryItemData> SavedInventory; // 缓存物品
+	UPROPERTY(Transient) FVector DeathLocation; // 缓存死亡位置
+	UPROPERTY(Transient) FRotator DeathRotation; // 缓存死亡旋转
+	UPROPERTY(Transient) FVector SpawnPointLocation; // 缓存复活点位置
+
+	UPROPERTY(EditDefaultsOnly, Category = "Respawn")
+	float RespawnDelay = 5.0f; // 复活延迟
+	
+	//UPROPERTY(EditDefaultsOnly, Category = "Animation")
+	//UAnimMontage* RespawnAnimMontage; // 复活动画
+
+	// 新增：复活相关函数
+	UFUNCTION() void OnDeathInitiated(); // 触发死亡（替代原OnDeath逻辑）
+	UFUNCTION() void EnterSpectatorMode(); // 切换到旁观者
+	UFUNCTION() void ExitSpectatorMode(); // 退出旁观者
+	UFUNCTION() void StartRespawnTimer(); // 启动复活计时器
+	UFUNCTION() void RespawnCharacter(); // 执行复活
+
+	FTimerHandle RespawnTimerHandle; // 复活计时器
+	
+
 };

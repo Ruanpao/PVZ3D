@@ -24,6 +24,12 @@ public:
 
 	void SetMaxHealth(float NewMaxHealth) {MaxHealth=NewMaxHealth;}
 
+	void SetCurrentHealth(float NewCurrentHealth) 
+	{
+		CurrentHealth = FMath::Clamp(NewCurrentHealth, 0.0f, MaxHealth);
+		OnHealthChanged.Broadcast(CurrentHealth, MaxHealth, GetHealthPercent());
+	}
+
 	float GetHealthPercent() const {return CurrentHealth / MaxHealth;}
 	
 	UFUNCTION(BlueprintCallable)
