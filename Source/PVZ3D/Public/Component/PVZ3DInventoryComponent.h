@@ -11,6 +11,8 @@ DECLARE_MULTICAST_DELEGATE(FOnInventoryUpdate)
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnGoldChanged , int32)
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FHoldedChanged , FItemInInventory)
+
 USTRUCT()
 struct FFindSlot
 {
@@ -35,7 +37,7 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	int32 Gold = 10;
+	int32 Gold = 100;
 
 	int32 GetCurrentGold();
 	
@@ -49,6 +51,11 @@ public:
 	int32 SlotSize = 10;
 
 	FOnInventoryUpdate OnInventoryUpdate;
+
+	FHoldedChanged HoldedChanged;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="HoldedItem")
+	FItemInInventory HoldedItem;
 	
 	bool AddToInventory(const FName Item_ID, int32 Quantity);
 
@@ -62,5 +69,13 @@ public:
 
 	void UpdateSlot();
 
+	void RemoveFromInventory(int32 Index , bool RemoveAll , bool IsConsumed);
+
+	void RemoveOne(int32 Index, int32 Quantity);
+
+	void DestroyAOldSlot(int32 Index);
+
 	void Buy(FName ID , int32 Quantity , int32 Price);
+
+	void UpdateHoldedSlot(int32 Index);
 };

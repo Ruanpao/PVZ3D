@@ -8,7 +8,9 @@
 #include "Components/Button.h"
 #include "PVZ3DInventoryCellWidget.generated.h"
 
-DECLARE_MULTICAST_DELEGATE_TwoParams(FReceived ,FName, int32)
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FReceived ,FName, int32 , int32)
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FRemove , int32)
 
 DECLARE_MULTICAST_DELEGATE(FBrushWhite)
 
@@ -21,6 +23,8 @@ public:
 	FReceived Received;
 	
 	FBrushWhite BrushWhite;
+
+	FRemove Remove;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="DataTable")
 	UDataTable* Datatable;
@@ -34,19 +38,25 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite , Category = "ItemInfo")
 	UTexture2D* Icon;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite , Category = "SlotIndex")
+	int32 SlotIndex = -1;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite , Category = "CellUI" , meta = (BindWidget))
 	UBorder* OuterBorder;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite , Category = "CellUI" ,  meta = (BindWidget))
 	UButton* Button_0;
 	
-	void UpdateInventoryCellWidget(FName P_ID , int32 P_Quantity);
+	void UpdateInventoryCellWidget(FName P_ID , int32 P_Quantity , int32 P_SlotIndex);
 
 	UFUNCTION(BlueprintCallable)
 	void OnButtonClicked();
 
 	UFUNCTION(BlueprintCallable)
 	void OnButtonPressed();
+
+	UFUNCTION(BlueprintCallable)
+	void OnMouseButtonDown_Right();
 
 protected:
 	virtual void NativeOnInitialized() override;

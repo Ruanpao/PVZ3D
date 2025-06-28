@@ -8,7 +8,9 @@
 #include "PVZ3DInventoryCellWidget.h"
 #include "PVZ3DInventoryMainWidget.generated.h"
 
-DECLARE_MULTICAST_DELEGATE_TwoParams(FReceived , FName , int32)
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FReceived , FName , int32 , int32)
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FReceivedRemove ,  int32)
 
 UCLASS()
 class PVZ3D_API UPVZ3DInventoryMainWidget : public UUserWidget
@@ -17,6 +19,8 @@ class PVZ3D_API UPVZ3DInventoryMainWidget : public UUserWidget
 	
 public:
 	FReceived Received;
+
+	FReceivedRemove ReceivedRemove;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite , Category = "CellUI")
 	TSubclassOf<UPVZ3DInventoryCellWidget> InventoryCellWidgetClass;
@@ -25,10 +29,13 @@ public:
 	UWrapBox* Grid;
 	
 	UFUNCTION(BlueprintCallable)
-	void ReceivedInfo(FName P_ID, int32 P_Quantity);
+	void ReceivedInfo(FName P_ID, int32 P_Quantity , int32 P_SlotIndex);
 
-	UFUNCTION(Blueprintcallable)
+	UFUNCTION(BlueprintCallable)
 	void BrushWhite();
+
+	UFUNCTION(BlueprintCallable)
+	void ReceivedRemoveInfo(int32 P_SlotIndex);
 
 protected:
 	virtual void NativePreConstruct() override;
