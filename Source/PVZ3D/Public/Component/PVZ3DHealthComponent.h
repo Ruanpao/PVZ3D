@@ -28,6 +28,9 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	bool IsDead() const {return CurrentHealth <= 0.0f;}
+
+	UFUNCTION(BlueprintCallable, Category = "Health")
+	void ResetHealth();
 	
 	FOnDeath OnDeath;
 	

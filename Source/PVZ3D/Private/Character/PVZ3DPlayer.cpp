@@ -1,5 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+#pragma once
 
 #include "Character/PVZ3DPlayer.h"
 #include "Camera/CameraComponent.h"
@@ -11,6 +12,9 @@
 #include "Component/PVZ3DHealthComponent.h"
 #include "Component/PVZ3DWeaponComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Actor/PVZ3DPlayerSpawnPoint.h"
+#include "Gamemode/PVZ3DGamemode.h"
+#include "Kismet/GameplayStatics.h"
 
 DEFINE_LOG_CATEGORY_STATIC(PVZ3DPlayerLog, All, All);
 
@@ -55,7 +59,17 @@ void APVZ3DPlayer::BeginPlay()
 	check(HealthComponent);
 	HealthComponent->OnDeath.AddUObject(this, &APVZ3DPlayer::OnDeath);
 	//InputComponent->BindAction(TEXT("Fire"), IE_Pressed, WeaponComponent, &USTUWeaponComponent::Fire);
-}
+
+	APVZ3DGamemode* GameMode = Cast<APVZ3DGamemode>(GetWorld()->GetAuthGameMode());
+	if (GameMode)
+	{
+		OnPlayerDied.AddDynamic(GameMode, &APVZ3DGamemode::OnPlayerDied);
+		UE_LOG(PVZ3DPlayerLog, Warning, TEXT("Player: 已绑定死亡委托到GameMode"));
+	}
+	else
+	{
+		UE_LOG(PVZ3DPlayerLog, Error, TEXT("Player: 找不到GameMode，无法绑定委托"));
+	}}
 
 void APVZ3DPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -315,21 +329,27 @@ void APVZ3DPlayer::PlayerMouseClick()
 void APVZ3DPlayer::OnDeath()
 {
 	PlayAnimMontage(DeathAnimMontage);
-
 	GetCharacterMovement()->DisableMovement();
 
-	SetLifeSpan(5.0f);
 	if (WeaponComponent)
 	{
 		WeaponComponent->DestroyWeapon(); 
 		WeaponComponent->DestroyComponent(); 
 		WeaponComponent = nullptr;
 	}
-	
-	if (Controller)
+
+	APlayerController* PlayerController = Cast<APlayerController>(Controller);
+	if (PlayerController && PlayerController->IsValidLowLevel())
 	{
 		Controller->ChangeState(NAME_Spectating);
-
+		OnPlayerDied.Broadcast(PlayerController); // 确保控制器有效时再广播
+		UE_LOG(PVZ3DPlayerLog, Warning, TEXT("Player has died and will respawn in 5 seconds."));
 	}
+	else
+	{
+		UE_LOG(PVZ3DPlayerLog, Error, TEXT("Player::OnDeath - Controller is null or invalid"));
+	}
+    
 	GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+	SetLifeSpan(5.0f);
 }

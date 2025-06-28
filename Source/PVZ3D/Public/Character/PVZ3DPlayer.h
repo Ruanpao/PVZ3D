@@ -16,15 +16,22 @@ class UPVZ3DHealthComponent;
 class UPVZ3DInventoryComponent;
 class APVZ3DWeapon;
 class UPVZ3DWeaponComponent;
+class APVZ3DPlayerSpawnPoint;
 
 /**
  * 
  */
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerDied, APlayerController*, PlayerController);
+
 UCLASS()
 class PVZ3D_API APVZ3DPlayer : public APVZ3DBaseEntity, public IGenericTeamAgentInterface
 {
 	GENERATED_BODY()
 
+
+private:
+	FTimerHandle TimerHandle_Respawn; // 复活计时器
+	
 protected:
 	virtual void BeginPlay() override;
 
@@ -60,6 +67,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Movement")
 	float RunningSpeed = 2000.0f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Movement")
+	APVZ3DPlayerSpawnPoint *SpawnPoint;
 	
 public:
 	APVZ3DPlayer();
@@ -115,4 +125,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Movement")
 	bool IsRunning() const { return bIsRunning; }
+
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+	FOnPlayerDied OnPlayerDied;
 };
