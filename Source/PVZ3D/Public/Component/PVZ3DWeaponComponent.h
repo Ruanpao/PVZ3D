@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "PVZ3D/CoreTypes/PVZ3DWeaponCoreTypes.h"
 #include "PVZ3DWeaponComponent.generated.h"
 
 class APVZ3DWeapon;
@@ -18,22 +19,30 @@ public:
 
 	void StartFire();
 	void StopFire();
-
-	void DestroyWeapon();
+	void SwitchWeapon();
+	void Reload();
 	
 protected:
 	virtual void BeginPlay() override;
 
-	UPROPERTY(EditDefaultsOnly,Category="Weapon")
-	TSubclassOf<APVZ3DWeapon> WeaponClass;
+private:
+	UPROPERTY(EditDefaultsOnly,Category="Weapons")
+	UDataTable*WeaponDataTable;
 
 	UPROPERTY(EditDefaultsOnly,Category="Weapon")
 	FName WeaponAttachPointName = "WeaponSocket";
-	
-public:	
+
 	UPROPERTY()
 	APVZ3DWeapon* CurrentWeapon =nullptr;
 
-	void SpawnWeapon();
-		
+	UPROPERTY()
+	TArray<APVZ3DWeapon*>WeaponInstances;
+	
+	int32 CurrentWeaponIndex=0;
+public:	
+	
+	void SpawnWeapon(const FWeapon&WeaponData);
+	void LoadWeapons();
+	void DestroyWeapon();
+	
 };
