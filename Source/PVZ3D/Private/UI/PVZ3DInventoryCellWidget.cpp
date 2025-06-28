@@ -20,10 +20,11 @@ void UPVZ3DInventoryCellWidget::NativeOnInitialized()
 	}
 }
 
-void UPVZ3DInventoryCellWidget::UpdateInventoryCellWidget(FName P_ID , int32 P_Quantity)
+void UPVZ3DInventoryCellWidget::UpdateInventoryCellWidget(FName P_ID , int32 P_Quantity , int32 P_SlotIndex)
 {
 	ID = P_ID;
 	Quantity = P_Quantity;
+	SlotIndex = P_SlotIndex;
 
 	if(!Datatable)
 	{
@@ -41,7 +42,7 @@ void UPVZ3DInventoryCellWidget::UpdateInventoryCellWidget(FName P_ID , int32 P_Q
 
 void UPVZ3DInventoryCellWidget::OnButtonClicked()
 {
-	Received.Broadcast(ID, Quantity);
+	Received.Broadcast(ID, Quantity , SlotIndex);
 
 	BrushWhite.Broadcast();
 	

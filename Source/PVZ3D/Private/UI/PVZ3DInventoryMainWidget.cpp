@@ -21,17 +21,20 @@ void UPVZ3DInventoryMainWidget::NativePreConstruct()
 			{
 				InventoryComponent->OnInventoryUpdate.AddUObject(this, &UPVZ3DInventoryMainWidget::UpdateMainWidget);
 
+				int32 Index = 0;
 				for(auto& Item : InventoryComponent->Slot)
 				{
 					if(UPVZ3DInventoryCellWidget* InventoryCellWidget = CreateWidget<UPVZ3DInventoryCellWidget>(GetWorld(), InventoryCellWidgetClass))
 					{
-						InventoryCellWidget->UpdateInventoryCellWidget(Item.ID, Item.Quantity);
+						InventoryCellWidget->UpdateInventoryCellWidget(Item.ID, Item.Quantity , Index);
 
 						InventoryCellWidget->Received.AddUObject(this, &UPVZ3DInventoryMainWidget::ReceivedInfo);
 
 						InventoryCellWidget->BrushWhite.AddUObject(this, &UPVZ3DInventoryMainWidget::BrushWhite);
 
 						Grid->AddChildToWrapBox(InventoryCellWidget);
+
+						Index += 1;
 					}
 				}
 			}
@@ -45,9 +48,9 @@ void UPVZ3DInventoryMainWidget::UpdateMainWidget()
 	NativePreConstruct();
 }
 
-void UPVZ3DInventoryMainWidget::ReceivedInfo(FName P_ID, int32 P_Quantity)
+void UPVZ3DInventoryMainWidget::ReceivedInfo(FName P_ID, int32 P_Quantity , int32 P_SlotIndex)
 {
-	Received.Broadcast(P_ID, P_Quantity);
+	Received.Broadcast(P_ID, P_Quantity , P_SlotIndex);
 }
 
 void UPVZ3DInventoryMainWidget::BrushWhite()
@@ -63,6 +66,7 @@ void UPVZ3DInventoryMainWidget::BrushWhite()
 		}
 	}
 }
+
 
 
 
