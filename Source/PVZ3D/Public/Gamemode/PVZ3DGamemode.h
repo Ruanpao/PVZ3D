@@ -18,23 +18,7 @@ public:
     
 	virtual void BeginPlay() override;
 	virtual void PostLogin(APlayerController* NewPlayer) override;
-    
-	// 开始关卡
-	UFUNCTION(BlueprintCallable)
-	void StartLevel();
-    
-	// 暂停关卡
-	UFUNCTION(BlueprintCallable)
-	void PauseLevel();
-    
-	// 继续关卡
-	UFUNCTION(BlueprintCallable)
-	void ResumeLevel();
-    
-	// 完成关卡
-	UFUNCTION(BlueprintCallable)
-	void CompleteLevel();
-
+	
 	UFUNCTION()
 	void OnPlayerDied(APlayerController* PlayerController);
     

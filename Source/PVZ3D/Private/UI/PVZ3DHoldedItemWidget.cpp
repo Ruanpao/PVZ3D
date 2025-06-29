@@ -53,12 +53,17 @@ void UPVZ3DHoldedItemWidget::UpdateHoldedItemWidget(FItemInInventory HoldedItem)
 				BulletNumBox->SetVisibility(ESlateVisibility::Hidden);
 				ItemQuantityBox->SetVisibility(ESlateVisibility::Hidden);
 			}
-			else if(FoundWeaponInfo->ItemType == "Plant")
+			else if(FoundWeaponInfo->ItemType == "Plant_Attack")
 			{
 				BulletNumBox->SetVisibility(ESlateVisibility::Visible);
 				ItemQuantityBox->SetVisibility(ESlateVisibility::Hidden);
 				
 				MaxBulletNum = FoundWeaponInfo->Clips;
+			}
+			else if(FoundWeaponInfo->ItemType == "Plant_Defense")
+			{
+				BulletNumBox->SetVisibility(ESlateVisibility::Hidden);
+				ItemQuantityBox->SetVisibility(ESlateVisibility::Hidden);
 			}
 			else if(FoundWeaponInfo->ItemType == "Item_Buff" || FoundWeaponInfo->ItemType == "Item_Damage")
 			{

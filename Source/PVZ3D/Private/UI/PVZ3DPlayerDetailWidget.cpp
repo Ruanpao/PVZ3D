@@ -2,6 +2,7 @@
 #include "UI/PVZ3DPlayerDetailWidget.h"
 #include "Component/PVZ3DInventoryComponent.h"
 #include "Component/PVZ3DHealthComponent.h"
+#include "Gamemode/PVZ3DGameState.h"
 #include "Kismet/GameplayStatics.h"
 
 void UPVZ3DPlayerDetailWidget::NativePreConstruct()
@@ -23,7 +24,15 @@ void UPVZ3DPlayerDetailWidget::NativePreConstruct()
 				InventoryComponent->OnGoldChanged.AddUObject(this, &UPVZ3DPlayerDetailWidget::UpdateGoldUI);
 			}
 		}
+		
+		if(APVZ3DGameState* GameState = Cast<APVZ3DGameState>(GetWorld()->GetGameState()))
+		{
+			GameState->OnBaseHealthChanged.AddUObject(this, &UPVZ3DPlayerDetailWidget::UpdateBaseHealthUI);
+
+			GameState->HomeMaxHealth = WMaxBaseHealth;
+		}
 	}
+	
 }
 
 void UPVZ3DPlayerDetailWidget::UpdateHealthUI(float CurrentHealth, float MaxHealth, float HealthPercent)
@@ -38,5 +47,10 @@ void UPVZ3DPlayerDetailWidget::UpdateHealthUI(float CurrentHealth, float MaxHeal
 void UPVZ3DPlayerDetailWidget::UpdateGoldUI(int32 Gold)
 {
 	WGold = Gold;
+}
+
+void UPVZ3DPlayerDetailWidget::UpdateBaseHealthUI(float BaseHealth)
+{
+	WBaseHealth = BaseHealth;
 }
 

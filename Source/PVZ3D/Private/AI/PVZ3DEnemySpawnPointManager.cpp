@@ -165,6 +165,8 @@ void APVZ3DEnemySpawnPointManager::StartWave(int WaveID)
         CurrentWaveTimeLimit = 10.0f;
     }
 
+    CurrentWaveTimeLimitChanged.Broadcast(CurrentWaveTimeLimit);
+
     GetWorldTimerManager().SetTimer(
     TimerHandle_WaveTimeout, 
     this, 
