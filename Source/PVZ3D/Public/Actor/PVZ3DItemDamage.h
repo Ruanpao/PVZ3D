@@ -99,4 +99,7 @@ private:
     bool bActive = false;
     TArray<FVector> PathPoints;
     FTimerHandle LifeSpanTimer;
+
+    AActor* WeaponOwner = nullptr;
+    AController* WeaponInstigator = nullptr;
 };

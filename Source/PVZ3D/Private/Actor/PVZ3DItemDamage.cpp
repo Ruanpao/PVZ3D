@@ -293,7 +293,7 @@ void APVZ3DItemDamage::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, U
         UDamageType::StaticClass(),
         IgnoredActors,
         this,
-        GetOwner()
+        GetInstigatorController()
     );
 
     // 播放爆炸特效
