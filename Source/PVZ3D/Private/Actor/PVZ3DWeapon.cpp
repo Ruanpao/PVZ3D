@@ -11,6 +11,7 @@
 #include"Engine/DamageEvents.h"
 #include"Camera/CameraComponent.h"
 #include "Clustering/FaceNormalClustering.h"
+#include "UniversalObjectLocators/AnimInstanceLocatorFragment.h"
 
 
 DEFINE_LOG_CATEGORY_STATIC(LogWeapon, All, All)
@@ -30,6 +31,8 @@ void APVZ3DWeapon::BeginPlay()
 	check(WeaponMesh);
 
 	CurrentAmmo = DefaultAmmo;
+	
+	bIsReloading =false;
 }
 
 void APVZ3DWeapon::StartFire()
@@ -121,6 +124,13 @@ void APVZ3DWeapon::MakeHit(FHitResult& HitResult, const FVector& TraceStart, FVe
 	FCollisionQueryParams CollisionParams;
 	CollisionParams.AddIgnoredActor(GetOwner());
 
+	TArray<AActor*> Towers;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APVZ3DTower::StaticClass(), Towers);
+	for (AActor* Tower : Towers)
+	{
+		CollisionParams.AddIgnoredActor(Tower);
+	}
+	
 	GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECollisionChannel::ECC_Visibility, CollisionParams);
 
 }
@@ -138,9 +148,9 @@ void APVZ3DWeapon::DecreaseAmmo()
 	CurrentAmmo.Bullets--;
 	LogAmmo();
 
-	if(!IsAmmoEmpty()&&IsClipEmpty())
+	if(IsClipEmpty()&&!IsAmmoEmpty())
 	{
-		ChangeClip();
+		StartReload();
 	}
 }
 
@@ -170,4 +180,37 @@ void APVZ3DWeapon::LogAmmo()
 	FString AmmoInfo = "Ammo: " + FString::FromInt(CurrentAmmo.Bullets) + " / ";
 	AmmoInfo +=CurrentAmmo.Infinite ? "Infinite" : FString::FromInt(CurrentAmmo.Clips);
 	UE_LOG(LogTemp, Display, TEXT("%s"), *AmmoInfo);
+}
+
+void APVZ3DWeapon::StartReload()
+{
+	if(!CanReload()) return;
+
+	bIsReloading = true;
+	StopFire();
+
+	if(ReloadAnimMontage)
+	{
+		if(const auto Character = Cast<ACharacter>(GetOwner()))
+		{
+			if(UAnimInstance*AnimInstance=Character->GetMesh()->GetAnimInstance())
+			{
+				AnimInstance->Montage_Play(ReloadAnimMontage);
+			}
+			
+		}
+	}
+
+	GetWorld()->GetTimerManager().SetTimer(ReloadTimerHandle, this, &APVZ3DWeapon::Reload,CurrentAmmo.ReloadTime,false);
+}
+
+bool APVZ3DWeapon::CanReload() const
+{
+	return !bIsReloading&&!CurrentAmmo.Infinite&&CurrentAmmo.Clips>0&&CurrentAmmo.Bullets<DefaultAmmo.Bullets;
+}
+
+void APVZ3DWeapon::Reload()
+{
+	bIsReloading = false;
+	ChangeClip();
 }

@@ -28,9 +28,11 @@ void UPVZ3DInventoryMainWidget::NativePreConstruct()
 					{
 						InventoryCellWidget->UpdateInventoryCellWidget(Item.ID, Item.Quantity , Index);
 
-						InventoryCellWidget->Received.AddUObject(this, &UPVZ3DInventoryMainWidget::ReceivedInfo);
+						InventoryCellWidget->Received_1.AddUObject(this, &UPVZ3DInventoryMainWidget::ReceivedInfo);
 
 						InventoryCellWidget->BrushWhite.AddUObject(this, &UPVZ3DInventoryMainWidget::BrushWhite);
+
+						InventoryCellWidget->Remove.AddUObject(this, &UPVZ3DInventoryMainWidget::ReceivedRemoveInfo);
 
 						Grid->AddChildToWrapBox(InventoryCellWidget);
 
@@ -48,9 +50,9 @@ void UPVZ3DInventoryMainWidget::UpdateMainWidget()
 	NativePreConstruct();
 }
 
-void UPVZ3DInventoryMainWidget::ReceivedInfo(FName P_ID, int32 P_Quantity , int32 P_SlotIndex)
+void UPVZ3DInventoryMainWidget::ReceivedInfo(int32 P_SlotIndex)
 {
-	Received.Broadcast(P_ID, P_Quantity , P_SlotIndex);
+	Received_2.Broadcast(P_SlotIndex);
 }
 
 void UPVZ3DInventoryMainWidget::BrushWhite()
@@ -65,6 +67,13 @@ void UPVZ3DInventoryMainWidget::BrushWhite()
 			}
 		}
 	}
+}
+
+void UPVZ3DInventoryMainWidget::ReceivedRemoveInfo(int32 P_SlotIndex)
+{
+	ReceivedRemove.Broadcast(P_SlotIndex);
+
+	UE_LOG(LogMainWidget , Warning, TEXT("OnMouseButtonDown_Right SlotIndex: %d"), P_SlotIndex);
 }
 
 

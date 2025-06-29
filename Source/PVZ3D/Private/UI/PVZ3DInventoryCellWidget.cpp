@@ -42,7 +42,7 @@ void UPVZ3DInventoryCellWidget::UpdateInventoryCellWidget(FName P_ID , int32 P_Q
 
 void UPVZ3DInventoryCellWidget::OnButtonClicked()
 {
-	Received.Broadcast(ID, Quantity , SlotIndex);
+	Received_1.Broadcast(SlotIndex);
 
 	BrushWhite.Broadcast();
 	
@@ -57,6 +57,14 @@ void UPVZ3DInventoryCellWidget::OnButtonPressed()
 	if(OuterBorder)
 	{
 		OuterBorder->SetBrushColor(FLinearColor::Yellow);
+	}
+}
+
+void UPVZ3DInventoryCellWidget::OnMouseButtonDown_Right()
+{
+	if(ID != "0000")
+	{
+		Remove.Broadcast(SlotIndex);
 	}
 }
 

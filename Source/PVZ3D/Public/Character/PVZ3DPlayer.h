@@ -31,6 +31,16 @@ enum class EPlayerState : uint8
  * 
  */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerDied, APlayerController*, PlayerController);
+DECLARE_DELEGATE(FSwitchToStack1);
+DECLARE_DELEGATE(FSwitchToStack2);
+DECLARE_DELEGATE(FSwitchToStack3);
+DECLARE_DELEGATE(FSwitchToStack4);
+DECLARE_DELEGATE(FSwitchToStack5);
+DECLARE_DELEGATE(FSwitchToStack6);
+DECLARE_DELEGATE(FSwitchToStack7);
+DECLARE_DELEGATE(FSwitchToStack8);
+DECLARE_DELEGATE(FSwitchToStack9);
+DECLARE_DELEGATE(FSwitchToStack10);
 
 UCLASS()
 class PVZ3D_API APVZ3DPlayer : public APVZ3DBaseEntity, public IGenericTeamAgentInterface
@@ -100,6 +110,17 @@ public:
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 	
 	void OnDeath();
+
+	void SwitchToStack1();
+	void SwitchToStack2();
+	void SwitchToStack3();
+	void SwitchToStack4();
+	void SwitchToStack5();
+	void SwitchToStack6();
+	void SwitchToStack7();
+	void SwitchToStack8();
+	void SwitchToStack9();
+	void SwitchToStack10();
 	
 	bool IsMovingForward = false;
 	bool IsMovingRight = false;
