@@ -26,7 +26,7 @@ EBTNodeResult::Type UPVZ3DTaskEnemyAttack::ExecuteTask(UBehaviorTreeComponent& O
             if (Enemy)
             {
                 Enemy->Attack();
-                UE_LOG(LogTemp, Warning, TEXT("Enemy Attack Target: %s"), *TargetActor->GetName());
+                //UE_LOG(LogTemp, Warning, TEXT("Enemy Attack Target: %s"), *TargetActor->GetName());
 
                 // 对目标应用伤害
                 UPVZ3DHealthComponent* TargetHealthComponent = TargetActor->FindComponentByClass<UPVZ3DHealthComponent>();

@@ -5,9 +5,11 @@
 #include "Engine/Canvas.h"
 #include "../UI/PVZ3DShopWidget.h"
 #include "../UI/PVZ3DInventoryMainWidget.h"
+#include "BehaviorTree/BehaviorTreeTypes.h"
 #include "Blueprint/UserWidget.h"
+#include "UI/PVZ3DDisposalPopWidget.h"
 
-DEFINE_LOG_CATEGORY_STATIC(LogHUD,All,All);
+DEFINE_LOG_CATEGORY_STATIC(LogHUD, All, All);
 
 void APVZ3DPlayerHUD::DrawHUD()
 {
@@ -23,11 +25,13 @@ void APVZ3DPlayerHUD::BeginPlay()
 	
 	auto LevelWidget = CreateWidget<UUserWidget>(GetWorld(), LevelWidgetClass);
 
+	auto HoldedItemWidget = CreateWidget<UUserWidget>(GetWorld(), HoldedItemWidgetClass);
+
 	ShopWidget = CreateWidget<UUserWidget>(GetWorld(), ShopWidgetClass);
 
 	InventoryInformationWidget = CreateWidget<UUserWidget>(GetWorld(), InventoryInformationWidgetClass);
 
-	InventoryMainWidget = CreateWidget<UUserWidget>(GetWorld(), InventoryMainWidgetClass);
+	//InventoryMainWidget = CreateWidget<UUserWidget>(GetWorld(), InventoryMainWidgetClass);
 	
 	if(PlayerDetailWidget)
 	{
@@ -37,6 +41,11 @@ void APVZ3DPlayerHUD::BeginPlay()
 	if(LevelWidget)
 	{
 		LevelWidget->AddToViewport();
+	}
+
+	if(HoldedItemWidget)
+	{
+		HoldedItemWidget->AddToViewport();
 	}
 
 	if(InventoryInformationWidget)
@@ -61,20 +70,16 @@ void APVZ3DPlayerHUD::BeginPlay()
 
 		if (UPVZ3DInventoryMainWidget* InventoryMainWidgetInstance = Cast<UPVZ3DInventoryMainWidget>(InventoryMainWidget))
         {
-            InventoryMainWidgetInstance->Received.AddUObject(this, &APVZ3DPlayerHUD::ReceivedInfo);
+			InventoryMainWidgetInstance->Received_2.AddUObject(this, &APVZ3DPlayerHUD::ReceivedInfo);
+			
+			InventoryMainWidgetInstance->ReceivedRemove.AddUObject(this, &APVZ3DPlayerHUD::RemoveRequest);
         }
 	}
 }
 
-void APVZ3DPlayerHUD::ReceivedInfo(FName P_ID, int32 P_Quantity)
+void APVZ3DPlayerHUD::ReceivedInfo(int32 Index)
 {
-	if(InventoryInformationWidget && InventoryInformationWidget->GetClass()->ImplementsInterface(UPVZ3DShowInfoInterface::StaticClass()))
-	{
-			if (IPVZ3DShowInfoInterface* ShowInfoInterface = Cast<IPVZ3DShowInfoInterface>(InventoryInformationWidget))
-			{
-				ShowInfoInterface->ShowInfo(P_ID, P_Quantity);
-			}
-	}
+	OnHoledSlotChanged.Broadcast(Index);
 }
 
 void APVZ3DPlayerHUD::ReceivedInfo_2(FName P_ID, int32 P_Quantity , int32 P_Price)
@@ -112,6 +117,30 @@ void APVZ3DPlayerHUD::ShopVisibility()
 	}
 }
 
+void APVZ3DPlayerHUD::RemoveRequest(int32 Index)
+{
+	RemoveIndex =  Index;
+
+	DisposalPopWidget = CreateWidget<UUserWidget>(GetWorld(), DisposalPopWidgetClass);
+
+	if(DisposalPopWidget)
+	{
+		DisposalPopWidget->AddToViewport();
+
+		if(UPVZ3DDisposalPopWidget* DisposalPopWidgetInstance = Cast<UPVZ3DDisposalPopWidget>(DisposalPopWidget))
+		{
+			DisposalPopWidgetInstance->Remove_2.AddUObject(this, &APVZ3DPlayerHUD::RemoveRequest_2);
+		}
+	}
+	
+}
+
+void APVZ3DPlayerHUD::RemoveRequest_2(bool RemoveAll)
+{
+	RemoveItem.Broadcast(RemoveIndex , RemoveAll , false);
+
+	UE_LOG(LogHUD , Warning , TEXT("RemoveIndex : %d , RemoveAll : %s"), RemoveIndex, RemoveAll ? TEXT("true") : TEXT("false"));
+}
 
 void APVZ3DPlayerHUD::DrawCrossHair()
 {

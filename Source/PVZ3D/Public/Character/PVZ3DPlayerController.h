@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "GenericTeamAgentInterface.h"
 #include "UI/PVZ3DPlayerHUD.h"
+#include "Component/PVZ3DInventoryComponent.h"
 #include "PVZ3DPlayerController.generated.h"
 
 /**

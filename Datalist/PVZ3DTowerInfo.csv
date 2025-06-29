@@ -1,12 +1,4 @@
-ï»¿,TowerID,Icon,TowerName,WeaponID,Heath,BehaviourTreeID,Height,AttackRange,AggroValue,TeamID
-0000,0000,None,è±Œè±†å°„æ‰‹I,0000,1000,3,100,1000,0,3
-0001,0001,None,å‘æ—¥è‘µI,0001,1000,2,101,1000,0,3
-0002,0002,None,åšæœå¢™,0002,1000,1,103,0,10,2
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
+,TowerID,Icon,TowerName,WeaponID,Heath,BehaviourTree,Height,AttackRange,AggroValue,TeamID
+0000,0000,None,Íã¶¹ÉäÊÖI,0000,1000,1,100,1000,0,3
+0001,0001,None,ÏòÈÕ¿ûI,0001,1000,2,101,1000,0,3
+0002,0002,None,¼á¹ûÇ½,0002,1000,3,103,0,10,2

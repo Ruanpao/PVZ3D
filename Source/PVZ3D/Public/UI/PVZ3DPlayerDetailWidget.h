@@ -20,6 +20,12 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "BindWidget")
 	float WHealthPercent = 1.0f;
 
+	UPROPERTY(EditDefaultsOnly, Category = "BindWidget")
+	float WBaseHealth = 10000.0f;
+
+	UPROPERTY(EditDefaultsOnly,  Category = "BindWidget")
+	float WMaxBaseHealth = 10000.0f;
+
 	UFUNCTION(BlueprintCallable)
 	float GetWCurrentHealth() const {return WCurrentHealth;}
 	
@@ -28,6 +34,12 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	float GetWHealthPercent() const {return WHealthPercent;}
+
+	UFUNCTION(BlueprintCallable)
+	float GetWBaseHealth() const {return WBaseHealth;}
+
+	UFUNCTION(BlueprintCallable)
+	float GetWMaxBaseHealth() const {return WMaxBaseHealth;}
 
 	UPROPERTY(EditDefaultsOnly, Category = "BindWidget")
 	int32 WGold = 0;
@@ -44,4 +56,7 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	void UpdateGoldUI(int32 Gold);
+
+	UFUNCTION(BlueprintCallable)
+	void UpdateBaseHealthUI(float BaseHealth);
 };

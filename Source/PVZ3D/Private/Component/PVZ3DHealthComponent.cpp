@@ -13,6 +13,12 @@ UPVZ3DHealthComponent::UPVZ3DHealthComponent()
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
+void UPVZ3DHealthComponent::ResetHealth()
+{
+	CurrentHealth = MaxHealth; 
+	OnHealthChanged.Broadcast(CurrentHealth, MaxHealth, 1.0f); 
+}
+
 
 // Called when the game starts
 void UPVZ3DHealthComponent::BeginPlay()

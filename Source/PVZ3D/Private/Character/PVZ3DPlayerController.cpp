@@ -2,7 +2,10 @@
 
 
 #include "Character/PVZ3DPlayerController.h"
+
+#include "PVZ3DWeaponComponent.h"
 #include "UI/PVZ3DPlayerHUD.h"
+#include "Kismet/GameplayStatics.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogPlayerController01,All,All);
 
@@ -10,6 +13,7 @@ APVZ3DPlayerController::APVZ3DPlayerController()
 {
 	FGenericTeamId InitialTeamID=FGenericTeamId(1);
 	//SetGenericTeamId(InitialTeamID);
+	
 }
 
 void APVZ3DPlayerController::BeginPlay()
@@ -54,6 +58,9 @@ void APVZ3DPlayerController::ToggleShopVisibility()
 		MyHUD->ShopVisibility();
 	}
 }
+
+
+
 
 	
 
