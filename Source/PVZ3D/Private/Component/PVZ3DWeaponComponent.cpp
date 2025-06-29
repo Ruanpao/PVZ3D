@@ -3,14 +3,20 @@
 
 #include "Component/PVZ3DWeaponComponent.h"
 #include"Actor/PVZ3DWeapon.h"
+#include"Component/PVZ3DInventoryComponent.h"
 #include"GameFramework/Character.h"
 #include"Character/PVZ3DPlayer.h"
+#include "Kismet/GameplayStatics.h"
 #include"AI/PVZ3DTower.h"
+
+DEFINE_LOG_CATEGORY_STATIC(LogWeaponComponent, All , All);
+
 
 UPVZ3DWeaponComponent::UPVZ3DWeaponComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
-	
+
+	DataTable = LoadObject<UDataTable>(this, TEXT("/Script/Engine.DataTable'/Game/MyAsset/DataTable/DT_HoldedItemDataTable.DT_HoldedItemDataTable' "));
 }
 
 
@@ -18,44 +24,53 @@ void UPVZ3DWeaponComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	SpawnWeapon();
-	
+	if(GetWorld())
+	{
+		if(UGameplayStatics::GetPlayerPawn(GetWorld(), 0))
+		{
+			
+			if(UPVZ3DInventoryComponent* InventoryComponent = UGameplayStatics::GetPlayerPawn(GetWorld(), 0)->FindComponentByClass<UPVZ3DInventoryComponent>())
+			{
+				InventoryComponent->HoldedChanged.AddUObject(this, &UPVZ3DWeaponComponent::SwitchWeapon);
+			}
+		}
+	}
 }
 
-void UPVZ3DWeaponComponent::SpawnWeapon()
+void UPVZ3DWeaponComponent::SwitchWeapon(FItemInInventory HoldedItem)
 {
-	if (!GetWorld()) return;
-
-	ACharacter* Character = Cast<ACharacter>(GetOwner());
-	if (!Character)return;
-
-	if (!WeaponClass) {
-		UE_LOG(LogTemp, Error, TEXT("WeaponClass is null!"));
-		return;
-	}
+	DestroyWeapon();
 	
-	CurrentWeapon = GetWorld()->SpawnActor<APVZ3DWeapon>(WeaponClass);
-	if (!CurrentWeapon)
+	if(FWeaponBasicInfo* FoundWeaponInfo = DataTable->FindRow<FWeaponBasicInfo>(HoldedItem.ID , ""))
 	{
-		UE_LOG(LogTemp, Error, TEXT("Failed to spawn weapon!"));
-		return;
-	}
-	
-	FAttachmentTransformRules AttachmentRules(EAttachmentRule::KeepRelative, false);
-	CurrentWeapon->AttachToComponent(Character->GetMesh(), AttachmentRules, WeaponAttachPointName);
-	CurrentWeapon->SetOwner(Character);
+		if(!FoundWeaponInfo->WeaponClass || !GetWorld()) return;
+		
+		ACharacter* Character = Cast<ACharacter>(GetOwner());
+		if (!Character)return;
 
-	UE_LOG(LogTemp, Warning, TEXT("Weapon attached to: %s"), *WeaponAttachPointName.ToString());
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner =Character;
+		SpawnParams.Instigator =Character;
+
+		CurrentWeapon =GetWorld()->SpawnActor<APVZ3DWeapon>(FoundWeaponInfo->WeaponClass,Character->GetMesh()->GetSocketTransform(WeaponAttachPointName),SpawnParams);
+		
+		if(!CurrentWeapon)  return;
+	
+		FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget,EAttachmentRule::SnapToTarget,EAttachmentRule::KeepWorld,false);
+		CurrentWeapon->AttachToComponent(Character->GetMesh(),AttachmentRules,WeaponAttachPointName);
+	}
 }
 
 void UPVZ3DWeaponComponent::DestroyWeapon()
 {
 	if (CurrentWeapon)
 	{
-		CurrentWeapon->Destroy(); 
-		CurrentWeapon = nullptr;  
+		CurrentWeapon->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		CurrentWeapon->SetActorHiddenInGame(true);
+		CurrentWeapon->SetActorEnableCollision(false);
 	}
 }
+
 
 void UPVZ3DWeaponComponent::StartFire()
 {
@@ -77,5 +92,13 @@ void UPVZ3DWeaponComponent::StopFire()
 	APVZ3DPlayer* Player = Cast<APVZ3DPlayer>(GetOwner());
 	if (Player) {
 		Player->StopAttack(); 
+	}
+}
+
+void UPVZ3DWeaponComponent::Reload()
+{
+	if(CurrentWeapon)
+	{
+		CurrentWeapon->StartReload();
 	}
 }

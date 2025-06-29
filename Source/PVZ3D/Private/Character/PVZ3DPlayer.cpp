@@ -107,13 +107,24 @@ void APVZ3DPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 		PlayerInputComponent->BindAction("Run", IE_Pressed, this, &APVZ3DPlayer::StartRun);
 		PlayerInputComponent->BindAction("Run", IE_Released, this, &APVZ3DPlayer::StopRun);
+
+		PlayerInputComponent->BindAction("SwitchToStack1" , IE_Pressed , this , &APVZ3DPlayer::SwitchToStack1);
+		PlayerInputComponent->BindAction("SwitchToStack2" , IE_Pressed , this , &APVZ3DPlayer::SwitchToStack2);
+		PlayerInputComponent->BindAction("SwitchToStack3" , IE_Pressed , this , &APVZ3DPlayer::SwitchToStack3);
+		PlayerInputComponent->BindAction("SwitchToStack4" , IE_Pressed , this , &APVZ3DPlayer::SwitchToStack4);
+		PlayerInputComponent->BindAction("SwitchToStack5" , IE_Pressed , this , &APVZ3DPlayer::SwitchToStack5);
+		PlayerInputComponent->BindAction("SwitchToStack6" , IE_Pressed , this , &APVZ3DPlayer::SwitchToStack6);
+		PlayerInputComponent->BindAction("SwitchToStack7" , IE_Pressed , this , &APVZ3DPlayer::SwitchToStack7);
+		PlayerInputComponent->BindAction("SwitchToStack8" , IE_Pressed , this , &APVZ3DPlayer::SwitchToStack8);
+		PlayerInputComponent->BindAction("SwitchToStack9" , IE_Pressed , this , &APVZ3DPlayer::SwitchToStack9);
+		PlayerInputComponent->BindAction("SwitchToStack10" , IE_Pressed , this , &APVZ3DPlayer::SwitchToStack10);
+		
 		
 		if (WeaponComponent && PlayerInputComponent)
 		{
 			PlayerInputComponent->BindAction("Attack", IE_Pressed, WeaponComponent, &UPVZ3DWeaponComponent::StartFire);
 			PlayerInputComponent->BindAction("Attack", IE_Released, WeaponComponent, &UPVZ3DWeaponComponent::StopFire);
 		}
-		
 	}
 	else
 	{
@@ -352,7 +363,7 @@ void APVZ3DPlayer::OnDeath()
 
 	if (WeaponComponent)
 	{
-		WeaponComponent->DestroyWeapon(); 
+		WeaponComponent->DestroyWeapon();
 		WeaponComponent->DestroyComponent(); 
 		WeaponComponent = nullptr;
 	}
@@ -487,9 +498,6 @@ void APVZ3DPlayer::ExitSpectatorMode()
     PC->bEnableClickEvents = false;
 
     UE_LOG(PVZ3DPlayerLog, Warning, TEXT("Player: 退出旁观者模式"));
-<<<<<<< Updated upstream
-}
-=======
 }
 
 
@@ -573,4 +581,3 @@ void APVZ3DPlayer::SwitchToStack10()
 	}
 }
 
->>>>>>> Stashed changes

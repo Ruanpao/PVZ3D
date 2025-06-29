@@ -4,6 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "PVZ3D/CoreTypes/ItemCoreTypes.h"
+#include "Actor/PVZ3DWeapon.h"
+#include "PVZ3D/CoreTypes/PVZ3DWeaponCoreTypes.h"
 #include "PVZ3DWeaponComponent.generated.h"
 
 class APVZ3DWeapon;
@@ -18,22 +21,30 @@ public:
 
 	void StartFire();
 	void StopFire();
-
-	void DestroyWeapon();
+	
+	void Reload();
 	
 protected:
 	virtual void BeginPlay() override;
 
-	UPROPERTY(EditDefaultsOnly,Category="Weapon")
-	TSubclassOf<APVZ3DWeapon> WeaponClass;
+private:
+	UPROPERTY(EditDefaultsOnly,Category="Weapons")
+	UDataTable* DataTable;
 
 	UPROPERTY(EditDefaultsOnly,Category="Weapon")
 	FName WeaponAttachPointName = "WeaponSocket";
 	
-public:	
-	UPROPERTY()
-	APVZ3DWeapon* CurrentWeapon =nullptr;
+	UPROPERTY(EditDefaultsOnly , Category = "HoldedItem")
+	APVZ3DWeapon* CurrentWeapon = nullptr;
 
-	void SpawnWeapon();
-		
+	UPROPERTY(EditDefaultsOnly , Category = "HoldedItem")
+	TSubclassOf<class APVZ3DWeapon> DefaultWeapon = nullptr;
+
+public:	
+	
+	void SwitchWeapon(FItemInInventory HoldedItem);
+	
+	void DestroyWeapon();
+	
+	
 };

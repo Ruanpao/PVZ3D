@@ -35,7 +35,7 @@ struct FItemBasicInfo : public FTableRowBase
 	FText Information = FText::FromString("Invalid Information");
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="ItemInfo")
-	FText ItemType = FText::FromString("Invalid ItemType");
+	FName ItemType = "None";
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="ItenInfo")
 	int32 Price = 0;
@@ -45,6 +45,9 @@ USTRUCT(BlueprintType)
 struct FItemInInventory
 {
 	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="SlotInfo")
+	int32 Index = -1;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="SlotInfo")
 	FName ID = "0000";

@@ -11,7 +11,7 @@
 
 
 UCLASS()
-class PVZ3D_API UPVZ3DInventoryInformationWidget : public UUserWidget, public IPVZ3DShowInfoInterface	
+class PVZ3D_API UPVZ3DInventoryInformationWidget : public UUserWidget	
 {
 	GENERATED_BODY()
 
@@ -53,7 +53,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "CellUI" , meta = (BindWidget))
 	UVerticalBox* InformationBox;
 	
-	virtual void ShowInfo(FName P_ID, int32 P_Quantity) override;
+	void ShowInfo(FItemInInventory HoldedItem);
 
 protected:
 	void NativeOnInitialized() override;
