@@ -34,22 +34,22 @@ protected:
 
     // 对象池管理
     void InitializeBombPool();
-    class APVZ3DItemDamage* GetBombFromPool();
+    APVZ3DItemDamage* GetBombFromPool();
 
     // 抛物线预览
-    void CalculateProjectilePath();
-    void ClearProjectilePath();
-    void SimulateProjectilePath(FVector StartLocation, FVector LaunchVelocity, TArray<FVector>& OutPath);
+    virtual void CalculateProjectilePath();
+    virtual void ClearProjectilePath();
+    virtual void SimulateProjectilePath(FVector StartLocation, FVector LaunchVelocity, TArray<FVector>& OutPath);
 
     // 射击控制
-    void StartFire();
-    void StopFire();
-    void MakeShot();
+    virtual void StartFire();
+    virtual void StopFire();
+    virtual void MakeShot();
 
     // 炸弹激活/禁用
-    void ActivateBomb(FVector Location, FVector Direction);
-    void DeactivateBomb();
-    void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+    virtual void ActivateBomb(FVector Location, FVector Direction, AActor* NewWeaponOwner, AController* NewWeaponInstigator);
+    virtual void DeactivateBomb();
+    virtual void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
 public:    
     UPROPERTY(VisibleAnywhere, Category = "Components")

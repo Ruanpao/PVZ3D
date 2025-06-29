@@ -2,133 +2,85 @@
 
 
 #include "Actor/PVZ3DCherryBomb.h"
+#include "Components/StaticMeshComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "DrawDebugHelpers.h"
 #include "NiagaraFunctionLibrary.h"
-#include "AI/PVZ3DTower.h"
 
 
-APVZ3DCherryBomb::APVZ3DCherryBomb()
+
+APVZ3DCherryBomb::APVZ3DCherryBomb() : APVZ3DItemDamage()
 {
-	PrimaryActorTick.bCanEverTick = true;
+	DamageAmount = 500.0f;          // 樱桃炸弹的伤害值
+	ExplosionRadius = 600.0f;       // 樱桃炸弹的爆炸范围
+	ProjectileSpeed = 1800.0f;      // 樱桃炸弹的投掷速度
+	ProjectileGravity = 980.0f;     // 樱桃炸弹的重力影响
+	TimeBetweenShots = 5.0f;        // 樱桃炸弹的使用冷却时间
 
-	BombMesh = CreateDefaultSubobject<UStaticMeshComponent>("BombMesh");
-	RootComponent = BombMesh;
-    
-	// 碰撞设置
-	BombMesh->SetCollisionProfileName("Projectile");
-	BombMesh->SetGenerateOverlapEvents(true);
-	BombMesh->SetNotifyRigidBodyCollision(true);
-    
-	// 初始状态隐藏
-	SetActorHiddenInGame(true);
-	SetActorEnableCollision(false);
-    
-	// 投射物运动组件（添加重力实现抛物线）
-	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>("ProjectileMovement");
-	ProjectileMovement->InitialSpeed = 2000.0f;
-	ProjectileMovement->MaxSpeed = 3000.0f;
-	ProjectileMovement->ProjectileGravityScale = 1.0f; // 启用重力实现抛物线
-	ProjectileMovement->bRotationFollowsVelocity = true;
-	ProjectileMovement->bShouldBounce = true;
-	ProjectileMovement->Bounciness = 0.3f;
-	ProjectileMovement->SetActive(false);
-	BombMesh->SetUseCCD(true);
-	ProjectileMovement->bForceSubStepping = true;
-    
-	// 绑定碰撞事件
-	BombMesh->OnComponentHit.AddDynamic(this, &APVZ3DCherryBomb::OnHit);
-
-}
-
-void APVZ3DCherryBomb::BeginPlay()
-{
-	Super::BeginPlay();
-	
-}
-
-void APVZ3DCherryBomb::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
-
-void APVZ3DCherryBomb::ActivateBomb(FVector Location, FVector Direction)
-{
-    bActive = true;
-    
-    SetActorLocation(Location);
-	SetActorRotation(Direction.Rotation());
-    SetActorHiddenInGame(false);
-    SetActorEnableCollision(true);
-    ProjectileMovement->SetActive(true);
-    
-	ProjectileMovement->Velocity = Direction * ProjectileMovement->InitialSpeed;
-
-	ProjectileMovement->ProjectileGravityScale = 1.0f;
-	ProjectileMovement->SetVelocityInLocalSpace(FVector::ForwardVector * ProjectileMovement->InitialSpeed);
-	
-	TArray<AActor*> Towers;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APVZ3DTower::StaticClass(), Towers);
-	for (AActor* Tower : Towers)
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> CherryMesh(TEXT("/Game/PlantsVsZombies3D/Props/Meshes/CherryBomb"));
+	if (CherryMesh.Succeeded() && BombMesh)
 	{
-		BombMesh->IgnoreActorWhenMoving(Tower, true); 
+		BombMesh->SetStaticMesh(CherryMesh.Object);
 	}
     
-    GetWorld()->GetTimerManager().SetTimer(LifeSpanTimer, this, &APVZ3DCherryBomb::DeactivateBomb, 5.0f, false);
+	// 材质
+	static ConstructorHelpers::FObjectFinder<UMaterialInterface> CherryMaterial(TEXT("/Game/PlantsVsZombies3D/Props/Materials/M_CherryBomb"));
+	if (CherryMaterial.Succeeded() && BombMesh)
+	{
+		BombMesh->SetMaterial(0, CherryMaterial.Object);
+	}
+    
+	// 爆炸特效
+	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> CherryExplosion(TEXT("/Game/PlantsVsZombies3D/VFX/NS_CherryExplosion"));
+	if (CherryExplosion.Succeeded())
+	{
+		ExplosionNiagaraSystem = CherryExplosion.Object;
+	}
 }
 
-void APVZ3DCherryBomb::DeactivateBomb()
+void APVZ3DCherryBomb::StartFire()
 {
-    bActive = false;
-    SetActorHiddenInGame(true);
-    SetActorEnableCollision(false);
-    ProjectileMovement->SetActive(false);
-    ProjectileMovement->Velocity = FVector::ZeroVector;
-    GetWorld()->GetTimerManager().ClearTimer(LifeSpanTimer);
+	// 调用父类方法显示抛物线轨迹预览
+	Super::StartFire();
+}
+
+void APVZ3DCherryBomb::StopFire()
+{
+	// 调用父类方法投掷炸弹并清除轨迹预览
+	Super::StopFire();
+}
+
+void APVZ3DCherryBomb::MakeShot()
+{
+	// 调用父类方法创建炸弹实例并投掷
+	Super::MakeShot();
+}
+
+void APVZ3DCherryBomb::CalculateProjectilePath()
+{
+	// 调用父类方法计算抛物线轨迹
+	Super::CalculateProjectilePath();
+}
+
+void APVZ3DCherryBomb::ClearProjectilePath()
+{
+	// 调用父类方法清除轨迹预览
+	Super::ClearProjectilePath();
 }
 
 void APVZ3DCherryBomb::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Collision Detected with: %s"), *OtherActor->GetName());
-	
-    if (!bActive) return;
+	// 调用父类方法处理碰撞和爆炸
+	Super::OnHit(HitComp, OtherActor, OtherComp, NormalImpulse, Hit);
+}
 
-	if (!OtherActor|| OtherActor == GetInstigator() || OtherActor->IsA(APVZ3DTower::StaticClass())) return;
-	
-    // 应用范围伤害
-    TArray<AActor*> IgnoredActors;
-    IgnoredActors.Add(this);
-    
-    UGameplayStatics::ApplyRadialDamage(
-        GetWorld(),
-        DamageAmount,
-        GetActorLocation(),
-        ExplosionRadius,
-        UDamageType::StaticClass(),
-        IgnoredActors,
-        this,
-        GetInstigatorController()
-    );
+void APVZ3DCherryBomb::ActivateBomb(FVector Location, FVector Direction, AActor* NewWeaponOwner, AController* NewWeaponInstigator)
+{
+	// 调用父类方法激活炸弹
+	Super::ActivateBomb(Location, Direction, NewWeaponOwner, NewWeaponInstigator);
+}
 
-	if (ExplosionNiagaraSystem)
-	{
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(
-			GetWorld(),
-			ExplosionNiagaraSystem,
-			GetActorLocation(),
-			GetActorRotation(),
-			FVector(1.0f), // 缩放系数
-			true,          // 自动销毁
-			true,          // 自动激活
-			ENCPoolMethod::AutoRelease // 自动回收
-		);
-	}
-    
-    // 调试绘制爆炸范围
-    // #if ENABLE_DRAW_DEBUG
-    // DrawDebugSphere(GetWorld(), GetActorLocation(), ExplosionRadius, 24, FColor::Red, false, 2.0f);
-    // #endif
-    
-    DeactivateBomb();
+void APVZ3DCherryBomb::DeactivateBomb()
+{
+	// 调用父类方法停用炸弹
+	Super::DeactivateBomb();
 }

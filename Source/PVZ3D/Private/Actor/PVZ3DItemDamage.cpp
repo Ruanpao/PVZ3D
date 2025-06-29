@@ -155,7 +155,7 @@ void APVZ3DItemDamage::MakeShot()
     if (!Bomb) return;
 
     // 激活并发射炸弹
-    Bomb->ActivateBomb(GetActorLocation(), ShootDirection);
+    Bomb->ActivateBomb(GetActorLocation(), ShootDirection, WeaponOwner, WeaponInstigator);
 }
 
 void APVZ3DItemDamage::CalculateProjectilePath()
@@ -250,8 +250,11 @@ void APVZ3DItemDamage::ClearProjectilePath()
     }
 }
 
-void APVZ3DItemDamage::ActivateBomb(FVector Location, FVector Direction)
+void APVZ3DItemDamage::ActivateBomb(FVector Location, FVector Direction, AActor* NewWeaponOwner, AController* NewWeaponInstigator)
 {
+    this->WeaponOwner = WeaponOwner;
+    this->WeaponInstigator = WeaponInstigator;
+    
     bActive = true;
     SetActorLocation(Location);
     SetActorRotation(Direction.Rotation());
