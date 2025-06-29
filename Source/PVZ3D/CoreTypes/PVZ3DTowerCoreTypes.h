@@ -35,5 +35,17 @@ struct FTowerBasicInfo : public FTableRowBase
 	int AggroValue = 0;
 
 	UPROPERTY(EditDefaultsOnly,Blueprintable, Category="TowerInfo")
-	FName TeamID = "0";
+	FGenericTeamId TeamID = 0;
+};
+
+USTRUCT(BlueprintType)
+struct FTowerState
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerState")
+	float CurrentHealth;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerState")
+	int32 CurrentAmmo;
 };

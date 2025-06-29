@@ -52,7 +52,7 @@ void UPVZ3DTaskAttackTarget::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* 
                 if (CurrentTime >= AttackInterval)  // 如果计时器时间达到攻击间隔
                 {
                     Tower->Attack();  // 执行攻击动作
-                    UE_LOG(LogTemp, Warning, TEXT("Tower Attack Target: %s"), *TargetActor->GetName());
+                    //UE_LOG(LogTemp, Warning, TEXT("Tower Attack Target: %s"), *TargetActor->GetName());
 
                     // 对目标应用伤害
                     // UPVZ3DHealthComponent* TargetHealthComponent = TargetActor->FindComponentByClass<UPVZ3DHealthComponent>();

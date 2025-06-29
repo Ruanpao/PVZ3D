@@ -1,5 +1,6 @@
 #pragma once
 #include "Engine/DataTable.h"
+#include "GenericTeamAgentInterface.h"
 #include "PVZ3DEnemyCoreTypes.generated.h"
 
 USTRUCT(BlueprintType)
@@ -35,5 +36,5 @@ struct FEnemyBasicInfo : public FTableRowBase
 	int AggroValue = 0;
 
 	UPROPERTY(EditDefaultsOnly,Blueprintable, Category="TowerInfo")
-	FName TeamID = "0";
+	FGenericTeamId TeamID = 0;
 };

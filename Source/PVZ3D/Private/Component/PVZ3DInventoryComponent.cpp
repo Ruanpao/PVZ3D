@@ -1,7 +1,9 @@
 
 #include "Component/PVZ3DInventoryComponent.h"
 #include "UI/PVZ3DPlayerHUD.h"
+#include "Character/PVZ3DPlayer.h"
 #include "Kismet/GameplayStatics.h"
+#include "WorldPartition/ContentBundle/ContentBundleLog.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogInventory, All, All);
 
@@ -19,16 +21,20 @@ void UPVZ3DInventoryComponent::BeginPlay()
 
 	UpdateSlot();
 
+	HoldedItem = Slot[0];
+
 	if(APVZ3DPlayerHUD* HUD = Cast<APVZ3DPlayerHUD>(UGameplayStatics::GetPlayerController(this,0)->GetHUD()))
 	{
 		HUD->Buy.AddUObject(this, &UPVZ3DInventoryComponent::Buy);
+
+		HUD->OnHoledSlotChanged.AddUObject(this, &UPVZ3DInventoryComponent::UpdateHoldedSlot);
+
+		HUD->RemoveItem.AddUObject(this, &UPVZ3DInventoryComponent::RemoveFromInventory);
 	}
 }
 
 bool UPVZ3DInventoryComponent::AddToInventory(const FName Item_ID, int32 Quantity)
 {
-	UE_LOG(LogInventory, Warning, TEXT("Now Calling AddToInventory"));
-	
 	int32 LocalQuantityRemaining = Quantity;
 
 	bool LocalHasFailed = false;
@@ -43,6 +49,11 @@ bool UPVZ3DInventoryComponent::AddToInventory(const FName Item_ID, int32 Quantit
 
 			OnInventoryUpdate.Broadcast();
 
+			if(FindSlotResult.SlotIndex == HoldedItem.Index)
+			{
+				UpdateHoldedSlot(FindSlotResult.SlotIndex);
+			}
+
 			LocalQuantityRemaining -= 1;
 		}
 		else if (AnyEmptySlotAvailable() >= 0)
@@ -52,6 +63,11 @@ bool UPVZ3DInventoryComponent::AddToInventory(const FName Item_ID, int32 Quantit
 			CreateNewSlot(Item_ID, EmptySlotIndex);
 
 			OnInventoryUpdate.Broadcast();
+
+			if(EmptySlotIndex == HoldedItem.Index)
+			{
+				UpdateHoldedSlot(EmptySlotIndex);
+			}
 
 			LocalQuantityRemaining -= 1;
 		}
@@ -80,10 +96,6 @@ FFindSlot UPVZ3DInventoryComponent::FindSlot(FName Item_ID)
 				{
 					ReturnResult.FindSlot = true;
 					ReturnResult.SlotIndex = index;
-					return ReturnResult;
-				}
-				else
-				{
 					return ReturnResult;
 				}
 			}
@@ -122,18 +134,93 @@ void UPVZ3DInventoryComponent::CreateNewSlot(FName Item_ID, int32 Index)
 
 void UPVZ3DInventoryComponent::UpdateSlot()
 {
+	int32 SlotIndex = 0;
+	
 	while(Slot.Num() < SlotSize)
 	{
 		FItemInInventory NewSlot;
 		NewSlot.ID = "0000";
 		NewSlot.Quantity = 0;
+		NewSlot.Index = SlotIndex;
 		
 		Slot.Add(NewSlot);
-		//UE_LOG(LogInventory,Warning, TEXT("%s"), *NewSlot.ID.ToString());
-		//UE_LOG(LogInventory,Warning, TEXT("%d"), NewSlot.Quantity);
+
+		SlotIndex += 1;
 	}
 	OnInventoryUpdate.Broadcast();
 }
+
+void UPVZ3DInventoryComponent::RemoveFromInventory(int32 Index, bool RemoveAll, bool IsConsumed)
+{
+	if(Slot[Index].Quantity == 1 or RemoveAll)
+	{
+		if(IsConsumed)
+		{
+			DestroyAOldSlot(Index);
+			UE_LOG(LogInventory, Error ,TEXT("I am Consumed"));
+
+			OnInventoryUpdate.Broadcast();
+
+			if(Index == HoldedItem.Index)
+			{
+				UpdateHoldedSlot(Index);
+			}
+		}
+		else
+		{
+			DestroyAOldSlot(Index);
+
+			OnInventoryUpdate.Broadcast();
+
+			if(Index == HoldedItem.Index)
+			{
+				UpdateHoldedSlot(Index);
+
+				UE_LOG(LogInventory , Warning , TEXT(" %d %d --- %s %d"),Index, HoldedItem.Index , *HoldedItem.ID.ToString(), HoldedItem.Quantity);
+			}
+		}
+	}
+	else
+	{
+		if(IsConsumed)
+		{
+			RemoveOne(Index , 1);
+			UE_LOG(LogInventory, Error ,TEXT("I am Consumed"));
+
+			OnInventoryUpdate.Broadcast();
+
+			if(Index == HoldedItem.Index)
+			{
+				UpdateHoldedSlot(Index);
+			}
+		}
+		else
+		{
+			RemoveOne(Index, 1);
+
+			OnInventoryUpdate.Broadcast();
+			
+			if(Index == HoldedItem.Index)
+			{
+				UpdateHoldedSlot(Index);
+
+				UE_LOG(LogInventory , Warning , TEXT(" %d %d --- %s %d"),Index, HoldedItem.Index , *HoldedItem.ID.ToString(), HoldedItem.Quantity);
+			}
+		}
+	}
+}
+
+void UPVZ3DInventoryComponent::RemoveOne(int32 Index , int32 Quantity)
+{
+	Slot[Index].Quantity -= Quantity;
+}
+
+void UPVZ3DInventoryComponent::DestroyAOldSlot(int32 Index)
+{
+	Slot[Index].ID = "0000";
+	Slot[Index].Quantity = 0;
+}
+
 
 void UPVZ3DInventoryComponent::Buy(FName ID , int32 Quantity , int32 Price)
 {
@@ -163,3 +250,14 @@ int32 UPVZ3DInventoryComponent::GetCurrentGold()
 {
 	return Gold;
 }
+
+void UPVZ3DInventoryComponent::UpdateHoldedSlot(int Index)
+{
+	HoldedItem = Slot[Index];
+	
+	HoldedChanged.Broadcast(HoldedItem);
+
+	UE_LOG(LogInventory , Warning , TEXT("HoldedItem Changed, ID : %s , Quantity : %d"), *HoldedItem.ID.ToString(), HoldedItem.Quantity);
+}
+
+

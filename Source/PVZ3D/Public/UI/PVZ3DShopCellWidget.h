@@ -38,7 +38,7 @@ public:
 	UButton* Button_0;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite , Category = "CellUI" ,  meta = (BindWidget))
-	int32 Price;
+	int32 Price = 0;
 
 	void UpdateShopCellWidget(FName P_ID);
 

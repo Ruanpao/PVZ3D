@@ -2,7 +2,9 @@
 
 
 #include "UI/PVZ3DInventoryInformationWidget.h"
+#include "Component/PVZ3DInventoryComponent.h"
 #include "../../CoreTypes/ItemCoreTypes.h"
+#include "Kismet/GameplayStatics.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogInformationWidget,All,All)
 
@@ -11,12 +13,23 @@ void UPVZ3DInventoryInformationWidget::NativeOnInitialized()
 	Super::NativeOnInitialized();
 	
 	Icon = LoadObject<UTexture2D>(this, TEXT("/Script/Engine.Texture2D'/Game/MyAsset/Texture/ItemNone.ItemNone'"));
+
+	if(GetWorld())
+	{
+		if(UGameplayStatics::GetPlayerPawn(GetWorld(), 0))
+		{
+			if(UPVZ3DInventoryComponent* InventoryComponent = UGameplayStatics::GetPlayerPawn(GetWorld(), 0)->FindComponentByClass<UPVZ3DInventoryComponent>())
+			{
+				InventoryComponent->HoldedChanged.AddUObject(this, &UPVZ3DInventoryInformationWidget::ShowInfo);
+			}
+		}
+	}
 }
 
-void UPVZ3DInventoryInformationWidget::ShowInfo(FName P_ID, int32 P_Quantity)
+void UPVZ3DInventoryInformationWidget::ShowInfo(FItemInInventory HoldedItem)
 {
-	ID = P_ID;
-	Quantity = P_Quantity;
+	ID = HoldedItem.ID;
+	Quantity = HoldedItem.Quantity;
 
 	if(!Datatable)
 	{
@@ -47,7 +60,7 @@ void UPVZ3DInventoryInformationWidget::ShowInfo(FName P_ID, int32 P_Quantity)
 				MaxStackNum = FoundItemInfo->MaxStackNum;
 				Description = FoundItemInfo->Description;
 				Information = FoundItemInfo->Information;
-				ItemType = FoundItemInfo->ItemType;
+				ItemType = FText::FromName(FoundItemInfo->ItemType);
 			}
 
 			if(DetailBox && DescriptionBox && InformationBox)

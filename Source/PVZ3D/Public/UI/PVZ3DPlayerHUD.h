@@ -12,6 +12,10 @@ DECLARE_MULTICAST_DELEGATE_TwoParams(FSendInfo, FName , int32)
 
 DECLARE_MULTICAST_DELEGATE_ThreeParams(FBuy , FName, int32 , int32)
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnHoledSlotChanged , int32)
+
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FRemoveItem , int32 , bool , bool)
+
 
 UCLASS()
 class PVZ3D_API APVZ3DPlayerHUD : public AHUD
@@ -19,15 +23,25 @@ class PVZ3D_API APVZ3DPlayerHUD : public AHUD
 	GENERATED_BODY()
 
 public:
+	int32 RemoveIndex;
+	
 	virtual void DrawHUD() override;
 
 	void InventoryInformationVisibility();
 
 	void ShopVisibility();
 
+	void RemoveRequest(int32 Index);
+
+	void RemoveRequest_2(bool RemoveAll);
+
 	FBuy Buy;
 	
 	FSendInfo SendInfo;
+
+	FOnHoledSlotChanged OnHoledSlotChanged;
+
+	FRemoveItem RemoveItem;
 
 protected:
 	
@@ -46,6 +60,12 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite , Category = "UI")
 	TSubclassOf<UUserWidget> ShopWidgetClass;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite , Category = "UI")
+	TSubclassOf<UUserWidget> DisposalPopWidgetClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category =  "UI")
+	TSubclassOf<UUserWidget> HoldedItemWidgetClass;
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite , Category = "UIInstance")
 	UUserWidget* InventoryInformationWidget;
 
@@ -54,16 +74,17 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite , Category = "UIInstance")
 	UUserWidget* InventoryMainWidget;
-	
-	UFUNCTION(BlueprintCallable)
-	void ReceivedInfo(FName P_ID, int32 P_Quantity);
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite , Category = "UIInstance")
+	UUserWidget* DisposalPopWidget;
+
+	UFUNCTION(Blueprintable)
+	void ReceivedInfo(int32 Index);
+	
 	UFUNCTION(BlueprintCallable)
 	void ReceivedInfo_2(FName P_ID, int32 P_Quantity , int32 P_Price);
 
 	virtual void BeginPlay() override;
-
-	
 
 private:
 	void DrawCrossHair();

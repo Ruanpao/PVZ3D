@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "PVZ3DBullet.h"
+#include "Kismet/GameplayStatics.h"
+#include "AI/PVZ3DTower.h"
 #include "PVZ3DWeapon.generated.h"
 
 class USkeletalMeshComponent;
@@ -22,8 +24,10 @@ struct FAmmoData
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite,Category="Weapon")
 	bool Infinite;
-};
 
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category="Weapon")
+	float ReloadTime = 2.0f ;
+};
 
 UCLASS()
 class PVZ3D_API APVZ3DWeapon : public AActor
@@ -35,9 +39,16 @@ public:
 
 	virtual void StartFire();
 	virtual void StopFire();
+
+	virtual void StartReload();
+	virtual bool CanReload() const;
+
+	USkeletalMeshComponent* GetWeaponMesh() const { return WeaponMesh; }
 	
 protected:
 	virtual void BeginPlay() override;
+
+	virtual void Reload();
 	
 	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="Components")
 	USkeletalMeshComponent* WeaponMesh;
@@ -53,7 +64,10 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite,Category="Weapon")
 	FAmmoData DefaultAmmo{150,100,false};
-
+	
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category="Animation")
+	UAnimMontage*ReloadAnimMontage;
+	
 	virtual void MakeShot();
 	virtual bool GetTraceData(FVector& TraceStart, FVector& TraceEnd)const;
 	
@@ -69,8 +83,11 @@ protected:
 	void ChangeClip();
 	void LogAmmo();
 
+	bool bIsReloading = false;
 private:
 	FTimerHandle ShotTimerHandle;
 
 	FAmmoData CurrentAmmo;
+
+	FTimerHandle ReloadTimerHandle;
 };

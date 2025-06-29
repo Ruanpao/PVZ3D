@@ -6,7 +6,7 @@
 #include "Components/TextRenderComponent.h"		//测试血量
 #include "PVZ3D/CoreTypes/PVZ3DEnemyCoreTypes.h"
 #include "AI/PVZ3DEnemyController.h"
-
+#include "Gamemode/PVZ3DGameState.h"
 
 
 APVZ3DEnemy::APVZ3DEnemy()
@@ -53,6 +53,13 @@ void APVZ3DEnemy::BeginPlay()
 	OnHealthChanged(HealthComponent->GetCurrentHealth(),HealthComponent->GetMaxHealth(),HealthComponent->GetHealthPercent());
 	HealthComponent->OnDeath.AddUObject(this, &APVZ3DEnemy::OnDeath);
 	HealthComponent->OnHealthChanged.AddUObject(this, &APVZ3DEnemy::OnHealthChanged);
+
+	APVZ3DGameState* GameState = Cast<APVZ3DGameState>(GetWorld()->GetGameState());
+	if (GameState && HealthComponent)
+	{
+		// 绑定OnDeath事件到GameState的处理函数
+		HealthComponent->OnDeath.AddUObject(GameState, &APVZ3DGameState::EnemyDead);
+	}
 }
 
 void APVZ3DEnemy::OnHealthChanged(float CurrentHealth, float MaxHealth, float HealthPercent)
