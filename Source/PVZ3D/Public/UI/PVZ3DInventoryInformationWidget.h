@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/VerticalBox.h"
+#include "PVZ3D/CoreTypes/ItemCoreTypes.h"
 #include "../Interface/PVZ3DShowInfoInterface.h"
 #include "PVZ3DInventoryInformationWidget.generated.h"
 
