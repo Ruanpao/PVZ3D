@@ -10,6 +10,7 @@ class APVZ3DEnemySpawnPoint;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FTotalEnemiesInWaveChanged, int,BoardcastTotalEnemies);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FTotalWavesChanged, int, BoardcastTotalWaves);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCurrentWaveChanged, int, BoardcastCurrentWaveID);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCurrentWaveTimeLimitChanged, int, CurrentWaveTimeLimit);
 
 USTRUCT(BlueprintType)
 struct FWaveDataRow : public FTableRowBase
@@ -49,6 +50,7 @@ public:
 	FTotalEnemiesInWaveChanged TotalEnemiesInWaveChanged; // 波次总敌人数变化委托
 	FTotalWavesChanged TotalWavesChanged; // 波次总数变化委托
 	FCurrentWaveChanged CurrentWaveChanged; // 当前波次变化委托
+	FCurrentWaveTimeLimitChanged CurrentWaveTimeLimitChanged;
 
 protected:
 	virtual void BeginPlay() override;
