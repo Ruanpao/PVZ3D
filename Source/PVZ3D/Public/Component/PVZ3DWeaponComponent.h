@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "PVZ3D/CoreTypes/ItemCoreTypes.h"
+#include "Actor/PVZ3DWeapon.h"
 #include "PVZ3D/CoreTypes/PVZ3DWeaponCoreTypes.h"
 #include "PVZ3DWeaponComponent.generated.h"
 
@@ -19,7 +21,7 @@ public:
 
 	void StartFire();
 	void StopFire();
-	void SwitchWeapon();
+	
 	void Reload();
 	
 protected:
@@ -27,22 +29,22 @@ protected:
 
 private:
 	UPROPERTY(EditDefaultsOnly,Category="Weapons")
-	UDataTable*WeaponDataTable;
+	UDataTable* DataTable;
 
 	UPROPERTY(EditDefaultsOnly,Category="Weapon")
 	FName WeaponAttachPointName = "WeaponSocket";
-
-	UPROPERTY()
-	APVZ3DWeapon* CurrentWeapon =nullptr;
-
-	UPROPERTY()
-	TArray<APVZ3DWeapon*>WeaponInstances;
 	
-	int32 CurrentWeaponIndex=0;
+	UPROPERTY(EditDefaultsOnly , Category = "HoldedItem")
+	APVZ3DWeapon* CurrentWeapon = nullptr;
+
+	UPROPERTY(EditDefaultsOnly , Category = "HoldedItem")
+	TSubclassOf<class APVZ3DWeapon> DefaultWeapon = nullptr;
+
 public:	
 	
-	void SpawnWeapon(const FWeapon&WeaponData);
-	void LoadWeapons();
+	void SwitchWeapon(FItemInInventory HoldedItem);
+	
 	void DestroyWeapon();
+	
 	
 };

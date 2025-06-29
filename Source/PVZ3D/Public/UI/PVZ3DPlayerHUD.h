@@ -77,10 +77,10 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite , Category = "UIInstance")
 	UUserWidget* DisposalPopWidget;
-	
-	UFUNCTION(BlueprintCallable)
-	void ReceivedInfo(FName P_ID, int32 P_Quantity, int32 P_SlotIndex);
 
+	UFUNCTION(Blueprintable)
+	void ReceivedInfo(int32 Index);
+	
 	UFUNCTION(BlueprintCallable)
 	void ReceivedInfo_2(FName P_ID, int32 P_Quantity , int32 P_Price);
 

@@ -8,7 +8,7 @@
 #include "Components/Button.h"
 #include "PVZ3DInventoryCellWidget.generated.h"
 
-DECLARE_MULTICAST_DELEGATE_ThreeParams(FReceived ,FName, int32 , int32)
+DECLARE_MULTICAST_DELEGATE_OneParam(FReceived_1 , int32)
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FRemove , int32)
 
@@ -20,7 +20,7 @@ class PVZ3D_API UPVZ3DInventoryCellWidget : public UUserWidget
 	GENERATED_BODY()
 	
 public:
-	FReceived Received;
+	FReceived_1 Received_1;
 	
 	FBrushWhite BrushWhite;
 

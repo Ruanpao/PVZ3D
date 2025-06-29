@@ -1,6 +1,7 @@
 
 #include "Component/PVZ3DInventoryComponent.h"
 #include "UI/PVZ3DPlayerHUD.h"
+#include "Character/PVZ3DPlayer.h"
 #include "Kismet/GameplayStatics.h"
 #include "WorldPartition/ContentBundle/ContentBundleLog.h"
 

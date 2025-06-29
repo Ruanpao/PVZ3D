@@ -70,24 +70,16 @@ void APVZ3DPlayerHUD::BeginPlay()
 
 		if (UPVZ3DInventoryMainWidget* InventoryMainWidgetInstance = Cast<UPVZ3DInventoryMainWidget>(InventoryMainWidget))
         {
-            InventoryMainWidgetInstance->Received.AddUObject(this, &APVZ3DPlayerHUD::ReceivedInfo);
-
+			InventoryMainWidgetInstance->Received_2.AddUObject(this, &APVZ3DPlayerHUD::ReceivedInfo);
+			
 			InventoryMainWidgetInstance->ReceivedRemove.AddUObject(this, &APVZ3DPlayerHUD::RemoveRequest);
         }
 	}
 }
 
-void APVZ3DPlayerHUD::ReceivedInfo(FName P_ID, int32 P_Quantity, int32 P_SlotIndex)
+void APVZ3DPlayerHUD::ReceivedInfo(int32 Index)
 {
-	if(InventoryInformationWidget && InventoryInformationWidget->GetClass()->ImplementsInterface(UPVZ3DShowInfoInterface::StaticClass()))
-	{
-			if (IPVZ3DShowInfoInterface* ShowInfoInterface = Cast<IPVZ3DShowInfoInterface>(InventoryInformationWidget))
-			{
-				ShowInfoInterface->ShowInfo(P_ID, P_Quantity);
-			}
-	}
-
-	OnHoledSlotChanged.Broadcast(P_SlotIndex);
+	OnHoledSlotChanged.Broadcast(Index);
 }
 
 void APVZ3DPlayerHUD::ReceivedInfo_2(FName P_ID, int32 P_Quantity , int32 P_Price)

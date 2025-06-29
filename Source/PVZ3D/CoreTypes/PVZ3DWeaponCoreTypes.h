@@ -1,5 +1,7 @@
 #pragma once
 #include "Engine/DataTable.h"
+#include "Actor/PVZ3DWeapon.h"
+#include "Actor/PVZ3DBullet.h"
 #include "PVZ3DWeaponCoreTypes.generated.h"
 
 USTRUCT(BlueprintType)

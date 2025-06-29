@@ -3,15 +3,20 @@
 
 #include "Component/PVZ3DWeaponComponent.h"
 #include"Actor/PVZ3DWeapon.h"
+#include"Component/PVZ3DInventoryComponent.h"
 #include"GameFramework/Character.h"
 #include"Character/PVZ3DPlayer.h"
+#include "Kismet/GameplayStatics.h"
 #include"AI/PVZ3DTower.h"
-#include"Actor/PVZ3DCherry.h"
+
+DEFINE_LOG_CATEGORY_STATIC(LogWeaponComponent, All , All);
+
 
 UPVZ3DWeaponComponent::UPVZ3DWeaponComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
-	
+
+	DataTable = LoadObject<UDataTable>(this, TEXT("/Script/Engine.DataTable'/Game/MyAsset/DataTable/DT_HoldedItemDataTable.DT_HoldedItemDataTable' "));
 }
 
 
@@ -19,131 +24,43 @@ void UPVZ3DWeaponComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	LoadWeapons();
-	
-}
-
-void UPVZ3DWeaponComponent::LoadWeapons()
-{
-	if(!WeaponDataTable||!GetWorld()) return;
-
-	for(auto Weapon:WeaponInstances)
+	if(GetWorld())
 	{
-		if(Weapon) Weapon->Destroy();
-	}
-	WeaponInstances.Empty();
-
-	//读表
-	TArray<FWeapon*> AllWeaponRows;
-	WeaponDataTable->GetAllRows<FWeapon>(TEXT("WeaponID"), AllWeaponRows);
-
-	ACharacter* Character = Cast<ACharacter>(GetOwner());
-	if(!Character) return;
-
-	for(const FWeapon* WeaponRow :AllWeaponRows)
-	{
-		if(WeaponRow &&WeaponRow->WeaponClass)
+		if(UGameplayStatics::GetPlayerPawn(GetWorld(), 0))
 		{
-			FActorSpawnParameters SpawnParams;
-			SpawnParams.Owner = Character;
-			SpawnParams.Instigator = Character;
-
-			APVZ3DWeapon*NewWeapon =GetWorld()->SpawnActor<APVZ3DWeapon>
-			(
-				WeaponRow->WeaponClass,
-				Character->GetMesh()->GetSocketTransform(WeaponAttachPointName),
-				SpawnParams);
-
-			if(NewWeapon)
+			
+			if(UPVZ3DInventoryComponent* InventoryComponent = UGameplayStatics::GetPlayerPawn(GetWorld(), 0)->FindComponentByClass<UPVZ3DInventoryComponent>())
 			{
-				FAttachmentTransformRules AttachmentRules(
-					EAttachmentRule::SnapToTarget,
-					EAttachmentRule::SnapToTarget,
-					EAttachmentRule::KeepWorld,
-					false);
-
-				NewWeapon->AttachToComponent(Character->GetMesh(), AttachmentRules, WeaponAttachPointName);
-				
-				NewWeapon->SetActorHiddenInGame(true);//一开始隐藏
-				NewWeapon->SetActorEnableCollision(false); 
-				WeaponInstances.Add(NewWeapon);
-				
+				InventoryComponent->HoldedChanged.AddUObject(this, &UPVZ3DWeaponComponent::SwitchWeapon);
 			}
 		}
 	}
-	if(WeaponInstances.Num()>0)
-	{
-		CurrentWeaponIndex=0;
-		CurrentWeapon =WeaponInstances[0];
-		CurrentWeapon->SetActorHiddenInGame(false);
-		CurrentWeapon->SetActorEnableCollision(true);
-	}
 }
 
-void UPVZ3DWeaponComponent::SpawnWeapon(const FWeapon& WeaponData)
+void UPVZ3DWeaponComponent::SwitchWeapon(FItemInInventory HoldedItem)
 {
 	DestroyWeapon();
-
-	if(!WeaponData.WeaponClass || !GetWorld()) return;
-
-	ACharacter* Character = Cast<ACharacter>(GetOwner());
-	if (!Character)return;
 	
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.Owner =Character;
-	SpawnParams.Instigator =Character;
-	
-	CurrentWeapon =GetWorld()->SpawnActor<APVZ3DWeapon>(WeaponData.WeaponClass,Character->GetMesh()->GetSocketTransform(WeaponAttachPointName),SpawnParams);
-	
-
-	if(!CurrentWeapon)  return;
-	
-	FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget,EAttachmentRule::SnapToTarget,EAttachmentRule::KeepWorld,false);
-	CurrentWeapon->AttachToComponent(Character->GetMesh(),AttachmentRules,WeaponAttachPointName);
-	
-}
-
-void UPVZ3DWeaponComponent::SwitchWeapon()
-{
-	if(WeaponInstances.Num() < 2)
+	if(FWeaponBasicInfo* FoundWeaponInfo = DataTable->FindRow<FWeaponBasicInfo>(HoldedItem.ID , ""))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Not enough weapons to switch."));
-		return;
-	}
-
-	if(CurrentWeapon)
-	{
-		CurrentWeapon->SetActorHiddenInGame(true);
-		CurrentWeapon->SetActorEnableCollision(false); 
-	}
-	
-	CurrentWeaponIndex =(CurrentWeaponIndex +1)%WeaponInstances.Num();
-	CurrentWeapon=WeaponInstances[CurrentWeaponIndex];
-
-	CurrentWeapon->SetActorHiddenInGame(false);
-	CurrentWeapon->SetActorEnableCollision(true);
-	
-	ACharacter* Character = Cast<ACharacter>(GetOwner());
-	if(Character&&Character->GetMesh())
-	{
-		FTransform SocketTransform = Character->GetMesh()->GetSocketTransform(WeaponAttachPointName);
-		CurrentWeapon->SetActorLocation(SocketTransform.GetLocation());
-		CurrentWeapon->SetActorRotation(SocketTransform.GetRotation());
+		if(!FoundWeaponInfo->WeaponClass || !GetWorld()) return;
 		
-		FAttachmentTransformRules AttachmentRules(
-			EAttachmentRule::SnapToTarget,
-			EAttachmentRule::SnapToTarget,
-			EAttachmentRule::KeepWorld, 
-			false);
-            
-		CurrentWeapon->AttachToComponent(
-			Character->GetMesh(),
-			AttachmentRules,
-			WeaponAttachPointName);
-	}
+		ACharacter* Character = Cast<ACharacter>(GetOwner());
+		if (!Character)return;
+
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner =Character;
+		SpawnParams.Instigator =Character;
+
+		CurrentWeapon =GetWorld()->SpawnActor<APVZ3DWeapon>(FoundWeaponInfo->WeaponClass,Character->GetMesh()->GetSocketTransform(WeaponAttachPointName),SpawnParams);
+		
+		if(!CurrentWeapon)  return;
 	
-	UE_LOG(LogTemp, Warning, TEXT("Switched to weapon index: %d"), CurrentWeaponIndex);
+		FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget,EAttachmentRule::SnapToTarget,EAttachmentRule::KeepWorld,false);
+		CurrentWeapon->AttachToComponent(Character->GetMesh(),AttachmentRules,WeaponAttachPointName);
+	}
 }
+
 void UPVZ3DWeaponComponent::DestroyWeapon()
 {
 	if (CurrentWeapon)
@@ -153,6 +70,7 @@ void UPVZ3DWeaponComponent::DestroyWeapon()
 		CurrentWeapon->SetActorEnableCollision(false);
 	}
 }
+
 
 void UPVZ3DWeaponComponent::StartFire()
 {
