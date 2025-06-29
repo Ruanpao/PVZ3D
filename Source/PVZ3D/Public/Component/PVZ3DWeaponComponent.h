@@ -7,6 +7,7 @@
 #include "PVZ3D/CoreTypes/ItemCoreTypes.h"
 #include "Actor/PVZ3DWeapon.h"
 #include "PVZ3D/CoreTypes/PVZ3DWeaponCoreTypes.h"
+#include "PVZ3D/CoreTypes/PVZ3DTowerCoreTypes.h"
 #include "PVZ3DWeaponComponent.generated.h"
 
 class APVZ3DWeapon;
@@ -23,6 +24,12 @@ public:
 	void StopFire();
 	
 	void Reload();
+
+	FName GetCurrentWeaponID() const;
+	FTowerState GetCarriedTowerState() const;
+    
+	// 设置当前武器携带的塔状态
+	void SetCarriedTowerState(const FTowerState& NewState);
 	
 protected:
 	virtual void BeginPlay() override;
@@ -36,9 +43,17 @@ private:
 	
 	UPROPERTY(EditDefaultsOnly , Category = "HoldedItem")
 	APVZ3DWeapon* CurrentWeapon = nullptr;
-
+	
 	UPROPERTY(EditDefaultsOnly , Category = "HoldedItem")
 	TSubclassOf<class APVZ3DWeapon> DefaultWeapon = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, Category = "HoldedItem")
+	FName CurrentWeaponID = "0000"; // 当前武器ID
+    
+	UPROPERTY(EditDefaultsOnly, Category = "TowerState")
+	FTowerState CarriedTowerState; // 携带的塔状态
+
+
 
 public:	
 	

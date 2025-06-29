@@ -31,7 +31,7 @@ void APVZ3DPlayerHUD::BeginPlay()
 
 	InventoryInformationWidget = CreateWidget<UUserWidget>(GetWorld(), InventoryInformationWidgetClass);
 
-	InventoryMainWidget = CreateWidget<UUserWidget>(GetWorld(), InventoryMainWidgetClass);
+	//InventoryMainWidget = CreateWidget<UUserWidget>(GetWorld(), InventoryMainWidgetClass);
 	
 	if(PlayerDetailWidget)
 	{

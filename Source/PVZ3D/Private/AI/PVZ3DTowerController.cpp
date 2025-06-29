@@ -64,7 +64,6 @@ void APVZ3DTowerController::UpdateTowerControllerImformation()
 	APVZ3DTower* Tower = Cast<APVZ3DTower>(GetPawn());
 	if (Tower)
 	{
-		Tower->UpdateTowerImformation();
 		//根据表的数据设置塔的行为树以及Controller阵营
 		FGenericTeamId TowerTeamID = Tower->GetGenericTeamId();
 		SetGenericTeamId(TowerTeamID);

@@ -6,6 +6,8 @@
 #include "IDetailTreeNode.h"
 #include "Actor/PVZ3DBaseEntity.h"
 #include "GenericTeamAgentInterface.h"
+#include "Interface/PVZ3DInteractInterface.h"
+#include "PVZ3D/CoreTypes/ItemCoreTypes.h"
 #include "PVZ3DPlayer.generated.h"
 
 
@@ -31,6 +33,8 @@ enum class EPlayerState : uint8
  * 
  */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerDied, APlayerController*, PlayerController);
+
+
 DECLARE_DELEGATE(FSwitchToStack1);
 DECLARE_DELEGATE(FSwitchToStack2);
 DECLARE_DELEGATE(FSwitchToStack3);
@@ -43,7 +47,7 @@ DECLARE_DELEGATE(FSwitchToStack9);
 DECLARE_DELEGATE(FSwitchToStack10);
 
 UCLASS()
-class PVZ3D_API APVZ3DPlayer : public APVZ3DBaseEntity, public IGenericTeamAgentInterface
+class PVZ3D_API APVZ3DPlayer : public APVZ3DBaseEntity, public IGenericTeamAgentInterface, public IPVZ3DInteractInterface
 {
 	GENERATED_BODY()
 
@@ -63,17 +67,13 @@ protected:
 	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="Component")
 	UPVZ3DHealthComponent* HealthComponent;
 
-	UPROPERTY(VisibleAnyWhere,BlueprintReadWrite,Category="Component")
-	UPVZ3DInventoryComponent* InventoryComponent;
-
 	UPROPERTY(EditDefaultsOnly,Category="Animation")
     UAnimMontage* AttackAnimMontage;
 
 	UPROPERTY(EditDefaultsOnly,Category="Animation")
 	UAnimMontage* DeathAnimMontage;
 	
-	UPROPERTY(VisibleAnywhere, BluePrintReadWrite, Category = "Component")
-	UPVZ3DWeaponComponent* WeaponComponent;
+
 
 	UPROPERTY(BlueprintReadOnly, Category = "Animation")
 	bool bIsAttacking = false;
@@ -111,6 +111,8 @@ public:
 	
 	void OnDeath();
 
+	void OnHoldedItemChanged(FItemInInventory Item);
+
 	void SwitchToStack1();
 	void SwitchToStack2();
 	void SwitchToStack3();
@@ -125,7 +127,7 @@ public:
 	bool IsMovingForward = false;
 	bool IsMovingRight = false;
 	
-	int CurrentWeaponID = 0;
+	FName CurrentWeaponID;
 	int AggroValue=0;
 	int ViewType=0; // 0为第一人称，1为第三人称
 	bool IsMouseInputDisabled = false; // 是否禁用鼠标输入
@@ -142,7 +144,8 @@ public:
 	virtual FGenericTeamId GetGenericTeamId() const override;
 	virtual ETeamAttitude::Type GetTeamAttitudeTowards(const AActor& Other) const override;
 
-
+	UFUNCTION(BlueprintCallable, Category = "Interaction")
+	void SwapWeaponsWithTower(APVZ3DTower* Tower);
 	//判断移动角度
 	UFUNCTION(BlueprintCallable,Category="Movement")
 	float GetMovementDirection() const;
@@ -159,8 +162,17 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnPlayerDied OnPlayerDied;
 
+	UFUNCTION(BlueprintCallable, Category="Player")
+	UPVZ3DWeaponComponent* GetWeaponComponent() const;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Respawn")
 	EPlayerState CurrentState = EPlayerState::Alive;
+
+	UPROPERTY(VisibleAnyWhere,BlueprintReadWrite,Category="Component")
+	UPVZ3DInventoryComponent* InventoryComponent;
+
+	UPROPERTY(VisibleAnywhere, BluePrintReadWrite, Category = "Component")
+	UPVZ3DWeaponComponent* WeaponComponent;
 
 	UPROPERTY(Transient) float SavedHealth; // 缓存血量
 	//UPROPERTY(Transient) TArray<FInventoryItemData> SavedInventory; // 缓存物品
@@ -183,5 +195,4 @@ public:
 
 	FTimerHandle RespawnTimerHandle; // 复活计时器
 	
-
 };

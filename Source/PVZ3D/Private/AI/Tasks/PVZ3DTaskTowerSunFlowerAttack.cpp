@@ -14,68 +14,67 @@
 UPVZ3DTaskTowerSunFlowerAttack::UPVZ3DTaskTowerSunFlowerAttack()
 {
 	NodeName = TEXT("Tower SunFlower Attack");
-	AttackInterval = 2.0f;  // 设置默认攻击间隔为2秒
+	AttackInterval = 0.0f;  // 设置默认攻击间隔为2秒
 	CurrentTime = 0.0f;
 	bNotifyTick = true;  // 启用Tick功能，这样TickTask函数会被调用
 }
 
 EBTNodeResult::Type UPVZ3DTaskTowerSunFlowerAttack::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
-	UBlackboardComponent* BlackboardComp = OwnerComp.GetBlackboardComponent();
-	if (BlackboardComp)
-	{
-		AActor* TargetActor = Cast<AActor>(BlackboardComp->GetValueAsObject(TargetKey.SelectedKeyName));
-		if (TargetActor)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Target found: %s"), *TargetActor->GetName());
-			return EBTNodeResult::InProgress;  // 任务开始，设置为进行中状态
-		}
-	}
-	UE_LOG(LogTemp, Warning, TEXT("Target not found or invalid!"));
-	return EBTNodeResult::Failed;  // 获取目标失败，任务失败
+    UBlackboardComponent* BlackboardComp = OwnerComp.GetBlackboardComponent();
+    if (BlackboardComp)
+    {
+        AActor* TargetActor = Cast<AActor>(BlackboardComp->GetValueAsObject(TargetKey.SelectedKeyName));
+        if (TargetActor)
+        {
+            UE_LOG(LogTemp, Warning, TEXT("Target found: %s"), *TargetActor->GetName());
+            return EBTNodeResult::InProgress;
+        }
+    }
+    UE_LOG(LogTemp, Warning, TEXT("Target not found or invalid!"));
+    return EBTNodeResult::Failed;
 }
 
 void UPVZ3DTaskTowerSunFlowerAttack::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaTime)
 {
-	UBlackboardComponent* BlackboardComp = OwnerComp.GetBlackboardComponent();
-	if (BlackboardComp)
-	{
-		AActor* TargetActor = Cast<AActor>(BlackboardComp->GetValueAsObject(TargetKey.SelectedKeyName));
-		if (TargetActor)
-		{
-			APVZ3DTower* Tower = Cast<APVZ3DTower>(OwnerComp.GetAIOwner()->GetPawn());
-			if (Tower)
-			{
-				UpdateTowerRotation(Tower, TargetActor);  // 更新Tower的朝向
+    UBlackboardComponent* BlackboardComp = OwnerComp.GetBlackboardComponent();
+    if (BlackboardComp)
+    {
+        AActor* TargetActor = Cast<AActor>(BlackboardComp->GetValueAsObject(TargetKey.SelectedKeyName));
+        if (TargetActor)
+        {
+            APVZ3DTower* Tower = Cast<APVZ3DTower>(OwnerComp.GetAIOwner()->GetPawn());
+            if (Tower)
+            {
+                UpdateTowerRotation(Tower, TargetActor);
+                
+      
+            	if (!Tower->bIsAttacking)
+            	{Tower->bIsAttacking = true;
+            		Tower->Attack();
+            		UE_LOG(LogTemp, Warning, TEXT("Tower Laser Attacking Target: %s"), *TargetActor->GetName());
+            	}
 
-				CurrentTime += DeltaTime;  // 更新当前计时器时间
-				if (CurrentTime >= AttackInterval)  // 如果计时器时间达到攻击间隔
-				{
-					Tower->Attack();  // 执行攻击动作
-					UE_LOG(LogTemp, Warning, TEXT("Tower Attack Target: %s"), *TargetActor->GetName());
+                
+            }
+        }
+        else
+        {
+        }
+    }
+}
 
-					// 对目标应用伤害
-					// UPVZ3DHealthComponent* TargetHealthComponent = TargetActor->FindComponentByClass<UPVZ3DHealthComponent>();
-					// if (TargetHealthComponent)
-					// {
-					//     float DamageAmount = 10.0f; 
-					//     AActor* DamageCauser = Tower;
-					//     AController* InstigatedBy = Tower->GetController();
-					//     UDamageType const* DamageType = nullptr;
-					//     TargetActor->TakeDamage(DamageAmount, FDamageEvent(), InstigatedBy, DamageCauser);
-					// }
-
-					CurrentTime = 0.0f;  // 重置计时器
-				}
-			}
-		}
-	}}
-
-void UPVZ3DTaskTowerSunFlowerAttack::OnTaskFinished(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory,
-	EBTNodeResult::Type TaskResult)
+void UPVZ3DTaskTowerSunFlowerAttack::OnTaskFinished(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, EBTNodeResult::Type TaskResult)
 {
-	CurrentTime = 0.0f;  // 任务结束，重置计时器
-	Super::OnTaskFinished(OwnerComp, NodeMemory, TaskResult);  // 调用父类的OnTaskFinished函数
+    // 任务结束时停止攻击
+    APVZ3DTower* Tower = Cast<APVZ3DTower>(OwnerComp.GetAIOwner()->GetPawn());
+    if (Tower && Tower->bIsAttacking)
+    {
+        Tower->StopAttack();
+    }
+    
+    CurrentTime = 0.0f;
+    Super::OnTaskFinished(OwnerComp, NodeMemory, TaskResult);
 }
 
 void UPVZ3DTaskTowerSunFlowerAttack::UpdateTowerRotation(APVZ3DTower* Tower, AActor* TargetActor)
