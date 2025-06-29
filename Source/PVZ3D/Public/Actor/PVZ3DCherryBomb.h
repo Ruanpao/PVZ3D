@@ -4,14 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Actor/PVZ3DItemDamage.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "NiagaraSystem.h"
 #include "PVZ3DCherryBomb.generated.h"
 
 UCLASS()
-class PVZ3D_API APVZ3DCherryBomb : public APVZ3DItemDamage
+class PVZ3D_API APVZ3DCherryBomb : public AActor
 {
 	GENERATED_BODY()
 	
