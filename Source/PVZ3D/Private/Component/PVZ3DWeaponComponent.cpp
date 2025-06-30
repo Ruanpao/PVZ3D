@@ -28,6 +28,11 @@ void UPVZ3DWeaponComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+	if(APVZ3DPlayer* Owner = Cast<APVZ3DPlayer>(GetOwner()))
+	{
+		Owner->OnTowerInteraction.AddDynamic(this, &UPVZ3DWeaponComponent::Interact);
+	}
+	
 
 }
 
@@ -38,7 +43,9 @@ void UPVZ3DWeaponComponent::BeginPlay()
 void UPVZ3DWeaponComponent::SwitchWeapon(FItemInInventory HoldedItem)
 {
 	DestroyWeapon();
-    
+
+	CurrentHoldedItem = HoldedItem;
+	
 	if (HoldedItem.ID == FName("0000"))
 	{
 		// 如果 ID 为 0000，不创建新武器，直接返回
@@ -61,6 +68,10 @@ void UPVZ3DWeaponComponent::SwitchWeapon(FItemInInventory HoldedItem)
 			CurrentWeapon = GetWorld()->SpawnActor<APVZ3DWeapon>(FoundHoldedItemInfo->WeaponClass,Character->GetMesh()->GetSocketTransform(WeaponAttachPointName),SpawnParams);
         
 			if(!CurrentWeapon)  return;
+
+			CurrentWeapon->OnReload.AddUObject(this, &UPVZ3DWeaponComponent::Reload);
+
+			CurrentWeaponClips = FoundHoldedItemInfo->Clips;
     
 			FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget,EAttachmentRule::SnapToTarget,EAttachmentRule::KeepWorld,false);
 			CurrentWeapon->AttachToComponent(Character->GetMesh(),AttachmentRules,WeaponAttachPointName);
@@ -144,4 +155,45 @@ FTowerState UPVZ3DWeaponComponent::GetCarriedTowerState() const
 void UPVZ3DWeaponComponent::SetCarriedTowerState(const FTowerState& NewState)
 {
 	CarriedTowerState = NewState;
+}
+
+void UPVZ3DWeaponComponent::Interact(bool IsFullTower,bool IsIntheMidLine, bool IsFullLevel , bool IsNearTower, APVZ3DTower* Tower)
+{
+	if(FWeaponBasicInfo* FoundHoldedItemInfo = DataTable->FindRow<FWeaponBasicInfo>(CurrentHoldedItem.ID , ""))
+	{
+		if(FoundHoldedItemInfo->ItemType == "Item_Damage" || FoundHoldedItemInfo->ItemType == "Item_Buff")
+		{
+			if(CurrentItem)
+			{
+				CurrentItem->StopUse();
+
+				OnConsumed.Broadcast(CurrentHoldedItem.Index , false , true);
+			}
+
+			
+		}
+		else if((FoundHoldedItemInfo->ItemType == "None" || FoundHoldedItemInfo->ItemType == "Plant_Attack" || FoundHoldedItemInfo->ItemType == "Plant_Defense" ) && IsNearTower)
+		{
+			ButtonInteraction.Broadcast(false, IsNearTower, IsFullTower ,IsFullLevel , IsIntheMidLine , CurrentHoldedItem);
+
+
+			UE_LOG(LogWeaponComponent, Warning , TEXT("Interact called with IsFullTower: %s, IsIntheMidLine: %s, IsFullLevel: %s, IsNearTower: %s, HoldedItem ID: %s"),
+				IsFullTower ? TEXT("true") : TEXT("false"),
+				IsIntheMidLine ? TEXT("true") : TEXT("false"),
+				IsFullLevel ? TEXT("true") : TEXT("false"),
+				IsNearTower ? TEXT("true") : TEXT("false"),
+				*CurrentHoldedItem.ID.ToString());
+			
+		}
+	}
+}
+
+void UPVZ3DWeaponComponent::OnReload()
+{
+	if(CurrentWeapon)
+	{
+		CurrentWeapon->StartReload();
+		
+		Reloading.Broadcast(CurrentWeaponClips);
+	}
 }

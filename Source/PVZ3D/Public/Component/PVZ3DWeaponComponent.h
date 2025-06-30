@@ -11,6 +11,12 @@
 #include "PVZ3D/CoreTypes/PVZ3DTowerCoreTypes.h"
 #include "PVZ3DWeaponComponent.generated.h"
 
+DECLARE_MULTICAST_DELEGATE_SixParams(FOnInteraction , bool , bool , bool , bool ,bool , FItemInInventory);
+
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnConsumed , int32 , bool , bool);
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FReloading, FText);
+
 class APVZ3DWeapon;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -18,7 +24,13 @@ class PVZ3D_API UPVZ3DWeaponComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
-public:	
+public:
+	FOnInteraction ButtonInteraction;
+
+	FOnConsumed OnConsumed;
+
+	FReloading Reloading;
+	
 	UPVZ3DWeaponComponent();
 
 	void StartFire();
@@ -58,10 +70,15 @@ private:
 
 	UPROPERTY(EditDefaultsOnly , Category = "HoldedItem")
 	APVZ3DItem* CurrentItem = nullptr;
-    
+
+	UPROPERTY(EditDefaultsOnly , Category = "HoldedITtem")
+	FItemInInventory CurrentHoldedItem = {0 , "0000" , 0};
+	
 	UPROPERTY(EditDefaultsOnly, Category = "TowerState")
 	FTowerState CarriedTowerState; // 携带的塔状态
 
+	UPROPERTY(EditDefaultsOnly, Category = "Clips")
+	FText CurrentWeaponClips = FText::FromString("0");
 
 
 public:	
@@ -69,7 +86,11 @@ public:
 	void SwitchWeapon(FItemInInventory HoldedItem);
 	
 	void DestroyWeapon();
+	
 	void BindSwitchWeapon(UPVZ3DInventoryComponent* InventoryComponent);
-	
-	
+
+	UFUNCTION(BlueprintCallable)
+	void Interact(bool IsFullTower,bool IsIntheMidLine, bool IsFullLevel , bool IsNearTower, APVZ3DTower* Tower);
+
+	void OnReload();
 };

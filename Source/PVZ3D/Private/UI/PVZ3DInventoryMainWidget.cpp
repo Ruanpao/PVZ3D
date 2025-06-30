@@ -22,6 +22,7 @@ void UPVZ3DInventoryMainWidget::NativePreConstruct()
 				InventoryComponent->OnInventoryUpdate.AddUObject(this, &UPVZ3DInventoryMainWidget::UpdateMainWidget);
 
 				int32 Index = 0;
+				
 				for(auto& Item : InventoryComponent->Slot)
 				{
 					if(UPVZ3DInventoryCellWidget* InventoryCellWidget = CreateWidget<UPVZ3DInventoryCellWidget>(GetWorld(), InventoryCellWidgetClass))
@@ -47,6 +48,7 @@ void UPVZ3DInventoryMainWidget::NativePreConstruct()
 void UPVZ3DInventoryMainWidget::UpdateMainWidget()
 {
 	Grid->ClearChildren();
+	
 	NativePreConstruct();
 }
 
