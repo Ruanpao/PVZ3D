@@ -131,7 +131,7 @@ void APVZ3DWeapon::MakeHit(FHitResult& HitResult, const FVector& TraceStart, FVe
 		CollisionParams.AddIgnoredActor(Tower);
 	}
 	
-	GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECollisionChannel::ECC_Visibility, CollisionParams);
+	GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECollisionChannel::ECC_GameTraceChannel1, CollisionParams);
 
 }
 

@@ -17,6 +17,9 @@ EBTNodeResult::Type UPVZ3DTaskEnemyAttack::ExecuteTask(UBehaviorTreeComponent& O
 {
     OwnerCompRef = &OwnerComp;
 
+    APVZ3DEnemy* Enemy = Cast<APVZ3DEnemy>(OwnerComp.GetAIOwner()->GetPawn());
+    AttackInterval= Enemy ? Enemy->AttackInterval : 1.0f; // 默认攻击间隔为1秒
+
     // 获取黑板中的攻击目标
     UBlackboardComponent* BlackboardComp = OwnerComp.GetBlackboardComponent();
     if (!BlackboardComp) 
@@ -55,7 +58,6 @@ void UPVZ3DTaskEnemyAttack::OnAttackTimerElapsed()
         return;
     }
 
-    // 获取敌人和AI控制器
     AAIController* AIController = OwnerCompRef->GetAIOwner();
     APVZ3DEnemy* Enemy = AIController ? Cast<APVZ3DEnemy>(AIController->GetPawn()) : nullptr;
     if (!Enemy)
@@ -64,11 +66,10 @@ void UPVZ3DTaskEnemyAttack::OnAttackTimerElapsed()
         ClearAttackTimer();
         return;
     }
-
-    // 计算与目标的距离
+    
     float DistanceToTarget = FVector::Dist(Enemy->GetActorLocation(), CurrentTarget->GetActorLocation());
     
-    // 检查是否在攻击范围内（假设AttackRange是APVZ3DEnemy的属性）
+    // 检查是否在攻击范围内
     if (DistanceToTarget > Enemy->AttackRange)
     {
         UE_LOG(LogTemp, Warning, TEXT("Enemy %s is out of range (%.2f > %.2f), cannot attack"), 

@@ -56,6 +56,7 @@ public:
 	bool BeAttracted=false;
 	float AttackRange;
 	float AttackDamage;
+	float AttackInterval;
 
 	FGenericTeamId TeamID;
 	TArray<FGenericTeamId> FriendlyTeamIDs;

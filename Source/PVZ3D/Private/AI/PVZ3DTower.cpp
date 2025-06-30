@@ -47,7 +47,7 @@ void APVZ3DTower::BeginPlay()
 	}
 	TowerInventory = FindComponentByClass<UPVZ3DInventoryComponent>();
 
-	//Player = Cast<APVZ3DPlayer>(UGameplayStatics::GetPlayerPawn(this, 0));
+	Player = Cast<APVZ3DPlayer>(UGameplayStatics::GetPlayerPawn(this, 0));
 	//StartInventoryCheckTimer();
 
 	//this->PlayerWeaponChanged.AddDynamic(Player, &APVZ3DPlayer::OnHoldedItemChanged);
@@ -106,11 +106,7 @@ void APVZ3DTower::Attack()
 			WeaponComponent->StartFire();
 			bIsAttacking = true;
 			UE_LOG(LogTemp, Warning, TEXT("Tower Laser Attack Started"));
-		//}
-		////else
-		//{
-			// 持续攻击中，无需重复启动
-		//}
+
 	}
 	
 	
@@ -178,9 +174,9 @@ void APVZ3DTower::UpdateTower()//根据CurrentWeaponID更新塔的属性
 			AggroValue = Row->AggroValue;
 			TowerBehaviorTreeNow = Row->BehaviourTreeID;
 			TeamID= Row->TeamID;
-			if(Row->BehaviourTreeID==FName("2"))
+			if(TowerBehaviorTreeNow==FName("2"))
 				AttackType= 2; // 激光武器
-			if(Row->BehaviourTreeID==FName("1"))
+			else if(TowerBehaviorTreeNow==FName("1"))
 				AttackType= 1; // 单次攻击
 			else
 				AttackType= 0; // 默认攻击类型)
@@ -194,6 +190,7 @@ void APVZ3DTower::UpdateTower()//根据CurrentWeaponID更新塔的属性
 			UE_LOG(LogTemp, Warning, TEXT("AggroValue: %d"), AggroValue);
 			UE_LOG(LogTemp, Warning, TEXT("TowerBehaviorTreeNow: %s"), *TowerBehaviorTreeNow.ToString());
 			UE_LOG(LogTemp, Warning, TEXT("TeamID:%d "),TeamID.GetId());
+			UE_LOG(LogTemp,Warning,TEXT("IMAS AttackType: %d"), AttackType);
 			//TeamID
 		} else {
 			// 处理未找到行的情况
@@ -227,7 +224,7 @@ void APVZ3DTower::NotifyActorOnClicked(FKey ButtonPressed)
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Tower Clicked - 测试武器交换"));
 	UE_LOG(LogTemp, Warning, TEXT("Tower Clicked, CurrentHealth: %f"), HealthComponent->GetCurrentHealth());
 	// 测试武器交换功能
-	//APVZ3DPlayer* Player = Cast<APVZ3DPlayer>(UGameplayStatics::GetPlayerPawn(this, 0));
+	//Player = Cast<APVZ3DPlayer>(UGameplayStatics::GetPlayerPawn(this, 0));
 	if (Player)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("找到玩家，开始测试武器交换"));
@@ -321,6 +318,12 @@ void APVZ3DTower::TowerDied()
 	UE_LOG(LogTemp, Warning, TEXT("Tower Died, CurrentWeaponID reset to 0000"));
 	UE_LOG(LogTemp, Warning, TEXT("TEAMID: %d"), TeamID.GetId());
 	HealthComponent->SetCurrentHealth(HealthComponent->GetMaxHealth());
+}
+
+void APVZ3DTower::SellTower()
+{
+	BuildTower(FName("0000"));
+	
 }
 
 

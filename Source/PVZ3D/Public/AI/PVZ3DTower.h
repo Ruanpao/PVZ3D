@@ -110,7 +110,9 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Interaction")
     void TowerDied();
 
-
+    UFUNCTION(BlueprintCallable, Category = "Interaction")
+    void SellTower();
+    
 private:
     UPVZ3DInventoryComponent* TowerInventory;
     APVZ3DPlayer* Player;

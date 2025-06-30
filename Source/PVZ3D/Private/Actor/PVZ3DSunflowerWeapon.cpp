@@ -63,7 +63,16 @@ void APVZ3DSunflowerWeapon::UpdateLaserBeam()
 
     FHitResult HitResult;
     MakeHit(HitResult, TraceStart, TraceEnd);
-
+    DrawDebugLine(
+            GetWorld(),
+            TraceStart,
+            TraceEnd,
+            FColor::Green, // 调试线颜色
+            false,         // 是否持久显示
+            1.0f,          // 显示时间
+            0,             // 深度优先级
+            1.0f           // 线宽
+        );
     if (HitResult.bBlockingHit && HitResult.GetActor() && HitResult.GetActor()->ActorHasTag(FName("Enemy")))
     {
         AActor* HitActor = HitResult.GetActor();

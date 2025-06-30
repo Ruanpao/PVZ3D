@@ -178,6 +178,7 @@ void APVZ3DEnemy::UpdateEnemyImformation()//通过EnemyID更新敌人信息
 			Vecolity = Row->Vecolity;
 			GetCharacterMovement()->MaxWalkSpeed =Vecolity;
 			AttackDamage=Row->Damage;
+			AttackInterval=Row->AttackInterval;
 			UE_LOG(LogTemp, Warning, TEXT("PVZ3DEnemy.cpp update row"));
 			//UE_LOG(LogTemp, Warning, TEXT("CurrentWeaponID: %s"), *CurrentWeaponID.ToString());
 			//UE_LOG(LogTemp, Warning, TEXT("AttackRange: %f"), AttackRange);

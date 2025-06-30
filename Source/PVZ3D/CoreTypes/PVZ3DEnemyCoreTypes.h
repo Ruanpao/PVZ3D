@@ -38,6 +38,9 @@ struct FEnemyBasicInfo : public FTableRowBase
 	UPROPERTY(EditDefaultsOnly,Blueprintable, Category="TowerInfo")
 	float Damage = 10.0f;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="TowerInfo")
+	float AttackInterval = 1.0f;
+
 	UPROPERTY(EditDefaultsOnly,Blueprintable, Category="TowerInfo")
 	FGenericTeamId TeamID = 0;
 };
