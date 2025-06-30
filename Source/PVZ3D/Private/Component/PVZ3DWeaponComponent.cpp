@@ -6,6 +6,7 @@
 #include"Component/PVZ3DInventoryComponent.h"
 #include"GameFramework/Character.h"
 #include"Character/PVZ3DPlayer.h"
+#include "Actor/PVZ3DSunflowerWeapon.h"
 #include "Kismet/GameplayStatics.h"
 #include"AI/PVZ3DTower.h"
 
@@ -27,17 +28,20 @@ void UPVZ3DWeaponComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// if(GetWorld())
-	// {
-	// 	if(UGameplayStatics::GetPlayerPawn(GetWorld(), 0))
-	// 	{
-	// 		
-	// 		if(UPVZ3DInventoryComponent* InventoryComponent = UGameplayStatics::GetPlayerPawn(GetWorld(), 0)->FindComponentByClass<UPVZ3DInventoryComponent>())
-	// 		{
-	// 			InventoryComponent->HoldedChanged.AddUObject(this, &UPVZ3DWeaponComponent::SwitchWeapon);
-	// 		}
-	// 	}
-	// }
+	if(GetWorld())
+	{
+		if(UGameplayStatics::GetPlayerPawn(GetWorld(), 0))
+		{
+			
+			if(UPVZ3DInventoryComponent* InventoryComponent = UGameplayStatics::GetPlayerPawn(GetWorld(), 0)->FindComponentByClass<UPVZ3DInventoryComponent>())
+			{
+				if(UGameplayStatics::GetPlayerPawn(GetWorld(), 0)->IsA(APVZ3DPlayer::StaticClass()))
+				{
+					InventoryComponent->HoldedChanged.AddUObject(this, &UPVZ3DWeaponComponent::SwitchWeapon);
+				}
+			}
+		}
+	}
 }
 
 
@@ -84,6 +88,10 @@ void UPVZ3DWeaponComponent::DestroyWeapon()
 		CurrentWeapon->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 		CurrentWeapon->SetActorHiddenInGame(true);
 		CurrentWeapon->SetActorEnableCollision(false);
+		if (CurrentWeapon->IsA(APVZ3DSunflowerWeapon::StaticClass()))
+		{
+			CurrentWeapon->StopFire();
+		}
 	}
 }
 

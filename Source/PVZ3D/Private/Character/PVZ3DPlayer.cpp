@@ -64,6 +64,8 @@ APVZ3DPlayer::APVZ3DPlayer()
 
 	TowerClass = APVZ3DTower::StaticClass();
 
+	Tags.Add(FName("Player"));
+
 }
 
 void APVZ3DPlayer::BeginPlay()

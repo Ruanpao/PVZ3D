@@ -72,13 +72,9 @@ APVZ3DTower::APVZ3DTower()
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
 	CameraComponent->SetupAttachment(RootComponent);
 	CameraComponent->bUsePawnControlRotation = false;
+	
+	Tags.Add(FName("Tower"));
 
-
-	TowerMeshComponent->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap); // 允许和玩家重叠
-	TowerMeshComponent->SetCollisionObjectType(ECC_WorldDynamic);
-	TowerMeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	TowerMeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	TowerMeshComponent->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Block); // 或 ECR_Overlap
 	
 }
 
