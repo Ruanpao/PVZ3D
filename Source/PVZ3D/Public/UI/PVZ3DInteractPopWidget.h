@@ -7,6 +7,7 @@
 #include "Components/VerticalBox.h"
 #include "Components/CanvasPanel.h"
 #include "Blueprint/UserWidget.h"
+#include "Character/PVZ3DPlayer.h" 
 #include "../../CoreTypes/ItemCoreTypes.h"
 #include "PVZ3DInteractPopWidget.generated.h"
 
@@ -63,10 +64,14 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void OnMouseLeave_1();
 
+	APVZ3DTower* Tower;
+
 protected:
 	virtual void NativeOnInitialized() override;
 
 	void UpdateHoldedItem(FItemInInventory NewHoldedItem);
 
 	void RealOnInitialized(bool IsClicked , bool IsNearTower , bool IsFullTower , bool IsFullLevel , bool IsIntheMidLine);
+	UFUNCTION()
+	void OnTowerInteractionReceived(bool bTowerHasWeapon, bool bTowerBaseInMiddle, bool bTowerWeaponMaxLevel, bool bIsNearTower, APVZ3DTower* aTower);
 };

@@ -194,5 +194,34 @@ public:
 	UFUNCTION() void RespawnCharacter(); // 执行复活
 
 	FTimerHandle RespawnTimerHandle; // 复活计时器
+<<<<<<< Updated upstream
+=======
+
+	APVZ3DTower* FindNearestTowerInRange();
+
+	// 广播塔的信息
+	void BroadcastTowerInfo(APVZ3DTower* Tower);
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Interaction")
+	TSubclassOf<AActor> TowerClass;
+
+	// 存储塔信息的变量
+	bool bTowerHasWeapon;
+	bool bTowerBaseInMiddle;
+	bool bTowerWeaponMaxLevel;
+	bool bIsNearTower;
+	APVZ3DTower* CurrentTower;
+
+	// 委托
+	UPROPERTY(BlueprintAssignable, Category = "TowerInteraction")
+	FOnTowerInteraction OnTowerInteraction;
+
+	// 交互范围
+	UPROPERTY(EditDefaultsOnly, Category = "Interaction")
+	float InteractionRange = 200.0f;
+
+	UPROPERTY(VisibleAnyWhere,BlueprintReadWrite,Category="Interact")
+	APVZ3DTower* InteractingTower;
+>>>>>>> Stashed changes
 	
 };
