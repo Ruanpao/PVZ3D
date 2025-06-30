@@ -43,8 +43,9 @@ void APVZ3DBullet::Tick(float DeltaTime)
 
 }
 
-void APVZ3DBullet::ActivateProjectile(FVector Location, FRotator Rotation, FVector Direction)
+void APVZ3DBullet::ActivateProjectile(FVector Location, FRotator Rotation, FVector Direction,float Damage)
 {
+	DamageAmount = Damage;
 	bActive = true;
 	
 	SetActorLocation(Location);

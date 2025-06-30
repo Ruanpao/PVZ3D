@@ -16,14 +16,11 @@
 #include "Gamemode/PVZ3DGamemode.h"
 #include "Kismet/GameplayStatics.h"
 #include "Actor/PVZ3DPlayerSpawnPoint.h"
-<<<<<<< Updated upstream
-=======
 #include "AI/PVZ3DTower.h"
 #include "Engine/OverlapResult.h"
 #include "DrawDebugHelpers.h"
-#include "PVZ3DWeaponComponent.h"
 #include "Interface/UPVZ3DTowerInterface.h"
->>>>>>> Stashed changes
+
 
 DEFINE_LOG_CATEGORY_STATIC(PVZ3DPlayerLog, All, All);
 
@@ -59,6 +56,17 @@ APVZ3DPlayer::APVZ3DPlayer()
 	WeaponComponent = CreateDefaultSubobject<UPVZ3DWeaponComponent>("WeaponComponent");
 
 	GetCharacterMovement()->MaxWalkSpeed = NormalSpeed;
+	
+	bTowerHasWeapon = false;
+	bTowerBaseInMiddle = false;
+	bTowerWeaponMaxLevel = false;
+	bIsNearTower = false;
+	CurrentTower = nullptr;
+
+	TowerClass = APVZ3DTower::StaticClass();
+
+	Tags.Add(FName("Player"));
+
 }
 
 void APVZ3DPlayer::BeginPlay()
@@ -98,9 +106,11 @@ void APVZ3DPlayer::BeginPlay()
 	{
 		// 正确绑定事件（注意函数指针语法）
 		InventoryComponent->HoldedChanged.AddUObject(this, &APVZ3DPlayer::OnHoldedItemChanged);
+
+		WeaponComponent->OnConsumed.AddUObject(InventoryComponent, &UPVZ3DInventoryComponent::RemoveFromInventory);
 	}
 
-
+	WeaponComponent->BindSwitchWeapon(InventoryComponent);
 	
 }
 
@@ -132,12 +142,15 @@ void APVZ3DPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 		PlayerInputComponent->BindAction("SwitchToStack8" , IE_Pressed , this , &APVZ3DPlayer::SwitchToStack8);
 		PlayerInputComponent->BindAction("SwitchToStack9" , IE_Pressed , this , &APVZ3DPlayer::SwitchToStack9);
 		PlayerInputComponent->BindAction("SwitchToStack10" , IE_Pressed , this , &APVZ3DPlayer::SwitchToStack10);
-		
+
+		PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &APVZ3DPlayer::Interact);
+
 		
 		if (WeaponComponent && PlayerInputComponent)
 		{
 			PlayerInputComponent->BindAction("Attack", IE_Pressed, WeaponComponent, &UPVZ3DWeaponComponent::StartFire);
 			PlayerInputComponent->BindAction("Attack", IE_Released, WeaponComponent, &UPVZ3DWeaponComponent::StopFire);
+			PlayerInputComponent->BindAction("Reload", IE_Released, WeaponComponent, &UPVZ3DWeaponComponent::OnReload);
 		}
 	}
 	else
@@ -223,10 +236,8 @@ UPVZ3DWeaponComponent* APVZ3DPlayer::GetWeaponComponent() const
 void APVZ3DPlayer::Interact()
 {
 	Super::Interact();
-<<<<<<< Updated upstream
-=======
-	CurrentTower = FindNearestTowerInRange();
 	InteractingTower=CurrentTower;
+	CurrentTower = FindNearestTowerInRange();
 
 	if (CurrentTower)
 	{
@@ -332,7 +343,6 @@ void APVZ3DPlayer::BroadcastTowerInfo(APVZ3DTower* Tower)
 	OnTowerInteraction.Broadcast(bTowerHasWeapon, bTowerBaseInMiddle, bTowerWeaponMaxLevel, bIsNearTower, Tower);
 	UE_LOG(LogTemp,Warning, TEXT("BroadcastTowerInfo: bTowerHasWeapon: %d, bTowerBaseInMiddle: %d, bTowerWeaponMaxLevel: %d, bIsNearTower: %d, Tower: %s"),
 		bTowerHasWeapon, bTowerBaseInMiddle, bTowerWeaponMaxLevel, bIsNearTower, (Tower ? *Tower->GetName() : TEXT("None")));
->>>>>>> Stashed changes
 }
 
 void APVZ3DPlayer::StartRun()
@@ -340,7 +350,7 @@ void APVZ3DPlayer::StartRun()
 	if(GetCharacterMovement()&&!bIsRunning)
 	{
 		bIsRunning = true;
-		GetCharacterMovement()->MaxWalkSpeed = RunningSpeed;	
+		GetCharacterMovement()->MaxWalkSpeed = RunningSpeed;
 	}
 }
 

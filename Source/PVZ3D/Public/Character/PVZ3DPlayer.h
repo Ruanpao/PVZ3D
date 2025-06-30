@@ -19,6 +19,7 @@ class UPVZ3DInventoryComponent;
 class APVZ3DWeapon;
 class UPVZ3DWeaponComponent;
 class APVZ3DPlayerSpawnPoint;
+class APVZ3DTower;
 
 UENUM(BlueprintType)
 enum class EPlayerState : uint8
@@ -33,6 +34,7 @@ enum class EPlayerState : uint8
  * 
  */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerDied, APlayerController*, PlayerController);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FiveParams(FOnTowerInteraction, bool, bTowerHasWeapon, bool, bTowerBaseInMiddle, bool, bTowerWeaponMaxLevel, bool, bIsNearTower, APVZ3DTower*, Tower);
 
 
 DECLARE_DELEGATE(FSwitchToStack1);
@@ -45,6 +47,7 @@ DECLARE_DELEGATE(FSwitchToStack7);
 DECLARE_DELEGATE(FSwitchToStack8);
 DECLARE_DELEGATE(FSwitchToStack9);
 DECLARE_DELEGATE(FSwitchToStack10);
+
 
 UCLASS()
 class PVZ3D_API APVZ3DPlayer : public APVZ3DBaseEntity, public IGenericTeamAgentInterface, public IPVZ3DInteractInterface
@@ -73,8 +76,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly,Category="Animation")
 	UAnimMontage* DeathAnimMontage;
 	
-
-
 	UPROPERTY(BlueprintReadOnly, Category = "Animation")
 	bool bIsAttacking = false;
 
@@ -194,8 +195,6 @@ public:
 	UFUNCTION() void RespawnCharacter(); // 执行复活
 
 	FTimerHandle RespawnTimerHandle; // 复活计时器
-<<<<<<< Updated upstream
-=======
 
 	APVZ3DTower* FindNearestTowerInRange();
 
@@ -222,6 +221,5 @@ public:
 
 	UPROPERTY(VisibleAnyWhere,BlueprintReadWrite,Category="Interact")
 	APVZ3DTower* InteractingTower;
->>>>>>> Stashed changes
-	
+
 };

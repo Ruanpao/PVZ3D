@@ -6,6 +6,7 @@
 #include"Component/PVZ3DInventoryComponent.h"
 #include"GameFramework/Character.h"
 #include"Character/PVZ3DPlayer.h"
+#include "Actor/PVZ3DSunflowerWeapon.h"
 #include "Kismet/GameplayStatics.h"
 #include"AI/PVZ3DTower.h"
 
@@ -19,7 +20,7 @@ UPVZ3DWeaponComponent::UPVZ3DWeaponComponent()
 	CarriedTowerState.CurrentAmmo = 0;
 	
 
-	DataTable = LoadObject<UDataTable>(this, TEXT("/Script/Engine.DataTable'/Game/MyAsset/DataTable/DT_HoldedItemDataTable.DT_HoldedItemDataTable' "));
+	DataTable = LoadObject<UDataTable>(this, TEXT("/Script/Engine.DataTable'/Game/MyAsset/DataTable/DT_HoldedItemDataTable.DT_HoldedItemDataTable'"));
 }
 
 
@@ -27,17 +28,12 @@ void UPVZ3DWeaponComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// if(GetWorld())
-	// {
-	// 	if(UGameplayStatics::GetPlayerPawn(GetWorld(), 0))
-	// 	{
-	// 		
-	// 		if(UPVZ3DInventoryComponent* InventoryComponent = UGameplayStatics::GetPlayerPawn(GetWorld(), 0)->FindComponentByClass<UPVZ3DInventoryComponent>())
-	// 		{
-	// 			InventoryComponent->HoldedChanged.AddUObject(this, &UPVZ3DWeaponComponent::SwitchWeapon);
-	// 		}
-	// 	}
-	// }
+	if(APVZ3DPlayer* Owner = Cast<APVZ3DPlayer>(GetOwner()))
+	{
+		Owner->OnTowerInteraction.AddDynamic(this, &UPVZ3DWeaponComponent::Interact);
+	}
+	
+
 }
 
 
@@ -47,19 +43,19 @@ void UPVZ3DWeaponComponent::BeginPlay()
 void UPVZ3DWeaponComponent::SwitchWeapon(FItemInInventory HoldedItem)
 {
 	DestroyWeapon();
-    
+
+	CurrentHoldedItem = HoldedItem;
+	
 	if (HoldedItem.ID == FName("0000"))
 	{
 		// 如果 ID 为 0000，不创建新武器，直接返回
 		CurrentWeapon = nullptr;
+		CurrentItem = nullptr;
 		return;
 	}
-
-	if(FWeaponBasicInfo* FoundWeaponInfo = DataTable->FindRow<FWeaponBasicInfo>(HoldedItem.ID , ""))
+	
+	if(FWeaponBasicInfo* FoundHoldedItemInfo = DataTable->FindRow<FWeaponBasicInfo>(HoldedItem.ID , ""))
 	{
-		UE_LOG(LogTemp,Warning,TEXT("WEACOMPONENT Weapon ID: %s, Onwer:%s"), *HoldedItem.ID.ToString(), *GetOwner()->GetName());
-		if(!FoundWeaponInfo->WeaponClass || !GetWorld()) return;
-        
 		ACharacter* Character = Cast<ACharacter>(GetOwner());
 		if (!Character)return;
 
@@ -67,13 +63,34 @@ void UPVZ3DWeaponComponent::SwitchWeapon(FItemInInventory HoldedItem)
 		SpawnParams.Owner =Character;
 		SpawnParams.Instigator =Character;
 
-		CurrentWeapon =GetWorld()->SpawnActor<APVZ3DWeapon>(FoundWeaponInfo->WeaponClass,Character->GetMesh()->GetSocketTransform(WeaponAttachPointName),SpawnParams);
-        
-		if(!CurrentWeapon)  return;
+		if((FoundHoldedItemInfo->ItemType == "Plant_Attack" || FoundHoldedItemInfo->ItemType == "Plant_Defense") && FoundHoldedItemInfo->WeaponClass)
+		{
+			CurrentWeapon = GetWorld()->SpawnActor<APVZ3DWeapon>(FoundHoldedItemInfo->WeaponClass,Character->GetMesh()->GetSocketTransform(WeaponAttachPointName),SpawnParams);
+			
+			if(!CurrentWeapon)  return;
+
+			//赋值
+			FString stringNum=FoundHoldedItemInfo->Clips.ToString();
+			int32 CurrentBullets =FCString::Atoi(*stringNum);
+			CurrentWeapon->SetAttribute(FoundHoldedItemInfo->Damage,FoundHoldedItemInfo->TraceMaxDistance,FoundHoldedItemInfo->ReloadTime,CurrentBullets);
+			
+			CurrentWeapon->OnReload.AddUObject(this, &UPVZ3DWeaponComponent::Reload);
+
+			CurrentWeaponClips = FoundHoldedItemInfo->Clips;
     
-		FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget,EAttachmentRule::SnapToTarget,EAttachmentRule::KeepWorld,false);
-		CurrentWeapon->AttachToComponent(Character->GetMesh(),AttachmentRules,WeaponAttachPointName);
-		UE_LOG(LogTemp,Warning,TEXT("END WEACOMPONENT Weapon ID: %s, Onwer:%s"), *HoldedItem.ID.ToString(), *GetOwner()->GetName());
+			FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget,EAttachmentRule::SnapToTarget,EAttachmentRule::KeepWorld,false);
+			CurrentWeapon->AttachToComponent(Character->GetMesh(),AttachmentRules,WeaponAttachPointName);
+		}
+		else if(FoundHoldedItemInfo->ItemType == "Item_Damage" || FoundHoldedItemInfo->ItemType == "Item_Buff" && FoundHoldedItemInfo->ItemClass)
+		{
+			CurrentItem = GetWorld()->SpawnActor<APVZ3DItem>(FoundHoldedItemInfo->ItemClass,Character->GetMesh()->GetSocketTransform(WeaponAttachPointName),SpawnParams);
+
+			if(!CurrentItem)  return;
+    
+			FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget,EAttachmentRule::SnapToTarget,EAttachmentRule::KeepWorld,false);
+			CurrentItem->AttachToComponent(Character->GetMesh(),AttachmentRules,WeaponAttachPointName);
+		}
+		
 	}
 }
 
@@ -84,7 +101,23 @@ void UPVZ3DWeaponComponent::DestroyWeapon()
 		CurrentWeapon->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 		CurrentWeapon->SetActorHiddenInGame(true);
 		CurrentWeapon->SetActorEnableCollision(false);
+		if (CurrentWeapon->IsA(APVZ3DSunflowerWeapon::StaticClass()))
+		{
+			CurrentWeapon->StopFire();
+		}
 	}
+
+	if(CurrentItem)
+	{
+		CurrentItem->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		CurrentItem->SetActorHiddenInGame(true);
+		CurrentItem->SetActorEnableCollision(false);
+	}
+}
+
+void UPVZ3DWeaponComponent::BindSwitchWeapon(UPVZ3DInventoryComponent* InventoryComponent)
+{
+	InventoryComponent->HoldedChanged.AddUObject(this, &UPVZ3DWeaponComponent::SwitchWeapon);
 }
 
 
@@ -119,11 +152,6 @@ void UPVZ3DWeaponComponent::Reload()
 	}
 }
 
-FName UPVZ3DWeaponComponent::GetCurrentWeaponID() const
-{
-	return CurrentWeaponID;
-}
-
 FTowerState UPVZ3DWeaponComponent::GetCarriedTowerState() const
 {
 	return CarriedTowerState;
@@ -132,4 +160,45 @@ FTowerState UPVZ3DWeaponComponent::GetCarriedTowerState() const
 void UPVZ3DWeaponComponent::SetCarriedTowerState(const FTowerState& NewState)
 {
 	CarriedTowerState = NewState;
+}
+
+void UPVZ3DWeaponComponent::Interact(bool IsFullTower,bool IsIntheMidLine, bool IsFullLevel , bool IsNearTower, APVZ3DTower* Tower)
+{
+	if(FWeaponBasicInfo* FoundHoldedItemInfo = DataTable->FindRow<FWeaponBasicInfo>(CurrentHoldedItem.ID , ""))
+	{
+		if(FoundHoldedItemInfo->ItemType == "Item_Damage" || FoundHoldedItemInfo->ItemType == "Item_Buff")
+		{
+			if(CurrentItem)
+			{
+				CurrentItem->StopUse();
+
+				OnConsumed.Broadcast(CurrentHoldedItem.Index , false , true);
+			}
+
+			
+		}
+		else if((FoundHoldedItemInfo->ItemType == "None" || FoundHoldedItemInfo->ItemType == "Plant_Attack" || FoundHoldedItemInfo->ItemType == "Plant_Defense" ) && IsNearTower)
+		{
+			ButtonInteraction.Broadcast(false, IsNearTower, IsFullTower ,IsFullLevel , IsIntheMidLine , CurrentHoldedItem);
+
+
+			UE_LOG(LogWeaponComponent, Warning , TEXT("Interact called with IsFullTower: %s, IsIntheMidLine: %s, IsFullLevel: %s, IsNearTower: %s, HoldedItem ID: %s"),
+				IsFullTower ? TEXT("true") : TEXT("false"),
+				IsIntheMidLine ? TEXT("true") : TEXT("false"),
+				IsFullLevel ? TEXT("true") : TEXT("false"),
+				IsNearTower ? TEXT("true") : TEXT("false"),
+				*CurrentHoldedItem.ID.ToString());
+			
+		}
+	}
+}
+
+void UPVZ3DWeaponComponent::OnReload()
+{
+	if(CurrentWeapon)
+	{
+		CurrentWeapon->StartReload();
+		
+		Reloading.Broadcast(CurrentWeaponClips);
+	}
 }

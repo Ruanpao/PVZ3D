@@ -10,17 +10,23 @@ UCLASS()
 class PVZ3D_API APVZ3DItem : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
-	// Sets default values for this actor's properties
+    
+public:    
 	APVZ3DItem();
 
+	virtual void StartUse();
+	virtual void StopUse();
+
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Buff")
+	AActor* ItemOwner;
+
+	AActor* GetItemOwner() const;
+public:    
 	virtual void Tick(float DeltaTime) override;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UStaticMeshComponent* ItemMesh;
 };

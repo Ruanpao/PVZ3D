@@ -65,6 +65,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category =  "UI")
 	TSubclassOf<UUserWidget> HoldedItemWidgetClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UI")
+	TSubclassOf<UUserWidget> InteractPopWidgetClass;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite , Category = "UIInstance")
 	UUserWidget* InventoryInformationWidget;
@@ -78,11 +81,17 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite , Category = "UIInstance")
 	UUserWidget* DisposalPopWidget;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite , Category = "UIInstance")
+	UUserWidget* InteractPopWidget;
+
 	UFUNCTION(Blueprintable)
 	void ReceivedInfo(int32 Index);
 	
 	UFUNCTION(BlueprintCallable)
 	void ReceivedInfo_2(FName P_ID, int32 P_Quantity , int32 P_Price);
+
+	UFUNCTION(BlueprintCallable)
+	void CreateInteractPopWidget(bool IsClicked, bool IsNearTower, bool IsFullTower , bool IsFullLevel , bool IsIntheMidLine , FItemInInventory HoldedItem);
 
 	virtual void BeginPlay() override;
 

@@ -21,7 +21,7 @@ protected:
 public:	
 	virtual void Tick(float DeltaTime) override;
 	
-	void ActivateProjectile(FVector Location, FRotator Rotation, FVector Direction);
+	void ActivateProjectile(FVector Location, FRotator Rotation, FVector Direction,float Damage);
 	
 	void DeactivateProjectile();
 	
@@ -35,6 +35,7 @@ public:
 	
 	void SetProjectileSpeed(float NewSpeed);
 
+	
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UStaticMeshComponent* ProjectileMesh;

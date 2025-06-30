@@ -129,7 +129,8 @@ void APVZ3DPeaWeapon::MakeShot()
 	Projectile->ActivateProjectile(
 		GetMuzzleWorldLocation(),
 		ShootDirection.Rotation(),
-		ShootDirection
+		ShootDirection,
+		DamageAmount
 	);
 	
 	Projectile->IgnoreActor(GetOwner());

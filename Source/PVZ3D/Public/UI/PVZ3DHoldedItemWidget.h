@@ -53,6 +53,8 @@ public:
 
 	void UpdateHoldedItemWidget(FItemInInventory HoldedItem);
 
+	void CurrentBulletNumChanged(FText NewBulletNum);
+
 protected:
 	virtual void NativeOnInitialized() override;
 };

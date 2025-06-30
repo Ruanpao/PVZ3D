@@ -15,45 +15,38 @@
 
 class UNiagaraSystem;
 class UProjectileMovementComponent;
-class UStaticMeshComponent;
+
 /**
  * 
  */
 UCLASS()
 class PVZ3D_API APVZ3DItemDamage : public APVZ3DItem
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:    
     APVZ3DItemDamage();
 
 protected:
+    bool bIsCharging = true;
+    
     virtual void BeginPlay() override;
     virtual void Tick(float DeltaTime) override;
-    virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-
-    // 对象池管理
-    void InitializeBombPool();
-    class APVZ3DItemDamage* GetBombFromPool();
 
     // 抛物线预览
-    void CalculateProjectilePath();
-    void ClearProjectilePath();
-    void SimulateProjectilePath(FVector StartLocation, FVector LaunchVelocity, TArray<FVector>& OutPath);
+    virtual void CalculateProjectilePath();
+    virtual void ClearProjectilePath();
+    virtual void SimulateProjectilePath(FVector StartLocation, FVector LaunchVelocity, TArray<FVector>& OutPath);
 
     // 射击控制
-    void StartFire();
-    void StopFire();
-    void MakeShot();
+    virtual void StartUse() override;
+    virtual void StopUse() override;
+    virtual void MakeShot();
 
     // 炸弹激活/禁用
-    void ActivateBomb(FVector Location, FVector Direction);
-    void DeactivateBomb();
-    void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
-
+    virtual void ActivateBomb(FVector Location, FVector Direction, AActor* NewWeaponOwner, AController* NewWeaponInstigator);
+    virtual void DeactivateBomb();
 public:    
-    UPROPERTY(VisibleAnywhere, Category = "Components")
-    UStaticMeshComponent* BombMesh;
 
     UPROPERTY(VisibleAnywhere, Category = "Components")
     UProjectileMovementComponent* ProjectileMovement;
@@ -87,16 +80,9 @@ public:
     UPROPERTY(EditDefaultsOnly, Category = "Projectile")
     float ProjectileGravity = 980.0f;
 
-private:
-    // 对象池
-    UPROPERTY(EditDefaultsOnly, Category = "Bomb")
-    int32 BombPoolSize = 5;
-
-    TArray<APVZ3DItemDamage*> BombPool;
-
-    // 状态控制
-    bool bIsCharging = false;
     bool bActive = false;
+private:
+    // 状态控制
     TArray<FVector> PathPoints;
     FTimerHandle LifeSpanTimer;
 
