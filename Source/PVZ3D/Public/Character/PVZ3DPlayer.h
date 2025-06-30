@@ -17,6 +17,7 @@ class UPVZ3DInventoryComponent;
 class APVZ3DWeapon;
 class UPVZ3DWeaponComponent;
 class APVZ3DPlayerSpawnPoint;
+class APVZ3DTower;
 
 UENUM(BlueprintType)
 enum class EPlayerState : uint8
@@ -31,6 +32,12 @@ enum class EPlayerState : uint8
  * 
  */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerDied, APlayerController*, PlayerController);
+<<<<<<< Updated upstream
+=======
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FiveParams(FOnTowerInteraction, bool, bTowerHasWeapon, bool, bTowerBaseInMiddle, bool, bTowerWeaponMaxLevel, bool, bIsNearTower, APVZ3DTower*, Tower);
+
+
+>>>>>>> Stashed changes
 DECLARE_DELEGATE(FSwitchToStack1);
 DECLARE_DELEGATE(FSwitchToStack2);
 DECLARE_DELEGATE(FSwitchToStack3);
@@ -72,9 +79,12 @@ protected:
 	UPROPERTY(EditDefaultsOnly,Category="Animation")
 	UAnimMontage* DeathAnimMontage;
 	
+<<<<<<< Updated upstream
 	UPROPERTY(VisibleAnywhere, BluePrintReadWrite, Category = "Component")
 	UPVZ3DWeaponComponent* WeaponComponent;
 
+=======
+>>>>>>> Stashed changes
 	UPROPERTY(BlueprintReadOnly, Category = "Animation")
 	bool bIsAttacking = false;
 
@@ -182,6 +192,29 @@ public:
 	UFUNCTION() void RespawnCharacter(); // 执行复活
 
 	FTimerHandle RespawnTimerHandle; // 复活计时器
+
+	APVZ3DTower* FindNearestTowerInRange();
+
+	// 广播塔的信息
+	void BroadcastTowerInfo(APVZ3DTower* Tower);
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Interaction")
+	TSubclassOf<AActor> TowerClass;
+
+	// 存储塔信息的变量
+	bool bTowerHasWeapon;
+	bool bTowerBaseInMiddle;
+	bool bTowerWeaponMaxLevel;
+	bool bIsNearTower;
+	APVZ3DTower* CurrentTower;
+
+	// 委托
+	UPROPERTY(BlueprintAssignable, Category = "TowerInteraction")
+	FOnTowerInteraction OnTowerInteraction;
+
+	// 交互范围
+	UPROPERTY(EditDefaultsOnly, Category = "Interaction")
+	float InteractionRange = 200.0f;
 	
 
 };

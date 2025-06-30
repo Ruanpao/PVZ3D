@@ -23,6 +23,20 @@ public:
 	void StopFire();
 	
 	void Reload();
+<<<<<<< Updated upstream
+=======
+
+	FName GetCurrentWeaponID() const;
+	FTowerState GetCarriedTowerState() const;
+    
+	// 设置当前武器携带的塔状态
+	void SetCarriedTowerState(const FTowerState& NewState);
+
+	UFUNCTION(BlueprintCallable,Category="Weapon")
+	int GetCurrentLevel() const { return CurrentLevel; }
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
+	int GetMaxLevel() const {return MaxLevel;}
+>>>>>>> Stashed changes
 	
 protected:
 	virtual void BeginPlay() override;
@@ -33,6 +47,12 @@ private:
 
 	UPROPERTY(EditDefaultsOnly,Category="Weapon")
 	FName WeaponAttachPointName = "WeaponSocket";
+
+	UPROPERTY(EditDefaultsOnly,Category="Weapons")
+	int CurrentLevel;
+
+	UPROPERTY(EditDefaultsOnly,Category="Weapons")
+	int MaxLevel;
 	
 	UPROPERTY(EditDefaultsOnly , Category = "HoldedItem")
 	APVZ3DWeapon* CurrentWeapon = nullptr;
