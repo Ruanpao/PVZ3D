@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "PVZ3D/CoreTypes/ItemCoreTypes.h"
 #include "Actor/PVZ3DWeapon.h"
+#include "Actor/PVZ3DItem.h"
 #include "PVZ3D/CoreTypes/PVZ3DWeaponCoreTypes.h"
 #include "PVZ3D/CoreTypes/PVZ3DTowerCoreTypes.h"
 #include "PVZ3DWeaponComponent.generated.h"
@@ -43,12 +44,9 @@ private:
 	
 	UPROPERTY(EditDefaultsOnly , Category = "HoldedItem")
 	APVZ3DWeapon* CurrentWeapon = nullptr;
-	
-	UPROPERTY(EditDefaultsOnly , Category = "HoldedItem")
-	TSubclassOf<class APVZ3DWeapon> DefaultWeapon = nullptr;
 
-	UPROPERTY(EditDefaultsOnly, Category = "HoldedItem")
-	FName CurrentWeaponID = "0000"; // 当前武器ID
+	UPROPERTY(EditDefaultsOnly , Category = "HoldedItem")
+	APVZ3DItem* CurrentItem = nullptr;
     
 	UPROPERTY(EditDefaultsOnly, Category = "TowerState")
 	FTowerState CarriedTowerState; // 携带的塔状态
