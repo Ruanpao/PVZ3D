@@ -105,6 +105,8 @@ void APVZ3DPlayer::BeginPlay()
 	{
 		// 正确绑定事件（注意函数指针语法）
 		InventoryComponent->HoldedChanged.AddUObject(this, &APVZ3DPlayer::OnHoldedItemChanged);
+
+		WeaponComponent->OnConsumed.AddUObject(InventoryComponent, &UPVZ3DInventoryComponent::RemoveFromInventory);
 	}
 
 	WeaponComponent->BindSwitchWeapon(InventoryComponent);
@@ -147,6 +149,7 @@ void APVZ3DPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 		{
 			PlayerInputComponent->BindAction("Attack", IE_Pressed, WeaponComponent, &UPVZ3DWeaponComponent::StartFire);
 			PlayerInputComponent->BindAction("Attack", IE_Released, WeaponComponent, &UPVZ3DWeaponComponent::StopFire);
+			PlayerInputComponent->BindAction("Reload", IE_Released, WeaponComponent, &UPVZ3DWeaponComponent::OnReload);
 		}
 	}
 	else

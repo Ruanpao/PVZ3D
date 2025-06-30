@@ -2,6 +2,8 @@
 
 
 #include "UI/PVZ3DHoldedItemWidget.h"
+
+#include "Component/PVZ3DWeaponComponent.h"
 #include "Component/PVZ3DInventoryComponent.h"
 #include "../../CoreTypes/PVZ3DWeaponCoreTypes.h"
 #include "Kismet/GameplayStatics.h"
@@ -26,6 +28,11 @@ void UPVZ3DHoldedItemWidget::NativeOnInitialized()
 					InventoryComponent->HoldedChanged.AddUObject(this, &UPVZ3DHoldedItemWidget::UpdateHoldedItemWidget);
 					break;
 				}
+			}
+
+			if(UPVZ3DWeaponComponent* WeaponComponent = UGameplayStatics::GetPlayerPawn(GetWorld(), 0)->FindComponentByClass<UPVZ3DWeaponComponent>())
+			{
+				WeaponComponent->Reloading.AddUObject(this, &UPVZ3DHoldedItemWidget::CurrentBulletNumChanged);
 			}
 		}
 	}
@@ -79,4 +86,10 @@ void UPVZ3DHoldedItemWidget::UpdateHoldedItemWidget(FItemInInventory HoldedItem)
 			}
 		}
 	}
+}
+
+void UPVZ3DHoldedItemWidget::CurrentBulletNumChanged(FText NewBulletNum)
+{
+	CurrentBulletNum = NewBulletNum;
+	UE_LOG(LogTemp, Warning, TEXT("CurrentBulletNum Changed: %s"), *CurrentBulletNum.ToString());
 }

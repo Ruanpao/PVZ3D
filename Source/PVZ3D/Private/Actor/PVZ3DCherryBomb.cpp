@@ -8,7 +8,7 @@
 
 
 
-APVZ3DCherryBomb::APVZ3DCherryBomb() : APVZ3DItemDamage()
+APVZ3DCherryBomb::APVZ3DCherryBomb() 
 {
 	DamageAmount = 500.0f;          // 樱桃炸弹的伤害值
 	ExplosionRadius = 600.0f;       // 樱桃炸弹的爆炸范围
@@ -16,61 +16,86 @@ APVZ3DCherryBomb::APVZ3DCherryBomb() : APVZ3DItemDamage()
 	ProjectileGravity = 980.0f;     // 樱桃炸弹的重力影响
 	TimeBetweenShots = 5.0f;        // 樱桃炸弹的使用冷却时间
 
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> CherryMesh(TEXT("/Game/PlantsVsZombies3D/Props/Meshes/CherryBomb"));
-	if (CherryMesh.Succeeded() && BombMesh)
-	{
-		BombMesh->SetStaticMesh(CherryMesh.Object);
-	}
-    
-	// 材质
-	static ConstructorHelpers::FObjectFinder<UMaterialInterface> CherryMaterial(TEXT("/Game/PlantsVsZombies3D/Props/Materials/M_CherryBomb"));
-	if (CherryMaterial.Succeeded() && BombMesh)
-	{
-		BombMesh->SetMaterial(0, CherryMaterial.Object);
-	}
-    
-	// 爆炸特效
-	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> CherryExplosion(TEXT("/Game/PlantsVsZombies3D/VFX/NS_CherryExplosion"));
-	if (CherryExplosion.Succeeded())
-	{
-		ExplosionNiagaraSystem = CherryExplosion.Object;
-	}
+	ProjectileMovement->ProjectileGravityScale = ProjectileGravity / 980.0f;
+
+	ItemMesh->OnComponentHit.AddDynamic(this, &APVZ3DCherryBomb::OnHit);
+	
 }
 
-void APVZ3DCherryBomb::StartFire()
+void APVZ3DCherryBomb::BeginPlay()
 {
-	// 调用父类方法显示抛物线轨迹预览
-	Super::StartFire();
+	Super::BeginPlay();
+	
 }
 
-void APVZ3DCherryBomb::StopFire()
+void APVZ3DCherryBomb::StartUse()
 {
-	// 调用父类方法投掷炸弹并清除轨迹预览
-	Super::StopFire();
+	Super::StartUse();
+}
+
+void APVZ3DCherryBomb::StopUse()
+{
+	Super::StopUse();
 }
 
 void APVZ3DCherryBomb::MakeShot()
 {
-	// 调用父类方法创建炸弹实例并投掷
 	Super::MakeShot();
 }
 
 void APVZ3DCherryBomb::CalculateProjectilePath()
 {
-	// 调用父类方法计算抛物线轨迹
 	Super::CalculateProjectilePath();
 }
 
 void APVZ3DCherryBomb::ClearProjectilePath()
 {
-	// 调用父类方法清除轨迹预览
 	Super::ClearProjectilePath();
 }
 
 void APVZ3DCherryBomb::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	// 调用父类方法处理碰撞和爆炸
-	Super::OnHit(HitComp, OtherActor, OtherComp, NormalImpulse, Hit);
+	if (!bActive) return;
+	if (!OtherActor || OtherActor == this || OtherActor == GetOwner()) return;
+
+	UE_LOG(LogTemp, Warning, TEXT("Bomb hit: %s"), OtherActor ? *OtherActor->GetName() : TEXT("None"));
+	// 应用范围伤害
+	TArray<AActor*> IgnoredActors;
+	IgnoredActors.Add(this);
+	if (GetOwner()) {
+		IgnoredActors.Add(GetOwner()); // 添加角色到忽略列表
+	}
+    
+	UGameplayStatics::ApplyRadialDamage(
+		GetWorld(),
+		DamageAmount,
+		GetActorLocation(),
+		ExplosionRadius,
+		UDamageType::StaticClass(),
+		IgnoredActors,
+		this,
+		GetInstigatorController()
+	);
+
+	// 播放爆炸特效
+	if (ExplosionNiagaraSystem)
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+			GetWorld(),
+			ExplosionNiagaraSystem,
+			GetActorLocation(),
+			GetActorRotation(),
+			FVector(1.0f),
+			true,
+			true,
+			ENCPoolMethod::AutoRelease
+		);
+	}
+    
+	// 调试绘制爆炸范围
+	DrawDebugSphere(GetWorld(), GetActorLocation(), ExplosionRadius, 24, FColor::Red, false, 2.0f);
+    
+	DeactivateBomb();
 }
 
 void APVZ3DCherryBomb::ActivateBomb(FVector Location, FVector Direction, AActor* NewWeaponOwner, AController* NewWeaponInstigator)

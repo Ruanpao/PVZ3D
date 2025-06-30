@@ -213,4 +213,8 @@ void APVZ3DWeapon::Reload()
 {
 	bIsReloading = false;
 	ChangeClip();
+
+	UE_LOG(LogWeapon , Warning , TEXT("Reloaded! Current Ammo: %d Bullets, %d Clips"), CurrentAmmo.Bullets, CurrentAmmo.Clips);
+	
+	OnReload.Broadcast();
 }
