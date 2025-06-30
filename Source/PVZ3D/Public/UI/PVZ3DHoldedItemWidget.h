@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/HorizontalBox.h"
+#include "PVZ3D/CoreTypes/ItemCoreTypes.h"
 #include "Components/TextBlock.h"
 #include "PVZ3DHoldedItemWidget.generated.h"
 

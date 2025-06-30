@@ -1,0 +1,13 @@
+Row Name,ID,Name,WeaponClass,Icon,Damage,TraceMaxDistance,ReloadTime,Clips,Infinite,Mesh,BulletClass,ItemType
+0000,0000,None,nullptr,/Script/Engine.Texture2D'/Game/MyAsset/Texture/ItemNone.ItemNone',0,0,0,0,FALSE,nullptr,/Script/Engine.Blueprint'/Game/Blueprint/BP_PeaBullet.BP_PeaBullet',None
+0001,0001,豌豆射手I,/Script/Engine.Blueprint'/Game/Blueprint/BP_PeaWeapon.BP_PeaWeapon_C',/Script/Engine.Texture2D'/Game/MyAsset/Texture/PeashooterI.PeashooterI',10,1500,2,30,FALSE,/Script/Engine.SkeletalMesh'/Game/MyAsset/bones/Tower_Bones/All/骨骼/豌豆.豌豆',nullptr,Plant
+0002,0002,豌豆射手II,/Script/Engine.Blueprint'/Game/Blueprint/BP_PeaWeapon.BP_PeaWeapon_C',/Script/Engine.Texture2D'/Game/MyAsset/Texture/PeaShooterII.PeaShooterII',50,1500,2,30,FALSE,/Script/Engine.SkeletalMesh'/Game/MyAsset/bones/Tower_Bones/All/骨骼/豌豆.豌豆',nullptr,Plant
+0003,0003,豌豆射手III,/Script/Engine.Blueprint'/Game/Blueprint/BP_PeaWeapon.BP_PeaWeapon_C',/Script/Engine.Texture2D'/Game/MyAsset/Texture/PeaShooterII.PeaShooterII',100,1500,2,30,FALSE,/Script/Engine.SkeletalMesh'/Game/MyAsset/bones/Tower_Bones/All/骨骼/豌豆.豌豆',,Plant
+0004,0004,向日葵I,/Script/Engine.Blueprint'/Game/Blueprint/BP_SunflowerWeapon.BP_SunflowerWeapon_C',/Script/Engine.Texture2D'/Game/MyAsset/Texture/SunFlowerI.SunFlowerI',10,1500,0,∞,TRUE,/Script/Engine.SkeletalMesh'/Game/MyAsset/bones/Tower_Bones/All/骨骼/向日葵.向日葵',,Plant
+0005,0005,向日葵II,/Script/Engine.Blueprint'/Game/Blueprint/BP_SunflowerWeapon.BP_SunflowerWeapon_C',/Script/Engine.Texture2D'/Game/MyAsset/Texture/SunFlowerII.SunFlowerII',50,1500,0,∞,TRUE,/Script/Engine.SkeletalMesh'/Game/MyAsset/bones/Tower_Bones/All/骨骼/向日葵.向日葵',,Plant
+0006,0006,向日葵III,/Script/Engine.Blueprint'/Game/Blueprint/BP_SunflowerWeapon.BP_SunflowerWeapon_C',/Script/Engine.Texture2D'/Game/MyAsset/Texture/SunFlowerIII.SunFlowerIII',100,1500,0,∞,TRUE,/Script/Engine.SkeletalMesh'/Game/MyAsset/bones/Tower_Bones/All/骨骼/向日葵.向日葵',,Plant
+0007,0007,樱桃炸弹,,/Script/Engine.Texture2D'/Game/MyAsset/Texture/CherryBomb.CherryBomb',1000,0,0,0,FALSE,,,Item_Damage
+0008,0008,戴夫玉米卷,Item_Buff,/Script/Engine.Texture2D'/Game/MyAsset/Texture/TACO.TACO',0,0,0,0,FALSE,,,Item_Buff
+0009,0009,医药箱,Item_Buff,/Script/Engine.Texture2D'/Game/MyAsset/Texture/MedicineBox.MedicineBox',0,0,0,0,FALSE,,,Item_Buff
+0010,0010,寒冰射手,,/Script/Engine.Texture2D'/Game/MyAsset/Texture/SnowPea.SnowPea',150,1500,2,30,FALSE,,,Plant
+0011,0011,坚果墙I,,/Script/Engine.Texture2D'/Game/MyAsset/Texture/Wall-NutI.Wall-NutI',0,0,0,0,FALSE,,,Plant

@@ -1,31 +1,18 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
-
 #include "CoreMinimal.h"
 #include "Actor/PVZ3DBaseEntity.h"
 #include "GenericTeamAgentInterface.h"
 #include "BehaviorTree/BlackboardComponent.h"
-<<<<<<< Updated upstream
-=======
 #include "Interface/PVZ3DInteractInterface.h"
 #include "PVZ3D/CoreTypes/PVZ3DTowerCoreTypes.h" // 包含FTowerState定义
 #include "Component/PVZ3DInventoryComponent.h"
 #include "Interface/UPVZ3DTowerInterface.h" 
->>>>>>> Stashed changes
 #include "PVZ3DTower.generated.h"
 
 class UStaticMeshComponent;
 class UPVZ3DHealthComponent;
-class APVZ3DWeapon;
 class UPVZ3DWeaponComponent;
 class UCameraComponent;
-<<<<<<< Updated upstream
-
-
-UCLASS()
-class PVZ3D_API APVZ3DTower : public APVZ3DBaseEntity,public IGenericTeamAgentInterface
-=======
 class UInventoryComponent;
 class APVZ3DPlayer;
 
@@ -35,68 +22,12 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPlayerWeaponChanged,FItemInInventor
 
 UCLASS()
 class PVZ3D_API APVZ3DTower : public APVZ3DBaseEntity, public IGenericTeamAgentInterface, public IPVZ3DInteractInterface, public IPVZ3DTowerInterface
->>>>>>> Stashed changes
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 protected:
-	// Called when the game starts or when spawned
+    virtual void BeginPlay() override;
 
-<<<<<<< Updated upstream
-	virtual void BeginPlay() override;
-
-	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="Component")
-	UStaticMeshComponent* TowerMeshComponent;
-	
-	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="Component")
-	UPVZ3DHealthComponent* HealthComponent;
-
-	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="Component")
-	UPVZ3DWeaponComponent* WeaponComponent;
-
-	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category="DataTable")
-	UDataTable* TowerDataTable;
-
-	
-	
-	
-public:	
-	// Called every frame
-	APVZ3DTower();
-	
-	virtual void Tick(float DeltaTime) override;
-	virtual void Attack();
-	virtual void Interact();
-	virtual void UpdateCurrentWeaponID();//可以考虑被UpdateTowerImformation替代
-	virtual void SwitchTower();
-	virtual void UpdateTower();
-	virtual void NotifyActorOnClicked(FKey ButtonPressed) override;
-	
-	FName CurrentWeaponID = "0002";
-	int AggroValue=-1;
-	double AttackRange=1000.0f;
-	FRotator InitialOrientation;
-	
-	FGenericTeamId TeamID;
-	TArray<FGenericTeamId> FriendlyTeamIDs;
-	TArray<FGenericTeamId> HostileTeamIDs;
-	FName TowerBehaviorTreeNow;
-	virtual void SetGenericTeamId(const FGenericTeamId& NewTeamID) override;
-	virtual FGenericTeamId GetGenericTeamId() const override;
-	virtual ETeamAttitude::Type GetTeamAttitudeTowards(const AActor& Other) const override;
-
-	UFUNCTION(BlueprintCallable,Category="AI")
-	void UpdateTowerImformation();
-	
-	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category="AI")
-	UBehaviorTree* TowerBehaviorTree1;
-	
-	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category="AI")
-	UBehaviorTree* TowerBehaviorTree2;
-	
-	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category="AI")
-	UBehaviorTree* TowerBehaviorTree3;
-=======
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Component")
     UStaticMeshComponent* TowerMeshComponent;
     
@@ -118,16 +49,11 @@ public:
     // 武器交换功能
     UFUNCTION(BlueprintCallable, Category = "TowerInteraction")
     void SwapWeaponsWithPlayer(APVZ3DPlayer* Player);
->>>>>>> Stashed changes
 
-	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category="AI")
-	UBehaviorTree* TowerBehaviorTree4;
+    // 状态处理
+    void ApplyStateFromWeapon(UPVZ3DWeaponComponent* WeaponComp);
+    void SaveStateToWeapon(UPVZ3DWeaponComponent* WeaponComp);
 
-<<<<<<< Updated upstream
-	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="Component")
-	UCameraComponent* CameraComponent;
-};
-=======
     // 其他功能
     virtual void UpdateCurrentWeaponID();
     virtual void SwitchTower();
@@ -219,4 +145,3 @@ private:
     int32 MaxLevel = 3;
 
 };
->>>>>>> Stashed changes

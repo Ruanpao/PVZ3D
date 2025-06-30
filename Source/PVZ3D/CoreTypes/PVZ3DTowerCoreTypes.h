@@ -36,9 +36,6 @@ struct FTowerBasicInfo : public FTableRowBase
 	int AggroValue = 0;
 
 	UPROPERTY(EditDefaultsOnly,Blueprintable, Category="TowerInfo")
-<<<<<<< Updated upstream
-	FName TeamID = "0";
-=======
 	FGenericTeamId TeamID = 0;
 
 	UPROPERTY(EditDefaultsOnly,Blueprintable, Category="TowerInfo")
@@ -60,5 +57,4 @@ struct FTowerState
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TowerState")
 	int32 CurrentAmmo;
->>>>>>> Stashed changes
 };

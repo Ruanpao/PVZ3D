@@ -110,7 +110,7 @@ void APVZ3DEnemyController::UpdateEnemyControllerinformation()
 		SetGenericTeamId(EnemyTeamID);
 
 		//按照表的数据设置敌人的行为树以及Controller阵营
-		if(EnemyTeamID==FGenericTeamId(4))
+		if(EnemyTeamID==FGenericTeamId(4))//4近战
 		{
 			FriendlyTeamID={FGenericTeamId(3),FGenericTeamId(4),FGenericTeamId(5)};
 			HostileTeamID={FGenericTeamId(1),FGenericTeamId(2),FGenericTeamId(6)};

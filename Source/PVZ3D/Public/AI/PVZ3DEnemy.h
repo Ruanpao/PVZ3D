@@ -55,6 +55,7 @@ public:
 	int Vecolity=100;
 	bool BeAttracted=false;
 	float AttackRange;
+	float AttackDamage;
 
 	FGenericTeamId TeamID;
 	TArray<FGenericTeamId> FriendlyTeamIDs;

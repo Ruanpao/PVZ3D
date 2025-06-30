@@ -99,6 +99,12 @@ void APVZ3DPlayer::BeginPlay()
 			UE_LOG(LogTemp, Warning, TEXT("APVZ3DGameState::BeginPlay - Home found and events bound!"));
 		}
 	}
+	if (InventoryComponent && WeaponComponent)
+	{
+		// 正确绑定事件（注意函数指针语法）
+		InventoryComponent->HoldedChanged.AddUObject(this, &APVZ3DPlayer::OnHoldedItemChanged);
+	}
+
 
 	
 }
@@ -214,6 +220,11 @@ void APVZ3DPlayer::StopAttack() {
 		StopAnimMontage(AttackAnimMontage);
 		bIsAttacking = false;
 	}
+}
+
+UPVZ3DWeaponComponent* APVZ3DPlayer::GetWeaponComponent() const
+{
+		return WeaponComponent;
 }
 
 void APVZ3DPlayer::Interact()
@@ -620,6 +631,41 @@ void APVZ3DPlayer::ExitSpectatorMode()
 
     UE_LOG(PVZ3DPlayerLog, Warning, TEXT("Player: 退出旁观者模式"));
 }
+
+void APVZ3DPlayer::SwapWeaponsWithTower(APVZ3DTower* Tower)
+{
+	if (!Tower || !InventoryComponent) return;
+
+	UPVZ3DInventoryComponent* PlayerInventory = InventoryComponent;
+	UPVZ3DInventoryComponent* TowerInventory = Tower->InventoryComponent;
+
+	FItemInInventory PlayerHoldedItem = PlayerInventory->HoldedItem;
+	FItemInInventory TowerHoldedItem = TowerInventory->HoldedItem;
+
+	// 交换逻辑与塔的实现对称
+	PlayerInventory->RemoveFromInventory(PlayerHoldedItem.Index, true, false);
+	TowerInventory->RemoveFromInventory(TowerHoldedItem.Index, true, false);
+
+	PlayerInventory->AddToInventory(TowerHoldedItem.ID, TowerHoldedItem.Quantity);
+	TowerInventory->AddToInventory(PlayerHoldedItem.ID, PlayerHoldedItem.Quantity);
+
+	PlayerInventory->UpdateHoldedSlot(PlayerInventory->AnyEmptySlotAvailable() >= 0 ? PlayerInventory->AnyEmptySlotAvailable() : 0);
+	TowerInventory->UpdateHoldedSlot(TowerInventory->AnyEmptySlotAvailable() >= 0 ? TowerInventory->AnyEmptySlotAvailable() : 0);
+
+	// 更新玩家武器组件
+	if (TowerHoldedItem.ID != "0000")
+	{
+		WeaponComponent->SwitchWeapon(TowerHoldedItem);
+	}
+}
+
+void APVZ3DPlayer::OnHoldedItemChanged(FItemInInventory Item)
+{
+	if (WeaponComponent && Item.ID != "0000")
+	{
+		// 只更新玩家自身的武器组件
+		WeaponComponent->SwitchWeapon(Item);
+	}
 }
 
 void APVZ3DPlayer::SwitchToStack1()
@@ -627,6 +673,7 @@ void APVZ3DPlayer::SwitchToStack1()
 	if(InventoryComponent)
 	{
 		InventoryComponent->UpdateHoldedSlot(0);
+		WeaponComponent->SwitchWeapon(InventoryComponent->Slot[0]);
 	}
 }
 
@@ -635,6 +682,7 @@ void APVZ3DPlayer::SwitchToStack2()
 	if(InventoryComponent)
 	{
 		InventoryComponent->UpdateHoldedSlot(1);
+		WeaponComponent->SwitchWeapon(InventoryComponent->Slot[1]);
 	}
 }
 
@@ -643,6 +691,7 @@ void APVZ3DPlayer::SwitchToStack3()
 	if(InventoryComponent)
 	{
 		InventoryComponent->UpdateHoldedSlot(2);
+		WeaponComponent->SwitchWeapon(InventoryComponent->Slot[2]);
 	}
 }
 
@@ -651,6 +700,7 @@ void APVZ3DPlayer::SwitchToStack4()
 	if(InventoryComponent)
 	{
 		InventoryComponent->UpdateHoldedSlot(3);
+		WeaponComponent->SwitchWeapon(InventoryComponent->Slot[3]);
 	}
 }
 
@@ -659,6 +709,7 @@ void APVZ3DPlayer::SwitchToStack5()
 	if(InventoryComponent)
 	{
 		InventoryComponent->UpdateHoldedSlot(4);
+		WeaponComponent->SwitchWeapon(InventoryComponent->Slot[4]);
 	}
 }
 
@@ -667,6 +718,7 @@ void APVZ3DPlayer::SwitchToStack6()
 	if(InventoryComponent)
 	{
 		InventoryComponent->UpdateHoldedSlot(5);
+		WeaponComponent->SwitchWeapon(InventoryComponent->Slot[5]);
 	}
 }
 
@@ -675,6 +727,7 @@ void APVZ3DPlayer::SwitchToStack7()
 	if(InventoryComponent)
 	{
 		InventoryComponent->UpdateHoldedSlot(6);
+		WeaponComponent->SwitchWeapon(InventoryComponent->Slot[6]);
 	}
 }
 
@@ -683,6 +736,7 @@ void APVZ3DPlayer::SwitchToStack8()
 	if(InventoryComponent)
 	{
 		InventoryComponent->UpdateHoldedSlot(7);
+		WeaponComponent->SwitchWeapon(InventoryComponent->Slot[7]);
 	}
 }
 
@@ -691,6 +745,7 @@ void APVZ3DPlayer::SwitchToStack9()
 	if(InventoryComponent)
 	{
 		InventoryComponent->UpdateHoldedSlot(8);
+		WeaponComponent->SwitchWeapon(InventoryComponent->Slot[8]);
 	}
 }
 
@@ -699,6 +754,7 @@ void APVZ3DPlayer::SwitchToStack10()
 	if(InventoryComponent)
 	{
 		InventoryComponent->UpdateHoldedSlot(9);
+		WeaponComponent->SwitchWeapon(InventoryComponent->Slot[9]);
 	}
 }
 
