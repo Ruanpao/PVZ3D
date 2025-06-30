@@ -1,4 +1,0 @@
-,TowerID,Icon,TowerName,WeaponID,Heath,BehaviourTree,Height,AttackRange,AggroValue,TeamID
-0000,0000,None,豌豆射手I,0000,1000,1,100,1000,0,3
-0001,0001,None,向日葵I,0001,1000,2,101,1000,0,3
-0002,0002,None,坚果墙,0002,1000,3,103,0,10,2
