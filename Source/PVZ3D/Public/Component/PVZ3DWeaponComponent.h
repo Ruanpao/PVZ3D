@@ -86,7 +86,6 @@ public:
 	void SwitchWeapon(FItemInInventory HoldedItem);
 	
 	void DestroyWeapon();
-	void BindSwitchWeapon(UPVZ3DInventoryComponent* InventoryComponent);
 	
 	void BindSwitchWeapon(UPVZ3DInventoryComponent* InventoryComponent);
 

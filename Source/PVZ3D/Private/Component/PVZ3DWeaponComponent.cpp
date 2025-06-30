@@ -66,9 +66,14 @@ void UPVZ3DWeaponComponent::SwitchWeapon(FItemInInventory HoldedItem)
 		if((FoundHoldedItemInfo->ItemType == "Plant_Attack" || FoundHoldedItemInfo->ItemType == "Plant_Defense") && FoundHoldedItemInfo->WeaponClass)
 		{
 			CurrentWeapon = GetWorld()->SpawnActor<APVZ3DWeapon>(FoundHoldedItemInfo->WeaponClass,Character->GetMesh()->GetSocketTransform(WeaponAttachPointName),SpawnParams);
-        
+			
 			if(!CurrentWeapon)  return;
 
+			//赋值
+			FString stringNum=FoundHoldedItemInfo->Clips.ToString();
+			int32 CurrentBullets =FCString::Atoi(*stringNum);
+			CurrentWeapon->SetAttribute(FoundHoldedItemInfo->Damage,FoundHoldedItemInfo->TraceMaxDistance,FoundHoldedItemInfo->ReloadTime,CurrentBullets);
+			
 			CurrentWeapon->OnReload.AddUObject(this, &UPVZ3DWeaponComponent::Reload);
 
 			CurrentWeaponClips = FoundHoldedItemInfo->Clips;

@@ -48,7 +48,9 @@ public:
 	virtual bool CanReload() const;
 
 	USkeletalMeshComponent* GetWeaponMesh() const { return WeaponMesh; }
-	
+
+	void SetAttribute(float Damage,float Distance,float ReloadTime,float Clips);
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -88,6 +90,8 @@ protected:
 	void LogAmmo();
 
 	bool bIsReloading = false;
+
+	float BulletDamage = 0.0f;
 private:
 	FTimerHandle ShotTimerHandle;
 
