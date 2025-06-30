@@ -14,13 +14,20 @@ void UPVZ3DHoldedItemWidget::NativeOnInitialized()
 
 	Icon = LoadObject<UTexture2D>(this, TEXT("/Script/Engine.Texture2D'/Game/MyAsset/Texture/ItemNone.ItemNone'"));
 
+	
 	if(GetWorld())
 	{
-		if(UGameplayStatics::GetPlayerPawn(GetWorld(), 0))
+		TArray<AActor*> PlayerTaggedActors;
+		UGameplayStatics::GetAllActorsWithTag(GetWorld(), FName("Player"), PlayerTaggedActors);
+		for (AActor* Actor : PlayerTaggedActors)
 		{
-			if(UPVZ3DInventoryComponent* InventoryComponent = UGameplayStatics::GetPlayerPawn(GetWorld(), 0)->FindComponentByClass<UPVZ3DInventoryComponent>())
+			if (APawn* PlayerPawn = Cast<APawn>(Actor))
 			{
-				InventoryComponent->HoldedChanged.AddUObject(this, &UPVZ3DHoldedItemWidget::UpdateHoldedItemWidget);
+				if (UPVZ3DInventoryComponent* InventoryComponent = PlayerPawn->FindComponentByClass<UPVZ3DInventoryComponent>())
+				{
+					InventoryComponent->HoldedChanged.AddUObject(this, &UPVZ3DHoldedItemWidget::UpdateHoldedItemWidget);
+					break;
+				}
 			}
 
 			if(UPVZ3DWeaponComponent* WeaponComponent = UGameplayStatics::GetPlayerPawn(GetWorld(), 0)->FindComponentByClass<UPVZ3DWeaponComponent>())

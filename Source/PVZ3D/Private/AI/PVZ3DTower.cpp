@@ -25,24 +25,20 @@ void APVZ3DTower::BeginPlay()
 	HealthComponent->OnHealthChanged.AddUObject(this, &APVZ3DTower::OnHealthChanged);
 	if (InventoryComponent)
 	{
-		// 设置初始武器（例如0001）
-		FItemInInventory InitialWeapon;
-		InitialWeapon.ID = "0001";
-		InitialWeapon.Quantity = 1;
-		InventoryComponent->AddToInventory(InitialWeapon.ID, InitialWeapon.Quantity);
+		InventoryComponent->HoldedItem = FItemInInventory(1,CurrentWeaponID, 1); // 初始化持有物品
 		InventoryComponent->UpdateHoldedSlot(0); // 设置第一个槽为当前持有
 	}
 	BuildTower(CurrentWeaponID);
 	// 获取Player0控制器
 
-	for (int32 i = 1; i < InventoryComponent->SlotSize; i++)
-	{
-		// 跳过第一个槽位(索引0)
-		if (i == 0) continue;
-        
-		// 添加物品到槽位
-		InventoryComponent->AddToInventory(FName("0011"), 1);
-	}
+	// for (int32 i = 1; i < InventoryComponent->SlotSize; i++)
+	// {
+	// 	// 跳过第一个槽位(索引0)
+	// 	if (i == 0) continue;
+ //        
+	// 	// 添加物品到槽位
+	// 	InventoryComponent->AddToInventory(FName("0011"), 1);
+	// }
 	TowerInventory = FindComponentByClass<UPVZ3DInventoryComponent>();
 
 	Player = Cast<APVZ3DPlayer>(UGameplayStatics::GetPlayerPawn(this, 0));

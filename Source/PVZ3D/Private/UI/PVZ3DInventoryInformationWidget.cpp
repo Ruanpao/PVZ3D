@@ -16,11 +16,19 @@ void UPVZ3DInventoryInformationWidget::NativeOnInitialized()
 
 	if(GetWorld())
 	{
-		if(UGameplayStatics::GetPlayerPawn(GetWorld(), 0))
+		TArray<AActor*> PlayerTaggedActors;
+		UGameplayStatics::GetAllActorsWithTag(GetWorld(), FName("Player"), PlayerTaggedActors);
+    
+		// 遍历查找符合条件的Pawn
+		for (AActor* Actor : PlayerTaggedActors)
 		{
-			if(UPVZ3DInventoryComponent* InventoryComponent = UGameplayStatics::GetPlayerPawn(GetWorld(), 0)->FindComponentByClass<UPVZ3DInventoryComponent>())
+			if (APawn* PlayerPawn = Cast<APawn>(Actor))
 			{
-				InventoryComponent->HoldedChanged.AddUObject(this, &UPVZ3DInventoryInformationWidget::ShowInfo);
+				if (UPVZ3DInventoryComponent* InventoryComponent = PlayerPawn->FindComponentByClass<UPVZ3DInventoryComponent>())
+				{
+					InventoryComponent->HoldedChanged.AddUObject(this, &UPVZ3DInventoryInformationWidget::ShowInfo);
+					break;
+				}
 			}
 		}
 	}
@@ -30,6 +38,8 @@ void UPVZ3DInventoryInformationWidget::ShowInfo(FItemInInventory HoldedItem)
 {
 	ID = HoldedItem.ID;
 	Quantity = HoldedItem.Quantity;
+
+	UE_LOG(LogTemp,Warning,TEXT("HHEELLOO"));
 
 	if(!Datatable)
 	{

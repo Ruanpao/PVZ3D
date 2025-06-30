@@ -111,8 +111,6 @@ void APVZ3DPlayer::BeginPlay()
 	}
 
 	WeaponComponent->BindSwitchWeapon(InventoryComponent);
-
-
 	
 }
 
