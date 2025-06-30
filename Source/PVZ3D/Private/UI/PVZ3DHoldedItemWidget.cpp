@@ -2,6 +2,8 @@
 
 
 #include "UI/PVZ3DHoldedItemWidget.h"
+
+#include "Component/PVZ3DWeaponComponent.h"
 #include "Component/PVZ3DInventoryComponent.h"
 #include "../../CoreTypes/PVZ3DWeaponCoreTypes.h"
 #include "Kismet/GameplayStatics.h"
@@ -12,13 +14,25 @@ void UPVZ3DHoldedItemWidget::NativeOnInitialized()
 
 	Icon = LoadObject<UTexture2D>(this, TEXT("/Script/Engine.Texture2D'/Game/MyAsset/Texture/ItemNone.ItemNone'"));
 
+	
 	if(GetWorld())
 	{
-		if(UGameplayStatics::GetPlayerPawn(GetWorld(), 0))
+		TArray<AActor*> PlayerTaggedActors;
+		UGameplayStatics::GetAllActorsWithTag(GetWorld(), FName("Player"), PlayerTaggedActors);
+		for (AActor* Actor : PlayerTaggedActors)
 		{
-			if(UPVZ3DInventoryComponent* InventoryComponent = UGameplayStatics::GetPlayerPawn(GetWorld(), 0)->FindComponentByClass<UPVZ3DInventoryComponent>())
+			if (APawn* PlayerPawn = Cast<APawn>(Actor))
 			{
-				InventoryComponent->HoldedChanged.AddUObject(this, &UPVZ3DHoldedItemWidget::UpdateHoldedItemWidget);
+				if (UPVZ3DInventoryComponent* InventoryComponent = PlayerPawn->FindComponentByClass<UPVZ3DInventoryComponent>())
+				{
+					InventoryComponent->HoldedChanged.AddUObject(this, &UPVZ3DHoldedItemWidget::UpdateHoldedItemWidget);
+					break;
+				}
+			}
+
+			if(UPVZ3DWeaponComponent* WeaponComponent = UGameplayStatics::GetPlayerPawn(GetWorld(), 0)->FindComponentByClass<UPVZ3DWeaponComponent>())
+			{
+				WeaponComponent->Reloading.AddUObject(this, &UPVZ3DHoldedItemWidget::CurrentBulletNumChanged);
 			}
 		}
 	}
@@ -72,4 +86,10 @@ void UPVZ3DHoldedItemWidget::UpdateHoldedItemWidget(FItemInInventory HoldedItem)
 			}
 		}
 	}
+}
+
+void UPVZ3DHoldedItemWidget::CurrentBulletNumChanged(FText NewBulletNum)
+{
+	CurrentBulletNum = NewBulletNum;
+	UE_LOG(LogTemp, Warning, TEXT("CurrentBulletNum Changed: %s"), *CurrentBulletNum.ToString());
 }

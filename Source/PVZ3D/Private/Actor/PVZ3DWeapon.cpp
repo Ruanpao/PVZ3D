@@ -131,7 +131,7 @@ void APVZ3DWeapon::MakeHit(FHitResult& HitResult, const FVector& TraceStart, FVe
 		CollisionParams.AddIgnoredActor(Tower);
 	}
 	
-	GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECollisionChannel::ECC_Visibility, CollisionParams);
+	GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECollisionChannel::ECC_GameTraceChannel1, CollisionParams);
 
 }
 
@@ -213,4 +213,8 @@ void APVZ3DWeapon::Reload()
 {
 	bIsReloading = false;
 	ChangeClip();
+
+	UE_LOG(LogWeapon , Warning , TEXT("Reloaded! Current Ammo: %d Bullets, %d Clips"), CurrentAmmo.Bullets, CurrentAmmo.Clips);
+	
+	OnReload.Broadcast();
 }

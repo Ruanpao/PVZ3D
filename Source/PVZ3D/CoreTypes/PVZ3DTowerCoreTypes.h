@@ -1,5 +1,6 @@
 #pragma once
 #include "Engine/DataTable.h"
+#include "GenericTeamAgentInterface.h"
 #include "PVZ3DTowerCoreTypes.generated.h"
 
 USTRUCT(BlueprintType)
@@ -36,6 +37,14 @@ struct FTowerBasicInfo : public FTableRowBase
 
 	UPROPERTY(EditDefaultsOnly,Blueprintable, Category="TowerInfo")
 	FGenericTeamId TeamID = 0;
+
+	UPROPERTY(EditDefaultsOnly,Blueprintable, Category="TowerInfo")
+	int CurrentLevel;
+
+	UPROPERTY(EditDefaultsOnly,Blueprintable, Category="TowerInfo")
+	int CurrentMaxLevel;
+	
+	
 };
 
 USTRUCT(BlueprintType)

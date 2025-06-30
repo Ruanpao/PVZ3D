@@ -5,6 +5,8 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Interface/PVZ3DInteractInterface.h"
 #include "PVZ3D/CoreTypes/PVZ3DTowerCoreTypes.h" // 包含FTowerState定义
+#include "Component/PVZ3DInventoryComponent.h"
+#include "Interface/UPVZ3DTowerInterface.h" 
 #include "Character/PVZ3DPlayer.h"
 #include "PVZ3DTower.generated.h"
 
@@ -13,13 +15,14 @@ class UPVZ3DHealthComponent;
 class UPVZ3DWeaponComponent;
 class UCameraComponent;
 class UInventoryComponent;
+class APVZ3DPlayer;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTowerHealthChanged, float, NewHealth);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPlayerWeaponChanged,FItemInInventory ,NewItem);
 
 
 UCLASS()
-class PVZ3D_API APVZ3DTower : public APVZ3DBaseEntity, public IGenericTeamAgentInterface, public IPVZ3DInteractInterface
+class PVZ3D_API APVZ3DTower : public APVZ3DBaseEntity, public IGenericTeamAgentInterface, public IPVZ3DInteractInterface, public IPVZ3DTowerInterface
 {
     GENERATED_BODY()
 
@@ -31,14 +34,11 @@ protected:
     
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Component")
     UPVZ3DHealthComponent* HealthComponent;
-
-    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Component")
-    UPVZ3DWeaponComponent* WeaponComponent;
-
-
-
+    
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "DataTable")
     UDataTable* TowerDataTable;
+
+
 
 public:
     APVZ3DTower();
@@ -61,7 +61,7 @@ public:
     virtual void UpdateTower();
     virtual void NotifyActorOnClicked(FKey ButtonPressed) override;
     
-    FName CurrentWeaponID = "0001";
+    FName CurrentWeaponID = "0000";
     int AggroValue = -1;
     double AttackRange = 1000.0f;
     FRotator InitialOrientation;
@@ -102,20 +102,33 @@ public:
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Component")
     UPVZ3DInventoryComponent* InventoryComponent;
 
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Component")
+    UPVZ3DWeaponComponent* WeaponComponent;
+
     UFUNCTION(BlueprintCallable, Category = "Interaction")
     void BuildTower(FName NewWeaponID);
 
     UFUNCTION(BlueprintCallable, Category = "Interaction")
     void TowerDied();
 
-
+    UFUNCTION(BlueprintCallable, Category = "Interaction")
+    void SellTower();
+    
 private:
     UPVZ3DInventoryComponent* TowerInventory;
     APVZ3DPlayer* Player;
     FTimerHandle InventoryCheckTimer;
+    
+
 
 public:
     virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+    
+    // 实现接口方法
+    virtual bool IsTowerValid_Implementation() const override;
+    virtual bool HasWeapon_Implementation() const override;
+    virtual bool IsTowerBaseInMiddle_Implementation() const override;
+    virtual bool IsWeaponMaxLevel_Implementation() const override;
 
 private:
     void StartInventoryCheckTimer();
@@ -123,4 +136,15 @@ private:
     void CheckAndLogInventories();
     void LogTowerInventory();
     void LogPlayerInventory();
+
+private:
+    UPROPERTY(EditAnywhere, Category = "Tower")
+    bool bIsBaseInMiddle = false;
+    
+    UPROPERTY(EditAnywhere, Category = "Tower")
+    int32 CurrentLevel = 1;
+    
+    UPROPERTY(EditAnywhere, Category = "Tower")
+    int32 MaxLevel = 3;
+
 };

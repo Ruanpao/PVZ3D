@@ -50,12 +50,12 @@ void UPVZ3DTaskTowerSunFlowerAttack::TickTask(UBehaviorTreeComponent& OwnerComp,
                 
       
             	if (!Tower->bIsAttacking)
-            	{Tower->bIsAttacking = true;
+            	{
+            		Tower->bIsAttacking = true;
             		Tower->Attack();
             		UE_LOG(LogTemp, Warning, TEXT("Tower Laser Attacking Target: %s"), *TargetActor->GetName());
             	}
-
-                
+            	
             }
         }
         else

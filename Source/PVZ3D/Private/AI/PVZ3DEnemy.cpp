@@ -6,6 +6,7 @@
 #include "Components/TextRenderComponent.h"		//测试血量
 #include "PVZ3D/CoreTypes/PVZ3DEnemyCoreTypes.h"
 #include "AI/PVZ3DEnemyController.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Gamemode/PVZ3DGameState.h"
 
 
@@ -39,13 +40,18 @@ void APVZ3DEnemy::BeginPlay()
 	RouteManager= Cast<APVZ3DRouteManager>(UGameplayStatics::GetActorOfClass(GetWorld(), APVZ3DRouteManager::StaticClass()));
 	if(RouteManager)
 	{
-		//UE_LOG(LogTemp, Warning, TEXT("RouteManager found!"));
-		//UE_LOG(LogTemp, Warning, TEXT("RouteManager: %d"), RouteManager->GetRouteNodesByID(1)[0]->OrderIndex);
+		UE_LOG(LogTemp, Warning, TEXT("RouteManager found!"));
+		UE_LOG(LogTemp, Warning, TEXT("RouteManager: %d"), RouteManager->GetRouteNodesByID(1)[0]->OrderIndex);
+
 	}
 	CurrentRouteNodes=RouteManager->GetRouteNodesByID(RouteID);
-	//UE_LOG(LogTemp, Warning, TEXT("CurrentRouteNodes: %d"), CurrentRouteNodes[0]->OrderIndex);
+	if (CurrentRouteNodes[0]!=nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("CurrentRouteNodes: %d"), CurrentRouteNodes[0]->OrderIndex);
+	}
 
-	//UpdateEnemyImformation();
+	
+	UpdateEnemyImformation();
 
 	check(HealthComponent);
 	check(HealthTextComponent);
@@ -170,6 +176,9 @@ void APVZ3DEnemy::UpdateEnemyImformation()//通过EnemyID更新敌人信息
 			EnemyBehaviorTreeID = Row->BehaviourTreeID;
 			HealthComponent->SetMaxHealth(Row->MaxHealth);
 			Vecolity = Row->Vecolity;
+			GetCharacterMovement()->MaxWalkSpeed =Vecolity;
+			AttackDamage=Row->Damage;
+			AttackInterval=Row->AttackInterval;
 			UE_LOG(LogTemp, Warning, TEXT("PVZ3DEnemy.cpp update row"));
 			//UE_LOG(LogTemp, Warning, TEXT("CurrentWeaponID: %s"), *CurrentWeaponID.ToString());
 			//UE_LOG(LogTemp, Warning, TEXT("AttackRange: %f"), AttackRange);
