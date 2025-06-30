@@ -107,6 +107,8 @@ void APVZ3DPlayer::BeginPlay()
 		InventoryComponent->HoldedChanged.AddUObject(this, &APVZ3DPlayer::OnHoldedItemChanged);
 	}
 
+	WeaponComponent->BindSwitchWeapon(InventoryComponent);
+
 
 	
 }

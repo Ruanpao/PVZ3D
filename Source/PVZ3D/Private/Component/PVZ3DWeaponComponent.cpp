@@ -28,20 +28,7 @@ void UPVZ3DWeaponComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if(GetWorld())
-	{
-		if(UGameplayStatics::GetPlayerPawn(GetWorld(), 0))
-		{
-			
-			if(UPVZ3DInventoryComponent* InventoryComponent = UGameplayStatics::GetPlayerPawn(GetWorld(), 0)->FindComponentByClass<UPVZ3DInventoryComponent>())
-			{
-				if(UGameplayStatics::GetPlayerPawn(GetWorld(), 0)->IsA(APVZ3DPlayer::StaticClass()))
-				{
-					InventoryComponent->HoldedChanged.AddUObject(this, &UPVZ3DWeaponComponent::SwitchWeapon);
-				}
-			}
-		}
-	}
+
 }
 
 
@@ -110,6 +97,11 @@ void UPVZ3DWeaponComponent::DestroyWeapon()
 		CurrentItem->SetActorHiddenInGame(true);
 		CurrentItem->SetActorEnableCollision(false);
 	}
+}
+
+void UPVZ3DWeaponComponent::BindSwitchWeapon(UPVZ3DInventoryComponent* InventoryComponent)
+{
+	InventoryComponent->HoldedChanged.AddUObject(this, &UPVZ3DWeaponComponent::SwitchWeapon);
 }
 
 
