@@ -48,6 +48,7 @@ DECLARE_DELEGATE(FSwitchToStack8);
 DECLARE_DELEGATE(FSwitchToStack9);
 DECLARE_DELEGATE(FSwitchToStack10);
 
+
 UCLASS()
 class PVZ3D_API APVZ3DPlayer : public APVZ3DBaseEntity, public IGenericTeamAgentInterface, public IPVZ3DInteractInterface
 {

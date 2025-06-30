@@ -7,6 +7,7 @@
 #include "PVZ3D/CoreTypes/PVZ3DTowerCoreTypes.h" // 包含FTowerState定义
 #include "Component/PVZ3DInventoryComponent.h"
 #include "Interface/UPVZ3DTowerInterface.h" 
+#include "Character/PVZ3DPlayer.h"
 #include "PVZ3DTower.generated.h"
 
 class UStaticMeshComponent;

@@ -27,6 +27,8 @@ void APVZ3DHome::BeginPlay()
 	{
 		GameState->UpdateHomeHealth(GetHomeCurrentHealth());
 		UE_LOG(LogTemp, Warning, TEXT("AND Gamestate tried APVZ3DHome::BeginPlay - Home Health: %.0f"), GetHomeCurrentHealth());
+
+		GameState->HomeMaxHealth = HomeMaxHealth;
 	}
 	else
 	{
@@ -119,12 +121,6 @@ void APVZ3DHome::OnHomeDeath()
 	if (GameState)
 	{
 		GameState->UpdateHomeHealth(0.f);
-        
-		// 触发关卡失败
-		if (GameState->IsLevelInProgress())
-		{
-			GameState->ServerFailLevel();
-		}
 	}
     
 	HomeDeathDelegate.Broadcast(); // 触发事件

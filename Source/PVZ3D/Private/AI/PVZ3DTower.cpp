@@ -12,8 +12,6 @@
 #include "Character/PVZ3DPlayer.h" // 假设玩家类名为 PVZ3DPlayer
 
 
-
-
 void APVZ3DTower::BeginPlay()
 {
 	Super::BeginPlay();
@@ -102,7 +100,6 @@ void APVZ3DTower::Attack()
 			WeaponComponent->StartFire();
 			bIsAttacking = true;
 			UE_LOG(LogTemp, Warning, TEXT("Tower Laser Attack Started"));
-
 	}
 	
 	
