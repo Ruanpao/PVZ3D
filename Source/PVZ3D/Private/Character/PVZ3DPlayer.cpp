@@ -792,4 +792,11 @@ void APVZ3DPlayer::UpdateMouseSituation(bool IsUsed)
 	}
 }
 
+void APVZ3DPlayer::OnClickedTower()
+{
+	if(InventoryComponent)
+	{
+		MouseInteraction.Broadcast(true,bIsNearTower, bTowerHasWeapon , bTowerBaseInMiddle, bTowerWeaponMaxLevel, InventoryComponent->HoldedItem);
+	}
+}
 

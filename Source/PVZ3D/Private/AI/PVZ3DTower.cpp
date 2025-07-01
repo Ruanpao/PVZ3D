@@ -111,7 +111,6 @@ void APVZ3DTower::StopAttack()
 }
 void APVZ3DTower::Interact(AActor* InstigatorActor)
 {
-
 }
 
 void APVZ3DTower::ApplyStateFromWeapon(UPVZ3DWeaponComponent* WeaponComp)
@@ -206,7 +205,12 @@ void APVZ3DTower::NotifyActorOnClicked(FKey ButtonPressed)
 {
 	Super::NotifyActorOnClicked(ButtonPressed);
 
-	
+	if(Player)
+	{
+		Player->InteractingTower = this;
+		Player->BroadcastTowerInfo(this);
+		Player->OnClickedTower();
+	}
 }
 
 void APVZ3DTower::SetGenericTeamId(const FGenericTeamId& NewTeamID)
