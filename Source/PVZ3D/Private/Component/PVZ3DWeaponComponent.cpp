@@ -99,19 +99,13 @@ void UPVZ3DWeaponComponent::DestroyWeapon()
 	if (CurrentWeapon)
 	{
 		CurrentWeapon->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-		CurrentWeapon->SetActorHiddenInGame(true);
-		CurrentWeapon->SetActorEnableCollision(false);
-		if (CurrentWeapon->IsA(APVZ3DSunflowerWeapon::StaticClass()))
-		{
-			CurrentWeapon->StopFire();
-		}
+		CurrentWeapon->Destroy();
 	}
 
 	if(CurrentItem)
 	{
 		CurrentItem->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-		CurrentItem->SetActorHiddenInGame(true);
-		CurrentItem->SetActorEnableCollision(false);
+		CurrentItem->Destroy();
 	}
 }
 

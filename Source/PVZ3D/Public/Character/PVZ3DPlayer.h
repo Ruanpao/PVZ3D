@@ -35,7 +35,7 @@ enum class EPlayerState : uint8
  */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerDied, APlayerController*, PlayerController);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_FiveParams(FOnTowerInteraction, bool, bTowerHasWeapon, bool, bTowerBaseInMiddle, bool, bTowerWeaponMaxLevel, bool, bIsNearTower, APVZ3DTower*, Tower);
-
+DECLARE_MULTICAST_DELEGATE_SixParams(FMouseInteraction , bool , bool , bool , bool ,bool , FItemInInventory);
 
 DECLARE_DELEGATE(FSwitchToStack1);
 DECLARE_DELEGATE(FSwitchToStack2);
@@ -214,6 +214,10 @@ public:
 	// 委托
 	UPROPERTY(BlueprintAssignable, Category = "TowerInteraction")
 	FOnTowerInteraction OnTowerInteraction;
+
+	FMouseInteraction MouseInteraction;
+
+	void OnClickedTower();
 
 	// 交互范围
 	UPROPERTY(EditDefaultsOnly, Category = "Interaction")

@@ -11,6 +11,8 @@
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FRemove_2 , bool)
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FNumChanged1 , int32)
+
 UCLASS()
 class PVZ3D_API UPVZ3DDisposalPopWidget : public UUserWidget
 {
@@ -18,6 +20,8 @@ class PVZ3D_API UPVZ3DDisposalPopWidget : public UUserWidget
 
 public:
 	FRemove_2 Remove_2;
+
+	FNumChanged1 NumChanged1;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite , Category = "UI" ,  meta = (BindWidget))
 	UButton* Button_0;

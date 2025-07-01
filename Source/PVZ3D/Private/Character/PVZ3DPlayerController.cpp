@@ -2,7 +2,7 @@
 
 
 #include "Character/PVZ3DPlayerController.h"
-
+#include "Character/PVZ3DPlayer.h"
 #include "PVZ3DWeaponComponent.h"
 #include "UI/PVZ3DPlayerHUD.h"
 #include "Kismet/GameplayStatics.h"
@@ -20,6 +20,8 @@ void APVZ3DPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
+	
+
 	FTimerHandle TimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &APVZ3DPlayerController::InitializeHUD, 0.1f, false);
 }
@@ -34,10 +36,6 @@ void APVZ3DPlayerController::InitializeHUD()
 		MyHUD->OnMouseSituationChanged.AddUObject(MyPlayer,&APVZ3DPlayer::UpdateMouseSituation);
 	}
 	SetupInputComponent();
-}
-
-void APVZ3DPlayerController::SetupInputComponent()
-{
 	Super::SetupInputComponent();
 	
 	if(InputComponent && MyHUD)
@@ -63,7 +61,6 @@ void APVZ3DPlayerController::ToggleShopVisibility()
 		MyHUD->ShopVisibility();
 	}
 }
-
 
 
 

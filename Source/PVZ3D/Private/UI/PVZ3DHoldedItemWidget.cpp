@@ -93,3 +93,4 @@ void UPVZ3DHoldedItemWidget::CurrentBulletNumChanged(FText NewBulletNum)
 	CurrentBulletNum = NewBulletNum;
 	UE_LOG(LogTemp, Warning, TEXT("CurrentBulletNum Changed: %s"), *CurrentBulletNum.ToString());
 }
+
