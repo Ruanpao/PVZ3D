@@ -63,11 +63,13 @@ void APVZ3DPlayerHUD::BeginPlay()
 
     if(InventoryInformationWidget)
     {
+    	InventoryInformationWidget->SetVisibility(ESlateVisibility::Hidden);
         InventoryInformationWidget->AddToViewport();
     }
 
     if(ShopWidget)
     {
+    	ShopWidget->SetVisibility(ESlateVisibility::Hidden);
         ShopWidget->AddToViewport();
 
         if (UPVZ3DShopWidget* ShopWidgetInstance = Cast<UPVZ3DShopWidget>(ShopWidget))

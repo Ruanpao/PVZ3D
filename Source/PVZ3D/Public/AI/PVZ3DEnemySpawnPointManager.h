@@ -7,6 +7,8 @@
 
 class APVZ3DEnemySpawnPoint;
 
+DECLARE_MULTICAST_DELEGATE(FOnVictory1);
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FTotalEnemiesInWaveChanged, int,BoardcastTotalEnemies);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FTotalWavesChanged, int, BoardcastTotalWaves);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCurrentWaveChanged, int, BoardcastCurrentWaveID);
@@ -16,7 +18,7 @@ USTRUCT(BlueprintType)
 struct FWaveDataRow : public FTableRowBase
 {
 	GENERATED_BODY()
-
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WaveData")
 	FName LevelID;
 
@@ -46,7 +48,7 @@ public:
 	APVZ3DEnemySpawnPointManager();
 	virtual void NotifyActorOnClicked(FKey ButtonPressed) override;
 
-
+	FOnVictory1 OnVictory1;
 	FTotalEnemiesInWaveChanged TotalEnemiesInWaveChanged; // 波次总敌人数变化委托
 	FTotalWavesChanged TotalWavesChanged; // 波次总数变化委托
 	FCurrentWaveChanged CurrentWaveChanged; // 当前波次变化委托

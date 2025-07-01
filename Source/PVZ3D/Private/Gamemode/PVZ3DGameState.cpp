@@ -40,6 +40,7 @@ void APVZ3DGameState::BeginPlay()
             SpawnPointManager->TotalWavesChanged.AddDynamic(this, &APVZ3DGameState::UpdateTotalWave);
             SpawnPointManager->CurrentWaveChanged.AddDynamic(this, &APVZ3DGameState::UpdateCurrentWaveID);
             SpawnPointManager->CurrentWaveTimeLimitChanged.AddDynamic(this, &APVZ3DGameState::UpdateTotalTime);
+            SpawnPointManager->OnVictory1.AddUObject(this, &APVZ3DGameState::Victory);
         }
     }
     
@@ -103,6 +104,8 @@ void APVZ3DGameState::UpdateRemainingEnemies(int NewRemainingEnemies)
 void APVZ3DGameState::OnHomeDeath()
 {
     UE_LOG(LogTemp, Warning, TEXT("GAMESTATE: Home has been destroyed!"));
+    
+    Lose();
 }
 
 void APVZ3DGameState::UpdateTotalTime(float NewTotalTime)
@@ -119,3 +122,16 @@ void APVZ3DGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
     // 添加需要复制的属性（如果有）
     // DOREPLIFETIME(APVZ3DGameState, MyReplicatedProperty);
 }
+
+void APVZ3DGameState::Victory()
+{
+    UE_LOG(LogGameState, Error ,TEXT("456"));
+    UGameplayStatics::OpenLevel(GetWorld(), "WinMap");
+}
+
+void APVZ3DGameState::Lose()
+{
+    UE_LOG(LogGameState, Error , TEXT("123"));
+    UGameplayStatics::OpenLevel(GetWorld(), "LoseMap");
+}
+

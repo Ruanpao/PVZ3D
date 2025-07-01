@@ -89,7 +89,7 @@ public:
     UFUNCTION(BlueprintCallable, Category="Level")
     void UpdateRemainingEnemies(int NewRemainingEnemies);
     
-    UFUNCTION()
+    UFUNCTION(BlueprintCallable,Category="Level")
     void OnHomeDeath();
 
     UFUNCTION(BlueprintCallable, Category = "Time")
@@ -97,6 +97,10 @@ public:
     
     virtual void BeginPlay() override;
     virtual void Tick(float DeltaTime) override;
+
+    void Victory();
+    
+    void Lose();
 };
 
 
