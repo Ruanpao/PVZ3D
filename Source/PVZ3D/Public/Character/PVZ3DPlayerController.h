@@ -30,6 +30,8 @@ public:
 protected:
 	APVZ3DPlayerHUD* MyHUD;
 
+	APVZ3DPlayer* MyPlayer;
+
 	virtual void BeginPlay() override;
 
 	void InitializeHUD();

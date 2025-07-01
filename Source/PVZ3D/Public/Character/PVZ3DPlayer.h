@@ -93,6 +93,8 @@ protected:
 	
 public:
 	APVZ3DPlayer();
+
+	void UpdateMouseSituation(bool IsUsed);
 	
 	virtual void MoveForward(const float Val);
 	virtual void MoveRight(const float Val);
@@ -218,5 +220,4 @@ public:
 	// 交互范围
 	UPROPERTY(EditDefaultsOnly, Category = "Interaction")
 	float InteractionRange = 200.0f;
-	
 };

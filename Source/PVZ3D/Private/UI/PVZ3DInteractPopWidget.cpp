@@ -36,12 +36,18 @@ void UPVZ3DInteractPopWidget::NativeOnInitialized()
 		Button_TakeInHand->OnClicked.AddDynamic(this, &UPVZ3DInteractPopWidget::OnButton_TakeInHandClicked);
 	}
 
-	if(Button_Construct && Button_Upgrade && Button_Sell && Button_TakeInHand)
+	if(Button_Remove)
+	{
+		Button_Remove->OnClicked.AddDynamic(this, &UPVZ3DInteractPopWidget::OnButton_RemoveClicked);
+	}
+	
+	if(Button_Construct && Button_Upgrade && Button_Sell && Button_TakeInHand && Button_Remove)
 	{
 		Button_Construct->SetVisibility(ESlateVisibility::Hidden);
 		Button_Upgrade->SetVisibility(ESlateVisibility::Hidden);
 		Button_Sell->SetVisibility(ESlateVisibility::Hidden);
 		Button_TakeInHand->SetVisibility(ESlateVisibility::Hidden);
+		Button_Remove->SetVisibility(ESlateVisibility::Visible);
 	}
 	
 	
@@ -144,7 +150,8 @@ void UPVZ3DInteractPopWidget::OnButton_TakeInHandClicked()
 	
 }
 
-void UPVZ3DInteractPopWidget::OnMouseLeave_1()
+void UPVZ3DInteractPopWidget::OnButton_RemoveClicked()
 {
+	UE_LOG(LogTemp ,Error , TEXT("123"));
 	this->RemoveFromParent();
 }

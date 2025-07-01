@@ -73,11 +73,15 @@ void APVZ3DPlayerHUD::BeginPlay()
 	if(InventoryInformationWidget)
 	{
 		InventoryInformationWidget->AddToViewport();
+		
+		InventoryInformationWidget->SetVisibility(ESlateVisibility::Hidden);
 	}
 
 	if(ShopWidget)
 	{
 		ShopWidget->AddToViewport();
+
+		ShopWidget->SetVisibility(ESlateVisibility::Hidden);
 
 		if (UPVZ3DShopWidget* ShopWidgetInstance = Cast<UPVZ3DShopWidget>(ShopWidget))
 		{
@@ -116,10 +120,12 @@ void APVZ3DPlayerHUD::InventoryInformationVisibility()
 		if(InventoryInformationWidget->IsVisible())
 		{
 			InventoryInformationWidget->SetVisibility(ESlateVisibility::Hidden);
+			UpdateMouseSituation(-1);
 		}
 		else
 		{
 			InventoryInformationWidget->SetVisibility(ESlateVisibility::Visible);
+			UpdateMouseSituation(1);
 		}
 	}
 }
@@ -131,10 +137,12 @@ void APVZ3DPlayerHUD::ShopVisibility()
 		if(ShopWidget->IsVisible())
 		{
 			ShopWidget->SetVisibility(ESlateVisibility::Hidden);
+			UpdateMouseSituation(-1);
 		}
 		else
 		{
 			ShopWidget->SetVisibility(ESlateVisibility::Visible);
+			UpdateMouseSituation(1);
 		}
 	}
 }
@@ -152,6 +160,7 @@ void APVZ3DPlayerHUD::RemoveRequest(int32 Index)
 		if(UPVZ3DDisposalPopWidget* DisposalPopWidgetInstance = Cast<UPVZ3DDisposalPopWidget>(DisposalPopWidget))
 		{
 			DisposalPopWidgetInstance->Remove_2.AddUObject(this, &APVZ3DPlayerHUD::RemoveRequest_2);
+			DisposalPopWidgetInstance->NumChanged1.AddUObject(this, &APVZ3DPlayerHUD::UpdateMouseSituation);
 		}
 	}
 	
@@ -178,6 +187,12 @@ void APVZ3DPlayerHUD::DrawCrossHair()
 
 void APVZ3DPlayerHUD::CreateInteractPopWidget(bool IsClicked, bool IsNearTower, bool IsFullTower , bool IsFullLevel , bool IsIntheMidLine , FItemInInventory HoldedItem)
 {
+	if (InteractPopWidget && InteractPopWidget->IsInViewport())
+	{
+		InteractPopWidget->RemoveFromParent();
+		InteractPopWidget = nullptr;
+	}
+	
 	InteractPopWidget = CreateWidget<UUserWidget>(GetWorld(), InteractPopWidgetClass);
 
 	if(InteractPopWidget)
@@ -186,9 +201,26 @@ void APVZ3DPlayerHUD::CreateInteractPopWidget(bool IsClicked, bool IsNearTower, 
 		{
 			InteractPopWidgetInstance->SendHoldedItem.Broadcast(HoldedItem);
 			InteractPopWidgetInstance->WhetherClickedAndNearTower.Broadcast(IsClicked, IsNearTower, IsFullTower, IsFullLevel, IsIntheMidLine);
+			InteractPopWidgetInstance->OnNumChanged2.AddUObject(this, &APVZ3DPlayerHUD::UpdateMouseSituation);
 		}
 
 		InteractPopWidget->AddToViewport();
+	}
+}
+
+void APVZ3DPlayerHUD::UpdateMouseSituation(int32 Num)
+{
+	CurrentVisibleNum += Num;
+
+	UE_LOG(LogHUD ,  Error , TEXT("%d") , CurrentVisibleNum);
+	
+	if(CurrentVisibleNum > 0)
+	{
+		OnMouseSituationChanged.Broadcast(true);
+	}
+	else
+	{
+		OnMouseSituationChanged.Broadcast(false);
 	}
 }
 
