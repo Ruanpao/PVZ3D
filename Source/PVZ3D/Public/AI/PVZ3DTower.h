@@ -67,6 +67,7 @@ public:
     FRotator InitialOrientation;
     bool bIsAttacking;
     int AttackType;
+    FName NextTowerID = "0000";
 
     APVZ3DPlayer* Player;
 
@@ -112,6 +113,9 @@ public:
     void BuildTower(FName NewWeaponID);
 
     UFUNCTION(BlueprintCallable, Category = "Interaction")
+    void TakeInHandTower();
+
+    UFUNCTION(BlueprintCallable, Category = "Interaction")
     void TowerDied();
 
     UFUNCTION(BlueprintCallable, Category = "Interaction")
@@ -127,10 +131,20 @@ public:
     virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
     
     // 实现接口方法
-    virtual bool IsTowerValid_Implementation() const override;
-    virtual bool HasWeapon_Implementation() const override;
+    virtual bool IsTowerValid_Implementation() override;
+    virtual bool HasWeapon_Implementation() override;
     virtual bool IsTowerBaseInMiddle_Implementation() const override;
-    virtual bool IsWeaponMaxLevel_Implementation() const override;
+    virtual bool IsWeaponMaxLevel_Implementation() override;
+
+    UPROPERTY(EditAnywhere, Category = "Tower")
+    bool bIsBaseInMiddle = false;
+    UPROPERTY(EditAnywhere, Category = "Tower")
+    bool IsTowerValid;
+    UPROPERTY(EditAnywhere, Category = "Tower")
+    bool HasWeapon;
+    UPROPERTY(EditAnywhere, Category = "Tower")
+    bool IsWeaponMaxLevel;
+    
 
 private:
     void StartInventoryCheckTimer();
@@ -140,8 +154,7 @@ private:
     void LogPlayerInventory();
 
 private:
-    UPROPERTY(EditAnywhere, Category = "Tower")
-    bool bIsBaseInMiddle = false;
+   
     
     UPROPERTY(EditAnywhere, Category = "Tower")
     int32 CurrentLevel = 1;

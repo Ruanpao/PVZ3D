@@ -35,7 +35,6 @@ public:
 	
 	void SetProjectileSpeed(float NewSpeed);
 
-	
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UStaticMeshComponent* ProjectileMesh;

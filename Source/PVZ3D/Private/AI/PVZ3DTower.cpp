@@ -163,6 +163,8 @@ void APVZ3DTower::UpdateTower()//根据CurrentWeaponID更新塔的属性
 			AggroValue = Row->AggroValue;
 			TowerBehaviorTreeNow = Row->BehaviourTreeID;
 			TeamID= Row->TeamID;
+			NextTowerID= Row->NextTowerID;
+			
 			if(TowerBehaviorTreeNow==FName("2"))
 				AttackType= 2; // 激光武器
 			else if(TowerBehaviorTreeNow==FName("1"))
@@ -180,6 +182,7 @@ void APVZ3DTower::UpdateTower()//根据CurrentWeaponID更新塔的属性
 			UE_LOG(LogTemp, Warning, TEXT("TowerBehaviorTreeNow: %s"), *TowerBehaviorTreeNow.ToString());
 			UE_LOG(LogTemp, Warning, TEXT("TeamID:%d "),TeamID.GetId());
 			UE_LOG(LogTemp,Warning,TEXT("IMAS AttackType: %d"), AttackType);
+			UE_LOG(LogTemp,Warning,TEXT("IMAS NextTowerID; %s"), *NextTowerID.ToString());
 			//TeamID
 		} else {
 			// 处理未找到行的情况
@@ -299,6 +302,28 @@ void APVZ3DTower::BuildTower(FName NewWeaponID)
 	}
 }
 
+void APVZ3DTower::TakeInHandTower()
+{
+	UPVZ3DInventoryComponent* PlayerInventory = Player->InventoryComponent;
+	UPVZ3DInventoryComponent* aTowerInventory = InventoryComponent;
+
+	FItemInInventory PlayerHolded = PlayerInventory->HoldedItem;
+	FItemInInventory TowerHolded = aTowerInventory->HoldedItem;
+	
+	// 塔始终使用第一个物品栏
+	TowerInventory->UpdateHoldedSlot(0);
+	CurrentWeaponID= FName("0000"); // 更新塔的当前武器ID
+	BuildTower(CurrentWeaponID);
+	UE_LOG(LogTemp,Error,TEXT("Before Towerholded ID: %s, Quantity: %d"), *TowerHolded.ID.ToString(), TowerHolded.Quantity);
+
+	if(PlayerInventory->AddToInventory(TowerHolded.ID, TowerHolded.Quantity) == false)
+	{
+		UE_LOG(LogTemp,Error,TEXT("ADD TO INVEN Towerholded ID: %s, Quantity: %d"), *TowerHolded.ID.ToString(), TowerHolded.Quantity);
+		UE_LOG(LogTemp, Error, TEXT("Done"));
+		return;	
+	}
+}
+
 void APVZ3DTower::TowerDied()
 {
 	CurrentWeaponID=FName("0000");
@@ -369,15 +394,18 @@ void APVZ3DTower::EndPlay(const EEndPlayReason::Type EndPlayReason)
     // 停止定时器
     StopInventoryCheckTimer();
 }
-bool APVZ3DTower::IsTowerValid_Implementation() const
+bool APVZ3DTower::IsTowerValid_Implementation()
 {
-	return HealthComponent && !HealthComponent->IsDead();
+	IsTowerValid = (HealthComponent && !HealthComponent->IsDead());
+
+	return IsTowerValid;
 }
 
-bool APVZ3DTower::HasWeapon_Implementation() const
+bool APVZ3DTower::HasWeapon_Implementation()
 {
 	UE_LOG(LogTemp,Warning, TEXT("HasWeapon called, CurrentWeaponID: %s"), *CurrentWeaponID.ToString());
-	return WeaponComponent && CurrentWeaponID != FName("0000");
+	HasWeapon=WeaponComponent && CurrentWeaponID != FName("0000");
+	return HasWeapon;
 }
 
 bool APVZ3DTower::IsTowerBaseInMiddle_Implementation() const
@@ -385,9 +413,10 @@ bool APVZ3DTower::IsTowerBaseInMiddle_Implementation() const
 	return bIsBaseInMiddle;
 }
 
-bool APVZ3DTower::IsWeaponMaxLevel_Implementation() const
+bool APVZ3DTower::IsWeaponMaxLevel_Implementation()
 {
-    return  CurrentLevel>= MaxLevel; 
+	IsWeaponMaxLevel = (CurrentLevel>= MaxLevel);
+    return IsWeaponMaxLevel; 
 }
 
 void APVZ3DTower::StartInventoryCheckTimer()

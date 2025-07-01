@@ -19,8 +19,8 @@
 #include "AI/PVZ3DTower.h"
 #include "Engine/OverlapResult.h"
 #include "DrawDebugHelpers.h"
+#include "PVZ3DWeaponComponent.h"
 #include "Interface/UPVZ3DTowerInterface.h"
-
 
 DEFINE_LOG_CATEGORY_STATIC(PVZ3DPlayerLog, All, All);
 
@@ -236,8 +236,8 @@ UPVZ3DWeaponComponent* APVZ3DPlayer::GetWeaponComponent() const
 void APVZ3DPlayer::Interact()
 {
 	Super::Interact();
-	InteractingTower=CurrentTower;
 	CurrentTower = FindNearestTowerInRange();
+	InteractingTower=CurrentTower;
 
 	if (CurrentTower)
 	{

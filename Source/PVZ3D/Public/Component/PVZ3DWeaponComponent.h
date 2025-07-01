@@ -93,5 +93,4 @@ public:
 	void Interact(bool IsFullTower,bool IsIntheMidLine, bool IsFullLevel , bool IsNearTower, APVZ3DTower* Tower);
 
 	void OnReload();
-
 };

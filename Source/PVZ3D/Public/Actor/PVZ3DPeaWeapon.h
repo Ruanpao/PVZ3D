@@ -24,6 +24,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	float BulletSpread = 1.5f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
+	TSubclassOf<APVZ3DBullet> ProjectileClass;
 	
 	virtual void MakeShot() override;
 	virtual bool GetTraceData(FVector& TraceStart, FVector& TraceEnd)const override;
@@ -31,15 +34,11 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
-	TSubclassOf<APVZ3DBullet> ProjectileClass;
-
 private:
 	FTimerHandle ShotTimerHandle;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon|Projectile Pool")
 	int32 ProjectilePoolSize = 20;
-	
 	
 	TArray<APVZ3DBullet*> ProjectilePool;
 	

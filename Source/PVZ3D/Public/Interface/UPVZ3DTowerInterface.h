@@ -20,15 +20,15 @@ class IPVZ3DTowerInterface
 public:
 	// 检查塔是否有效（可交互）
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	bool IsTowerValid() const;
+	bool IsTowerValid() ;
     
 	// 获取塔基础信息
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	bool HasWeapon() const;
+	bool HasWeapon() ;
     
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	bool IsTowerBaseInMiddle() const;
     
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	bool IsWeaponMaxLevel() const;
+	bool IsWeaponMaxLevel() ;
 };

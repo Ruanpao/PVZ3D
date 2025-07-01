@@ -221,5 +221,5 @@ public:
 
 	UPROPERTY(VisibleAnyWhere,BlueprintReadWrite,Category="Interact")
 	APVZ3DTower* InteractingTower;
-
+	
 };

@@ -145,16 +145,22 @@ void UPVZ3DInteractPopWidget::OnButton_ConstructClicked()
 	{
 		Tower->SwapWeaponsWithPlayer(Tower->Player);
 	}
-
+	this->RemoveFromParent();
 }
 
 void UPVZ3DInteractPopWidget::OnButton_UpgradeClicked()
 {
-	
+	if(Tower)
+	{
+		Tower->BuildTower(Tower->NextTowerID);
+	}
+	this->RemoveFromParent();
+
 }
 
 void UPVZ3DInteractPopWidget::OnButton_SellClicked()
 {
+	this->RemoveFromParent();
 
 }
 
@@ -163,8 +169,10 @@ void UPVZ3DInteractPopWidget::OnButton_TakeInHandClicked()
 	UE_LOG(LogTemp, Warning, TEXT("HOLYJESUS HUDCLICK: %s"),(Tower ? *Tower->GetName() : TEXT("None")));
 	if(Tower)
 	{
-		Tower->SwapWeaponsWithPlayer(Tower->Player);
+		Tower->TakeInHandTower();
 	}
+	this->RemoveFromParent();
+
 }
 
 void UPVZ3DInteractPopWidget::OnMouseLeave_1()
