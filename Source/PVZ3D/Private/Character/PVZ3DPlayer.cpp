@@ -236,6 +236,8 @@ void APVZ3DPlayer::Interact()
 {
 	Super::Interact();
 	CurrentTower = FindNearestTowerInRange();
+	InteractingTower=CurrentTower;
+
 
 	if (CurrentTower)
 	{

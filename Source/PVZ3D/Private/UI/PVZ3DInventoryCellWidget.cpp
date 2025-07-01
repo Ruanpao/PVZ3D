@@ -25,7 +25,7 @@ void UPVZ3DInventoryCellWidget::UpdateInventoryCellWidget(FName P_ID , int32 P_Q
 	ID = P_ID;
 	Quantity = P_Quantity;
 	SlotIndex = P_SlotIndex;
-	UE_LOG(LogTemp,Warning,TEXT("Nakamura 02 ID: %s , Quantity: %d , SlotIndex: %d, Name:%s"), *ID.ToString(), Quantity, SlotIndex, *GetName());
+	//UE_LOG(LogTemp,Warning,TEXT("Nakamura 02 ID: %s , Quantity: %d , SlotIndex: %d, Name:%s"), *ID.ToString(), Quantity, SlotIndex, *GetName());
 
 
 	if(!Datatable)

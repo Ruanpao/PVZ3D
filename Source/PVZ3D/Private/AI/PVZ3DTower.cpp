@@ -39,10 +39,10 @@ void APVZ3DTower::BeginPlay()
 	// 	// 添加物品到槽位
 	// 	InventoryComponent->AddToInventory(FName("0011"), 1);
 	// }
-	TowerInventory = FindComponentByClass<UPVZ3DInventoryComponent>();
+	InventoryComponent = FindComponentByClass<UPVZ3DInventoryComponent>();
 
 	Player = Cast<APVZ3DPlayer>(UGameplayStatics::GetPlayerPawn(this, 0));
-	//StartInventoryCheckTimer();
+	StartInventoryCheckTimer();
 
 	//this->PlayerWeaponChanged.AddDynamic(Player, &APVZ3DPlayer::OnHoldedItemChanged);
 
@@ -293,12 +293,51 @@ void APVZ3DTower::BuildTower(FName NewWeaponID)
 	UE_LOG(LogTemp, Warning, TEXT("BUILDTOWER1: Weapon ID: %s"), *WeaponItem.ID.ToString());
 	if (WeaponComponent)
 	{
+		InventoryComponent->RemoveFromInventory(0, true, false); // 移除当前持有的武器
+		InventoryComponent->AddToInventory(WeaponItem.ID, 1); // 添加新武器到物品栏
 		WeaponComponent->SwitchWeapon(WeaponItem);
 		UE_LOG(LogTemp, Warning, TEXT("BUILDTOWER2: Weapon ID: %s"), *WeaponItem.ID.ToString());
 		UpdateTower();
 	}
 }
 
+<<<<<<< Updated upstream
+=======
+void APVZ3DTower::TakeInHandTower()
+{
+	UPVZ3DInventoryComponent* PlayerInventory = Player->InventoryComponent;
+	
+	FItemInInventory TowerHolded = InventoryComponent->HoldedItem;
+
+	UE_LOG(LogTemp, Warning, TEXT("CurrentID: %s, TowerHolded ID: %s, Quantity: %d"),
+		   *CurrentWeaponID.ToString(), *TowerHolded.ID.ToString(), TowerHolded.Quantity);
+	
+	// 塔始终使用第一个物品栏
+	InventoryComponent->UpdateHoldedSlot(0);
+	CurrentWeaponID = FName("0000"); // 更新塔的当前武器ID
+	BuildTower(CurrentWeaponID);
+	UE_LOG(LogTemp, Error, TEXT("Before Towerholded ID: %s, Quantity: %d"), 
+		   *TowerHolded.ID.ToString(), TowerHolded.Quantity);
+
+	// 添加到玩家库存
+	if (PlayerInventory && TowerHolded.ID != "0000")
+	{
+		PlayerInventory->AddToInventory(TowerHolded.ID, TowerHolded.Quantity);
+		
+		// 关键修复：从塔库存中移除武器
+		if (InventoryComponent)
+		{
+			InventoryComponent->RemoveFromInventory(TowerHolded.Index, true, false);
+			
+			// 强制更新塔的持有物品为0000
+			InventoryComponent->HoldedItem = FItemInInventory(1, FName("0000"), 0);
+			InventoryComponent->UpdateHoldedSlot(0);
+		}
+	}
+	
+}
+
+>>>>>>> Stashed changes
 void APVZ3DTower::TowerDied()
 {
 	CurrentWeaponID=FName("0000");
@@ -328,12 +367,12 @@ void APVZ3DTower::SwapWeaponsWithPlayer(APVZ3DPlayer* aPlayer)
 	int32 PlayerOriginalSlot = PlayerHolded.Index;
 
 	PlayerInventory->RemoveFromInventory(PlayerHolded.Index, true, false);
-	TowerInventory->RemoveFromInventory(TowerHolded.Index, true, false);
+	InventoryComponent->RemoveFromInventory(TowerHolded.Index, true, false);
 	PlayerInventory->AddToInventory(TowerHolded.ID, TowerHolded.Quantity);
-	TowerInventory->AddToInventory(PlayerHolded.ID, PlayerHolded.Quantity);
+	InventoryComponent->AddToInventory(PlayerHolded.ID, PlayerHolded.Quantity);
 
 	// 塔始终使用第一个物品栏
-	TowerInventory->UpdateHoldedSlot(0); // 强制设置为第一个槽位
+	InventoryComponent->UpdateHoldedSlot(0); // 强制设置为第一个槽位
 
 	// 玩家使用交换前的槽位
 	if (PlayerOriginalSlot >= 0 && PlayerOriginalSlot < PlayerInventory->SlotSize)
@@ -392,7 +431,7 @@ bool APVZ3DTower::IsWeaponMaxLevel_Implementation() const
 
 void APVZ3DTower::StartInventoryCheckTimer()
 {
-    if (GetWorld() && TowerInventory && Player)
+    if (GetWorld() && InventoryComponent && Player)
     {
         // 设置每1秒调用一次CheckAndLogInventories函数
         GetWorld()->GetTimerManager().SetTimer(
@@ -431,25 +470,25 @@ void APVZ3DTower::CheckAndLogInventories()
 void APVZ3DTower::LogTowerInventory()
 {
     UE_LOG(LogTemp, Warning, TEXT("--- 塔的库存系统 ---"));
-    if (!TowerInventory)
+    if (!InventoryComponent)
     {
         UE_LOG(LogTemp, Error, TEXT("塔没有库存组件"));
         return;
     }
     
-    for (int32 i = 0; i < TowerInventory->SlotSize; i++)
+    for (int32 i = 0; i < InventoryComponent->SlotSize; i++)
     {
-        FItemInInventory Item = TowerInventory->Slot[i];
+        FItemInInventory Item = InventoryComponent->Slot[i];
         if (Item.ID == "0000" && Item.Quantity == 0)
         {
             UE_LOG(LogTemp, Warning, TEXT("槽位 %d: 空"), i);
         }
         else
         {
-            UE_LOG(LogTemp, Warning, TEXT("槽位 %d: ID=%s, 数量=%d"), i, *Item.ID.ToString(), Item.Quantity);
+            UE_LOG(LogTemp, Warning, TEXT("槽位 %d: ID=%s, 数量=%d"),i, *Item.ID.ToString(), Item.Quantity);
         }
     }
-	UE_LOG(LogTemp,Warning,TEXT("CURRENT HEALTH TOWER:%f"),HealthComponent->GetCurrentHealth());
+	UE_LOG(LogTemp,Warning,TEXT("Tower Current Holded : %s ,CURRENT HEALTH TOWER:%f, Curreent Next Tower:%s"),*InventoryComponent->HoldedItem.ID.ToString(),HealthComponent->GetCurrentHealth(),*NextTowerID.ToString());
 }
 
 void APVZ3DTower::LogPlayerInventory()
@@ -480,3 +519,4 @@ void APVZ3DTower::LogPlayerInventory()
     UE_LOG(LogTemp, Warning, TEXT("玩家当前持有: ID=%s, 数量=%d, 槽位=%d"), 
            *HoldedItem.ID.ToString(), HoldedItem.Quantity, HoldedItem.Index);
 }
+

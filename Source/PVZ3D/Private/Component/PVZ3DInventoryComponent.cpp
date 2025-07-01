@@ -156,7 +156,7 @@ int32 UPVZ3DInventoryComponent::AnyEmptySlotAvailable() const
 {
 	for (int32 index = 0 ; index < SlotSize ; index++)
 	{
-		if (Slot[index].Quantity == 0)
+		if (Slot[index].Quantity == 0 || Slot[index].ID == FName("0000"))
 		{
 			return index;
 		}

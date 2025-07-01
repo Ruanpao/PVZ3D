@@ -147,6 +147,12 @@ void UPVZ3DWeaponComponent::Reload()
 	}
 }
 
+FName UPVZ3DWeaponComponent::GetCurrentWeaponID() const
+{
+	return CurrentHoldedItem.ID;
+}
+
+
 FTowerState UPVZ3DWeaponComponent::GetCarriedTowerState() const
 {
 	return CarriedTowerState;

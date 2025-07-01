@@ -35,9 +35,7 @@ protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Component")
     UPVZ3DHealthComponent* HealthComponent;
     
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "DataTable")
-    UDataTable* TowerDataTable;
-
+    
 
 
 public:
@@ -105,6 +103,9 @@ public:
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Component")
     UPVZ3DWeaponComponent* WeaponComponent;
 
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "DataTable")
+    UDataTable* TowerDataTable;
+
     UFUNCTION(BlueprintCallable, Category = "Interaction")
     void BuildTower(FName NewWeaponID);
 
@@ -115,8 +116,11 @@ public:
     void SellTower();
     
 private:
+<<<<<<< Updated upstream
     UPVZ3DInventoryComponent* TowerInventory;
     APVZ3DPlayer* Player;
+=======
+>>>>>>> Stashed changes
     FTimerHandle InventoryCheckTimer;
     
 
@@ -130,16 +134,19 @@ public:
     virtual bool IsTowerBaseInMiddle_Implementation() const override;
     virtual bool IsWeaponMaxLevel_Implementation() const override;
 
-private:
     void StartInventoryCheckTimer();
     void StopInventoryCheckTimer();
     void CheckAndLogInventories();
     void LogTowerInventory();
     void LogPlayerInventory();
 
+<<<<<<< Updated upstream
 private:
     UPROPERTY(EditAnywhere, Category = "Tower")
     bool bIsBaseInMiddle = false;
+=======
+   
+>>>>>>> Stashed changes
     
     UPROPERTY(EditAnywhere, Category = "Tower")
     int32 CurrentLevel = 1;
