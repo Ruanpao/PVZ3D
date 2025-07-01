@@ -68,6 +68,9 @@ public:
     bool bIsAttacking;
     int AttackType;
 
+    APVZ3DPlayer* Player;
+
+
     FOnTowerHealthChanged OnTowerHealthChanged;
     FPlayerWeaponChanged PlayerWeaponChanged;
     
@@ -116,7 +119,6 @@ public:
     
 private:
     UPVZ3DInventoryComponent* TowerInventory;
-    APVZ3DPlayer* Player;
     FTimerHandle InventoryCheckTimer;
     
 

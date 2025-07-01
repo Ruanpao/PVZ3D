@@ -23,6 +23,23 @@ APVZ3DWeapon::APVZ3DWeapon()
 
 	WeaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>("WeaponMesh");
 	SetRootComponent(WeaponMesh);
+	
+}
+
+void APVZ3DWeapon::SetAttribute(float Damage, float Distance, float ReloadTime, float Clips)
+{
+	DamageAmount = Damage;
+	
+	TraceMaxDistance = Distance;
+	CurrentAmmo.ReloadTime = ReloadTime;
+	if(Clips)
+	{
+		CurrentAmmo.Bullets = Clips;
+	}
+	else
+	{
+		CurrentAmmo.Bullets = 1000;
+	}
 }
 
 void APVZ3DWeapon::BeginPlay()

@@ -86,10 +86,12 @@ public:
 	void SwitchWeapon(FItemInInventory HoldedItem);
 	
 	void DestroyWeapon();
+	
 	void BindSwitchWeapon(UPVZ3DInventoryComponent* InventoryComponent);
 
 	UFUNCTION(BlueprintCallable)
 	void Interact(bool IsFullTower,bool IsIntheMidLine, bool IsFullLevel , bool IsNearTower, APVZ3DTower* Tower);
 
 	void OnReload();
+
 };

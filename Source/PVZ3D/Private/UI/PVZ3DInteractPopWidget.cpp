@@ -52,6 +52,20 @@ void UPVZ3DInteractPopWidget::NativeOnInitialized()
 	
 	
 	WhetherClickedAndNearTower.AddUObject(this, &UPVZ3DInteractPopWidget::RealOnInitialized);
+
+	APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
+	UE_LOG(LogTemp, Warning, TEXT("HOLYJESUS HUDCLICK Tryget"));
+	if (PlayerPawn)
+	{
+		UE_LOG(LogTemp,Warning,TEXT("HOLYJESUS HUDCLICK: %s"), *PlayerPawn->GetName());
+		APVZ3DPlayer* Player = Cast<APVZ3DPlayer>(PlayerPawn);
+		if (Player)
+		{
+			UE_LOG(LogTemp,Warning,TEXT("HOLYJESUS Getplayer: %s"), *Player->GetName());
+			Tower=Player->InteractingTower;
+			UE_LOG(LogTemp,Warning,TEXT("HOLYJESUS InteractingTower:%s"), *Tower->GetName());
+		}
+	}
 	
 }
 
@@ -132,7 +146,12 @@ void UPVZ3DInteractPopWidget::RealOnInitialized(bool IsClicked , bool IsNearTowe
 
 void UPVZ3DInteractPopWidget::OnButton_ConstructClicked()
 {
-	
+	UE_LOG(LogTemp, Warning, TEXT("HOLYJESUS HUDCLICK: %s"),(Tower ? *Tower->GetName() : TEXT("None")));
+	if(Tower)
+	{
+		Tower->SwapWeaponsWithPlayer(Tower->Player);
+	}
+
 }
 
 void UPVZ3DInteractPopWidget::OnButton_UpgradeClicked()
@@ -142,16 +161,31 @@ void UPVZ3DInteractPopWidget::OnButton_UpgradeClicked()
 
 void UPVZ3DInteractPopWidget::OnButton_SellClicked()
 {
-	
+
 }
 
 void UPVZ3DInteractPopWidget::OnButton_TakeInHandClicked()
 {
-	
+	UE_LOG(LogTemp, Warning, TEXT("HOLYJESUS HUDCLICK: %s"),(Tower ? *Tower->GetName() : TEXT("None")));
+	if(Tower)
+	{
+		Tower->SwapWeaponsWithPlayer(Tower->Player);
+	}
 }
 
 void UPVZ3DInteractPopWidget::OnButton_RemoveClicked()
 {
 	UE_LOG(LogTemp ,Error , TEXT("123"));
 	this->RemoveFromParent();
+}
+
+void UPVZ3DInteractPopWidget::OnTowerInteractionReceived(bool bTowerHasWeapon, bool bTowerBaseInMiddle, bool bTowerWeaponMaxLevel, bool bIsNearTower, APVZ3DTower* aTower)
+{
+	Tower=aTower;
+
+	// 在这里处理接收到的塔信息
+	UE_LOG(LogTemp, Warning, TEXT("Received tower info: bTowerHasWeapon: %d, bTowerBaseInMiddle: %d, bTowerWeaponMaxLevel: %d, bIsNearTower: %d, Tower: %s"),
+		   bTowerHasWeapon, bTowerBaseInMiddle, bTowerWeaponMaxLevel, bIsNearTower, (Tower ? *Tower->GetName() : TEXT("None")));
+	// 可以根据接收到的信息更新交互弹窗的显示
+	RealOnInitialized(false, bIsNearTower, bTowerHasWeapon, bTowerWeaponMaxLevel, bTowerBaseInMiddle);
 }
