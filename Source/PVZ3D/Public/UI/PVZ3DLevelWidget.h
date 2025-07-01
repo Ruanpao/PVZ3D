@@ -24,8 +24,14 @@ public:
 	UPROPERTY(EditDefaultsOnly,	BlueprintReadWrite, Category = "UI")
 	int32 RemainingEnemy = 0;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UI")
+	float TotalTime = 0.0f;
+
 	UPROPERTY(EditDefaultsOnly,	BlueprintReadWrite, Category = "UI")
 	float RemainingTime = 0.0f;
+
+	UPROPERTY(EditDefaultsOnlY , BlueprintReadWrite , Category = "UI")
+	float RemainingTimePercent = 1.0f;
 	
 protected:
 	virtual void NativePreConstruct() override;
@@ -38,4 +44,12 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	void UpdateTotalWaves(int32 NewTotalWaves);
+
+	UFUNCTION(BlueprintCallable)
+	void UpdateTotalTime(float NewTotalTime);
+
+	UFUNCTION(BlueprintCallable)
+	void UpdateRemainingTime();
+
+	FTimerHandle TimerHandleRemaining;
 };

@@ -7,6 +7,7 @@
 #include "Components/VerticalBox.h"
 #include "Components/CanvasPanel.h"
 #include "Blueprint/UserWidget.h"
+#include "Character/PVZ3DPlayer.h" 
 #include "../../CoreTypes/ItemCoreTypes.h"
 #include "PVZ3DInteractPopWidget.generated.h"
 
@@ -43,6 +44,9 @@ public:
 	UButton* Button_TakeInHand;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite , Category = "UI" ,  meta = (BindWidget))
+	UButton* Button_Remove;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite , Category = "UI" ,  meta = (BindWidget))
 	UCanvasPanel* CanvasPanel;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite , Category = "UI" ,  meta = (BindWidget))
@@ -61,7 +65,9 @@ public:
 	void OnButton_TakeInHandClicked();
 
 	UFUNCTION(BlueprintCallable)
-	void OnMouseLeave_1();
+	void OnButton_RemoveClicked();
+
+	APVZ3DTower* Tower;
 
 protected:
 	virtual void NativeOnInitialized() override;
@@ -69,4 +75,6 @@ protected:
 	void UpdateHoldedItem(FItemInInventory NewHoldedItem);
 
 	void RealOnInitialized(bool IsClicked , bool IsNearTower , bool IsFullTower , bool IsFullLevel , bool IsIntheMidLine);
+	UFUNCTION()
+	void OnTowerInteractionReceived(bool bTowerHasWeapon, bool bTowerBaseInMiddle, bool bTowerWeaponMaxLevel, bool bIsNearTower, APVZ3DTower* aTower);
 };

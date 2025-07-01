@@ -16,6 +16,8 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FOnHoledSlotChanged , int32)
 
 DECLARE_MULTICAST_DELEGATE_ThreeParams(FRemoveItem , int32 , bool , bool)
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnMouseSituationChanged , bool)
+
 
 UCLASS()
 class PVZ3D_API APVZ3DPlayerHUD : public AHUD
@@ -42,6 +44,8 @@ public:
 	FOnHoledSlotChanged OnHoledSlotChanged;
 
 	FRemoveItem RemoveItem;
+
+	FOnMouseSituationChanged OnMouseSituationChanged;
 
 protected:
 	
@@ -84,6 +88,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite , Category = "UIInstance")
 	UUserWidget* InteractPopWidget;
 
+	UPROPERTY(EditDefaultsOnly , BlueprintReadWrite , Category = "Num")
+	int32 CurrentVisibleNum = 0;
+
 	UFUNCTION(Blueprintable)
 	void ReceivedInfo(int32 Index);
 	
@@ -92,8 +99,11 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	void CreateInteractPopWidget(bool IsClicked, bool IsNearTower, bool IsFullTower , bool IsFullLevel , bool IsIntheMidLine , FItemInInventory HoldedItem);
-
+	
 	virtual void BeginPlay() override;
+
+	UFUNCTION(BlueprintCallable)
+	void UpdateMouseSituation(int32 Num);
 
 private:
 	void DrawCrossHair();

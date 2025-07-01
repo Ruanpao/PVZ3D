@@ -36,16 +36,59 @@ void UPVZ3DInteractPopWidget::NativeOnInitialized()
 		Button_TakeInHand->OnClicked.AddDynamic(this, &UPVZ3DInteractPopWidget::OnButton_TakeInHandClicked);
 	}
 
-	if(Button_Construct && Button_Upgrade && Button_Sell && Button_TakeInHand)
+	if(Button_Remove)
+	{
+		Button_Remove->OnClicked.AddDynamic(this, &UPVZ3DInteractPopWidget::OnButton_RemoveClicked);
+	}
+
+	if(Button_Construct && Button_Upgrade && Button_Sell && Button_TakeInHand && Button_Remove)
 	{
 		Button_Construct->SetVisibility(ESlateVisibility::Hidden);
 		Button_Upgrade->SetVisibility(ESlateVisibility::Hidden);
 		Button_Sell->SetVisibility(ESlateVisibility::Hidden);
 		Button_TakeInHand->SetVisibility(ESlateVisibility::Hidden);
+		Button_Remove->SetVisibility(ESlateVisibility::Visible);
 	}
 	
 	
 	WhetherClickedAndNearTower.AddUObject(this, &UPVZ3DInteractPopWidget::RealOnInitialized);
+
+	TArray<AActor*> PlayerActors;
+	UGameplayStatics::GetAllActorsWithTag(GetWorld(), FName("Player"), PlayerActors);
+
+	UE_LOG(LogTemp,Error,TEXT("WidgetName : %s"), *GetName());
+	UE_LOG(LogTemp, Warning, TEXT("HOLYJESUS HUDCLICK Tryget by Tag"));
+	
+
+	if (PlayerActors.Num() > 0)
+	{
+		AActor* PlayerActor = PlayerActors[0];
+		UE_LOG(LogTemp, Warning, TEXT("HOLYJESUS HUDCLICK: %s"), *PlayerActor->GetName());
+    
+		APVZ3DPlayer* Player = Cast<APVZ3DPlayer>(PlayerActor);
+		if (Player)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HOLYJESUS Getplayer: %s"), *Player->GetName());
+			Tower = Player->InteractingTower;
+        
+			if (Tower)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("HOLYJESUS InteractingTower: %s"), *Tower->GetName());
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("HOLYJESUS InteractingTower is nullptr"));
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HOLYJESUS Failed to cast to APVZ3DPlayer"));
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("HOLYJESUS No actors with 'Player' tag found"));
+	}
 	
 }
 
@@ -126,25 +169,53 @@ void UPVZ3DInteractPopWidget::RealOnInitialized(bool IsClicked , bool IsNearTowe
 
 void UPVZ3DInteractPopWidget::OnButton_ConstructClicked()
 {
-	
+	UE_LOG(LogTemp, Warning, TEXT("HOLYJESUS HUDCLICK: %s"),(Tower ? *Tower->GetName() : TEXT("None")));
+	if(Tower)
+	{
+		Tower->SwapWeaponsWithPlayer(Tower->Player);
+	}
+	this->RemoveFromParent();
 }
 
 void UPVZ3DInteractPopWidget::OnButton_UpgradeClicked()
 {
-	
+	if(Tower)
+	{
+		Tower->BuildTower(Tower->NextTowerID);
+	}
+	this->RemoveFromParent();
+
 }
 
 void UPVZ3DInteractPopWidget::OnButton_SellClicked()
 {
-	
+	this->RemoveFromParent();
+
 }
 
 void UPVZ3DInteractPopWidget::OnButton_TakeInHandClicked()
 {
-	
+	UE_LOG(LogTemp, Warning, TEXT("HOLYJESUS HUDCLICK: %s"),(Tower ? *Tower->GetName() : TEXT("None")));
+	if(Tower)
+	{
+		Tower->TakeInHandTower();
+	}
+	this->RemoveFromParent();
+
 }
 
-void UPVZ3DInteractPopWidget::OnMouseLeave_1()
+void UPVZ3DInteractPopWidget::OnButton_RemoveClicked()
 {
 	this->RemoveFromParent();
+}
+
+void UPVZ3DInteractPopWidget::OnTowerInteractionReceived(bool bTowerHasWeapon, bool bTowerBaseInMiddle, bool bTowerWeaponMaxLevel, bool bIsNearTower, APVZ3DTower* aTower)
+{
+	Tower=aTower;
+
+	// 在这里处理接收到的塔信息
+	UE_LOG(LogTemp, Warning, TEXT("Received tower info: bTowerHasWeapon: %d, bTowerBaseInMiddle: %d, bTowerWeaponMaxLevel: %d, bIsNearTower: %d, Tower: %s"),
+		   bTowerHasWeapon, bTowerBaseInMiddle, bTowerWeaponMaxLevel, bIsNearTower, (Tower ? *Tower->GetName() : TEXT("None")));
+	// 可以根据接收到的信息更新交互弹窗的显示
+	RealOnInitialized(false, bIsNearTower, bTowerHasWeapon, bTowerWeaponMaxLevel, bTowerBaseInMiddle);
 }

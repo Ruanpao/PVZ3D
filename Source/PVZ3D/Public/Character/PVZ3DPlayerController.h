@@ -12,6 +12,10 @@
 /**
  * 
  */
+
+
+class APVZ3DPlayer;
+
 UCLASS()
 class PVZ3D_API APVZ3DPlayerController : public APlayerController
 {
@@ -29,6 +33,8 @@ public:
 	
 protected:
 	APVZ3DPlayerHUD* MyHUD;
+
+	APVZ3DPlayer* MyPlayer;
 
 	virtual void BeginPlay() override;
 

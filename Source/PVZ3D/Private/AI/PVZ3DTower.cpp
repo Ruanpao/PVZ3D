@@ -163,6 +163,8 @@ void APVZ3DTower::UpdateTower()//根据CurrentWeaponID更新塔的属性
 			AggroValue = Row->AggroValue;
 			TowerBehaviorTreeNow = Row->BehaviourTreeID;
 			TeamID= Row->TeamID;
+			NextTowerID= Row->NextTowerID;
+			
 			if(TowerBehaviorTreeNow==FName("2"))
 				AttackType= 2; // 激光武器
 			else if(TowerBehaviorTreeNow==FName("1"))
@@ -180,6 +182,7 @@ void APVZ3DTower::UpdateTower()//根据CurrentWeaponID更新塔的属性
 			UE_LOG(LogTemp, Warning, TEXT("TowerBehaviorTreeNow: %s"), *TowerBehaviorTreeNow.ToString());
 			UE_LOG(LogTemp, Warning, TEXT("TeamID:%d "),TeamID.GetId());
 			UE_LOG(LogTemp,Warning,TEXT("IMAS AttackType: %d"), AttackType);
+			UE_LOG(LogTemp,Warning,TEXT("IMAS NextTowerID; %s"), *NextTowerID.ToString());
 			//TeamID
 		} else {
 			// 处理未找到行的情况
@@ -205,47 +208,12 @@ void APVZ3DTower::UpdateTower()//根据CurrentWeaponID更新塔的属性
 void APVZ3DTower::NotifyActorOnClicked(FKey ButtonPressed)
 {
 	Super::NotifyActorOnClicked(ButtonPressed);
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Tower Clicked"));
-	// SwitchTower();
-	// UE_LOG(LogTemp, Warning,TEXT("CurrentTowerHealth,%f"),HealthComponent->GetCurrentHealth());
-	// BuildTower(FName("0004")); // 这里可以传入一个实际的武器ID
-
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Tower Clicked - 测试武器交换"));
-	UE_LOG(LogTemp, Warning, TEXT("Tower Clicked, CurrentHealth: %f"), HealthComponent->GetCurrentHealth());
-	// 测试武器交换功能
-	//Player = Cast<APVZ3DPlayer>(UGameplayStatics::GetPlayerPawn(this, 0));
-	if (Player)
+	if(Player)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("找到玩家，开始测试武器交换"));
-		SwapWeaponsWithPlayer(Player);
+		Player->InteractingTower = this;
+		Player->BroadcastTowerInfo(this);
+		Player->OnClickedTower();
 	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("未找到玩家，无法测试武器交换"));
-	}
-	// if (InventoryComponent)
-	// {
-	// 	UE_LOG(LogTemp, Warning, TEXT("===== 塔的物品栏内容 ====="));
-	// 	for (int32 i = 0; i < InventoryComponent->SlotSize; i++)
-	// 	{
-	// 		FItemInInventory SlotItem = InventoryComponent->Slot[i];
-	// 		if (SlotItem.ID != "0000" && SlotItem.Quantity > 0)
-	// 		{
-	// 			UE_LOG(LogTemp, Warning, TEXT("物品栏 %d - ID: %s, 数量: %d"), 
-	// 				   i, *SlotItem.ID.ToString(), SlotItem.Quantity);
-	// 		}
-	// 		else
-	// 		{
-	// 			UE_LOG(LogTemp, Warning, TEXT("物品栏 %d - 空槽位"), i);
-	// 		}
-	// 	}
-	// 	UE_LOG(LogTemp, Warning, TEXT("========================"));
-	// }
-	// else
-	// {
-	// 	UE_LOG(LogTemp, Error, TEXT("塔没有库存组件，无法检查物品栏"));
-	// }
-	UE_LOG(LogTemp,Warning,TEXT("CurrentHealth: %f"), HealthComponent->GetCurrentHealth());
 }
 
 void APVZ3DTower::SetGenericTeamId(const FGenericTeamId& NewTeamID)
@@ -407,15 +375,18 @@ void APVZ3DTower::EndPlay(const EEndPlayReason::Type EndPlayReason)
     // 停止定时器
     StopInventoryCheckTimer();
 }
-bool APVZ3DTower::IsTowerValid_Implementation() const
+bool APVZ3DTower::IsTowerValid_Implementation()
 {
-	return HealthComponent && !HealthComponent->IsDead();
+	IsTowerValid = (HealthComponent && !HealthComponent->IsDead());
+
+	return IsTowerValid;
 }
 
-bool APVZ3DTower::HasWeapon_Implementation() const
+bool APVZ3DTower::HasWeapon_Implementation()
 {
 	UE_LOG(LogTemp,Warning, TEXT("HasWeapon called, CurrentWeaponID: %s"), *CurrentWeaponID.ToString());
-	return WeaponComponent && CurrentWeaponID != FName("0000");
+	HasWeapon=WeaponComponent && CurrentWeaponID != FName("0000");
+	return HasWeapon;
 }
 
 bool APVZ3DTower::IsTowerBaseInMiddle_Implementation() const
@@ -423,9 +394,10 @@ bool APVZ3DTower::IsTowerBaseInMiddle_Implementation() const
 	return bIsBaseInMiddle;
 }
 
-bool APVZ3DTower::IsWeaponMaxLevel_Implementation() const
+bool APVZ3DTower::IsWeaponMaxLevel_Implementation()
 {
-    return  CurrentLevel>= MaxLevel; 
+	IsWeaponMaxLevel = (CurrentLevel>= MaxLevel);
+    return IsWeaponMaxLevel; 
 }
 
 void APVZ3DTower::StartInventoryCheckTimer()

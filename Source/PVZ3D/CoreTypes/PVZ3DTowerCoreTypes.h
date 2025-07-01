@@ -43,6 +43,9 @@ struct FTowerBasicInfo : public FTableRowBase
 
 	UPROPERTY(EditDefaultsOnly,Blueprintable, Category="TowerInfo")
 	int CurrentMaxLevel;
+
+	UPROPERTY(EditDefaultsOnly,Blueprintable, Category="TowerInfo")
+	FName NextTowerID = "0000";
 	
 	
 };

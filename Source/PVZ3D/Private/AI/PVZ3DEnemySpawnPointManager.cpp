@@ -109,6 +109,9 @@ void APVZ3DEnemySpawnPointManager::NextWave()
     if (!bCanNextWave)
     {
         UE_LOG(LogTemp, Warning, TEXT("Cannot next wave: Current wave %d is still spawning"), CurrentWaveID);
+
+        OnVictory1.Broadcast();
+        
         return;
     }
     

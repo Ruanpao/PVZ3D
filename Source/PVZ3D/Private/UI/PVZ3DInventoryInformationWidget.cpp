@@ -69,7 +69,9 @@ void UPVZ3DInventoryInformationWidget::ShowInfo(FItemInInventory HoldedItem)
 				Name = FText::FromName(FoundItemInfo->Name);
 				MaxStackNum = FoundItemInfo->MaxStackNum;
 				Description = FoundItemInfo->Description;
-				Information = FoundItemInfo->Information;
+				FString Information1 = FoundItemInfo->Information.ToString();
+				FString Information2 = Information1.Replace(TEXT("\\n"), TEXT("\n"));
+				Information = FText::FromString(Information2);
 				ItemType = FText::FromName(FoundItemInfo->ItemType);
 			}
 

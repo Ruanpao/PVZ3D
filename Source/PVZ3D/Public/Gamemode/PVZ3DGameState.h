@@ -23,6 +23,7 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FOnBaseHealthChanged, float);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnRemaningEnemiesChanged, int32);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnCurrentWavesChanged, int32);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnTotalWavesChanged, int32);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnTotalTimeChanged , float);
 
 UCLASS()
 class PVZ3D_API APVZ3DGameState : public AGameStateBase
@@ -40,6 +41,8 @@ public:
     FOnRemaningEnemiesChanged OnRemaningEnemiesChanged;
 
     FOnTotalWavesChanged OnTotalWavesChanged;
+
+    FOnTotalTimeChanged OnTotalTimeChanged;
     
     // 关卡状态变化委托
     FOnLevelStateChanged OnLevelStateChanged;
@@ -86,14 +89,18 @@ public:
     UFUNCTION(BlueprintCallable, Category="Level")
     void UpdateRemainingEnemies(int NewRemainingEnemies);
     
-    UFUNCTION()
+    UFUNCTION(BlueprintCallable,Category="Level")
     void OnHomeDeath();
 
     UFUNCTION(BlueprintCallable, Category = "Time")
-    void UpdateTotalTime(int32 NewTotalTime);
+    void UpdateTotalTime(float NewTotalTime);
     
     virtual void BeginPlay() override;
     virtual void Tick(float DeltaTime) override;
+
+    void Victory();
+    
+    void Lose();
 };
 
 

@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "Character/PVZ3DPlayer.h"
@@ -8,6 +6,7 @@
 #include "Component/PVZ3DInventoryComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/Controller.h"
+#include "UI/PVZ3DPlayerHUD.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Component/PVZ3DHealthComponent.h"
 #include "Component/PVZ3DWeaponComponent.h"
@@ -21,6 +20,7 @@
 #include "DrawDebugHelpers.h"
 #include "PVZ3DWeaponComponent.h"
 #include "Interface/UPVZ3DTowerInterface.h"
+
 
 DEFINE_LOG_CATEGORY_STATIC(PVZ3DPlayerLog, All, All);
 
@@ -72,6 +72,8 @@ APVZ3DPlayer::APVZ3DPlayer()
 void APVZ3DPlayer::BeginPlay()
 {
 	Super::BeginPlay();
+
+	
 
 	check(HealthComponent);
 	//HealthComponent->OnDeath.AddUObject(this, &APVZ3DPlayer::OnDeath);
@@ -238,6 +240,7 @@ UPVZ3DWeaponComponent* APVZ3DPlayer::GetWeaponComponent() const
 void APVZ3DPlayer::Interact()
 {
 	Super::Interact();
+	InteractingTower=CurrentTower;
 	CurrentTower = FindNearestTowerInRange();
 	InteractingTower=CurrentTower;
 
@@ -768,3 +771,34 @@ void APVZ3DPlayer::SwitchToStack10()
 	}
 }
 
+void APVZ3DPlayer::UpdateMouseSituation(bool IsUsed)
+{
+	if(IsUsed && !IsMouseInputDisabled)
+	{
+		InputComponent->RemoveActionBinding(TEXT("Attack"), IE_Pressed);
+		InputComponent->RemoveActionBinding(TEXT("Attack"), IE_Released);
+		IsMouseInputDisabled = true;
+		Cast<APlayerController>(GetController())->bShowMouseCursor = true;
+		Cast<APlayerController>(GetController())->bEnableClickEvents = true;
+		InputComponent->BindAction(TEXT("PlayerMouseClick"), IE_Pressed, this, &APVZ3DPlayer::PlayerMouseClick);
+		Cast<APlayerController>(GetController())->SetInputMode(FInputModeGameAndUI());
+	}
+	else if(!IsUsed && IsMouseInputDisabled)
+	{
+		InputComponent->RemoveActionBinding(TEXT("PlayerMouseClick"), IE_Pressed);
+		InputComponent->BindAction("Attack", IE_Pressed, WeaponComponent, &UPVZ3DWeaponComponent::StartFire);
+		InputComponent->BindAction("Attack", IE_Released, WeaponComponent, &UPVZ3DWeaponComponent::StopFire);
+		IsMouseInputDisabled = false;
+		Cast<APlayerController>(GetController())->bShowMouseCursor = false;
+		Cast<APlayerController>(GetController())->bEnableClickEvents = false;
+		Cast<APlayerController>(GetController())->SetInputMode(FInputModeGameOnly());
+	}
+}
+
+void APVZ3DPlayer::OnClickedTower()
+{
+	if(InventoryComponent)
+	{
+		MouseInteraction.Broadcast(true,bIsNearTower, bTowerHasWeapon , bTowerBaseInMiddle, bTowerWeaponMaxLevel, InventoryComponent->HoldedItem);
+	}
+}
