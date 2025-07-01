@@ -19,84 +19,87 @@ DEFINE_LOG_CATEGORY_STATIC(LogHUD, All, All);
 
 void APVZ3DPlayerHUD::DrawHUD()
 {
-	Super::DrawHUD();
+    Super::DrawHUD();
 
-	DrawCrossHair();
-	
-	if (APlayerController* PlayerController = GetOwningPlayerController())
-	{
-		if (APVZ3DPlayer* PlayerCharacter = Cast<APVZ3DPlayer>(PlayerController->GetPawn()))
-		{
-			if (UPVZ3DWeaponComponent* WeaponComponent = PlayerCharacter->FindComponentByClass<UPVZ3DWeaponComponent>())
-			{
-				WeaponComponent->ButtonInteraction.AddUObject(this, &APVZ3DPlayerHUD::CreateInteractPopWidget);
-			}
-		}
-	}
+    DrawCrossHair();
+    //UE_LOG(LogTemp,Error,TEXT("%s Try AddUObject"), *GetName());
+    
 }
 
 void APVZ3DPlayerHUD::BeginPlay()
 {
-	Super::BeginPlay();
+    Super::BeginPlay();
 
 
 
-	
-	
-	auto PlayerDetailWidget = CreateWidget<UUserWidget>(GetWorld(), PlayerDetailWidgetClass);
-	
-	auto LevelWidget = CreateWidget<UUserWidget>(GetWorld(), LevelWidgetClass);
+    
+    
+    auto PlayerDetailWidget = CreateWidget<UUserWidget>(GetWorld(), PlayerDetailWidgetClass);
+    
+    auto LevelWidget = CreateWidget<UUserWidget>(GetWorld(), LevelWidgetClass);
 
-	auto HoldedItemWidget = CreateWidget<UUserWidget>(GetWorld(), HoldedItemWidgetClass);
+    auto HoldedItemWidget = CreateWidget<UUserWidget>(GetWorld(), HoldedItemWidgetClass);
 
-	ShopWidget = CreateWidget<UUserWidget>(GetWorld(), ShopWidgetClass);
+    ShopWidget = CreateWidget<UUserWidget>(GetWorld(), ShopWidgetClass);
 
-	InventoryInformationWidget = CreateWidget<UUserWidget>(GetWorld(), InventoryInformationWidgetClass);
+    InventoryInformationWidget = CreateWidget<UUserWidget>(GetWorld(), InventoryInformationWidgetClass);
 
-	InventoryMainWidget = CreateWidget<UUserWidget>(GetWorld(), InventoryMainWidgetClass);
-	
-	if(PlayerDetailWidget)
-	{
-		PlayerDetailWidget->AddToViewport();
-	}
+    InventoryMainWidget = CreateWidget<UUserWidget>(GetWorld(), InventoryMainWidgetClass);
+    
+    if(PlayerDetailWidget)
+    {
+        PlayerDetailWidget->AddToViewport();
+    }
 
-	if(LevelWidget)
-	{
-		LevelWidget->AddToViewport();
-	}
+    if(LevelWidget)
+    {
+        LevelWidget->AddToViewport();
+    }
 
-	if(HoldedItemWidget)
-	{
-		HoldedItemWidget->AddToViewport();
-	}
+    if(HoldedItemWidget)
+    {
+        HoldedItemWidget->AddToViewport();
+    }
 
-	if(InventoryInformationWidget)
-	{
-		InventoryInformationWidget->AddToViewport();
-	}
+    if(InventoryInformationWidget)
+    {
+        InventoryInformationWidget->AddToViewport();
+    }
 
-	if(ShopWidget)
-	{
-		ShopWidget->AddToViewport();
+    if(ShopWidget)
+    {
+        ShopWidget->AddToViewport();
 
-		if (UPVZ3DShopWidget* ShopWidgetInstance = Cast<UPVZ3DShopWidget>(ShopWidget))
-		{
-			ShopWidgetInstance->ReceivedInfo_2.AddUObject(this, &APVZ3DPlayerHUD::ReceivedInfo_2);
-		}
-		
-	}
-	
-	if(InventoryMainWidget)
-	{
-		InventoryMainWidget->AddToViewport();
-
-		if (UPVZ3DInventoryMainWidget* InventoryMainWidgetInstance = Cast<UPVZ3DInventoryMainWidget>(InventoryMainWidget))
+        if (UPVZ3DShopWidget* ShopWidgetInstance = Cast<UPVZ3DShopWidget>(ShopWidget))
         {
-			InventoryMainWidgetInstance->Received_2.AddUObject(this, &APVZ3DPlayerHUD::ReceivedInfo);
-			
-			InventoryMainWidgetInstance->ReceivedRemove.AddUObject(this, &APVZ3DPlayerHUD::RemoveRequest);
+            ShopWidgetInstance->ReceivedInfo_2.AddUObject(this, &APVZ3DPlayerHUD::ReceivedInfo_2);
         }
-	}
+        
+    }
+    
+    if(InventoryMainWidget)
+    {
+        InventoryMainWidget->AddToViewport();
+
+        if (UPVZ3DInventoryMainWidget* InventoryMainWidgetInstance = Cast<UPVZ3DInventoryMainWidget>(InventoryMainWidget))
+        {
+            InventoryMainWidgetInstance->Received_2.AddUObject(this, &APVZ3DPlayerHUD::ReceivedInfo);
+            
+            InventoryMainWidgetInstance->ReceivedRemove.AddUObject(this, &APVZ3DPlayerHUD::RemoveRequest);
+        }
+    }
+
+    if (APlayerController* PlayerController = GetOwningPlayerController())
+    {
+        if (APVZ3DPlayer* PlayerCharacter = Cast<APVZ3DPlayer>(PlayerController->GetPawn()))
+        {
+            if (UPVZ3DWeaponComponent* WeaponComponent = PlayerCharacter->FindComponentByClass<UPVZ3DWeaponComponent>())
+            {
+                WeaponComponent->ButtonInteraction.AddUObject(this, &APVZ3DPlayerHUD::CreateInteractPopWidget);
+                UE_LOG(LogTemp,Error,TEXT("DrawHUD bind, %s , Player:%s"),*GetName(), *PlayerCharacter->GetName());
+            }
+        }
+    }
 }
 
 void APVZ3DPlayerHUD::ReceivedInfo(int32 Index)
@@ -116,10 +119,12 @@ void APVZ3DPlayerHUD::InventoryInformationVisibility()
 		if(InventoryInformationWidget->IsVisible())
 		{
 			InventoryInformationWidget->SetVisibility(ESlateVisibility::Hidden);
+			UpdateMouseSituation(-1);
 		}
 		else
 		{
 			InventoryInformationWidget->SetVisibility(ESlateVisibility::Visible);
+			UpdateMouseSituation(1);
 		}
 	}
 }
@@ -131,10 +136,12 @@ void APVZ3DPlayerHUD::ShopVisibility()
 		if(ShopWidget->IsVisible())
 		{
 			ShopWidget->SetVisibility(ESlateVisibility::Hidden);
+			UpdateMouseSituation(-1);
 		}
 		else
 		{
 			ShopWidget->SetVisibility(ESlateVisibility::Visible);
+			UpdateMouseSituation(1);
 		}
 	}
 }
@@ -178,6 +185,12 @@ void APVZ3DPlayerHUD::DrawCrossHair()
 
 void APVZ3DPlayerHUD::CreateInteractPopWidget(bool IsClicked, bool IsNearTower, bool IsFullTower , bool IsFullLevel , bool IsIntheMidLine , FItemInInventory HoldedItem)
 {
+	if (InteractPopWidget && InteractPopWidget->IsInViewport())
+	{
+		InteractPopWidget->RemoveFromParent();
+		InteractPopWidget = nullptr;
+	}
+	
 	InteractPopWidget = CreateWidget<UUserWidget>(GetWorld(), InteractPopWidgetClass);
 
 	if(InteractPopWidget)
@@ -189,6 +202,22 @@ void APVZ3DPlayerHUD::CreateInteractPopWidget(bool IsClicked, bool IsNearTower, 
 		}
 
 		InteractPopWidget->AddToViewport();
+	}
+}
+
+void APVZ3DPlayerHUD::UpdateMouseSituation(int32 Num)
+{
+	CurrentVisibleNum += Num;
+
+	UE_LOG(LogHUD ,  Error , TEXT("%d") , CurrentVisibleNum);
+	
+	if(CurrentVisibleNum > 0)
+	{
+		OnMouseSituationChanged.Broadcast(true);
+	}
+	else
+	{
+		OnMouseSituationChanged.Broadcast(false);
 	}
 }
 

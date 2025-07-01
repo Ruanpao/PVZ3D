@@ -305,10 +305,12 @@ void APVZ3DTower::BuildTower(FName NewWeaponID)
 void APVZ3DTower::TakeInHandTower()
 {
 	UPVZ3DInventoryComponent* PlayerInventory = Player->InventoryComponent;
-	UPVZ3DInventoryComponent* aTowerInventory = InventoryComponent;
-
+	InventoryComponent->HoldedItem = FItemInInventory(1,CurrentWeaponID, 1);
+	
 	FItemInInventory PlayerHolded = PlayerInventory->HoldedItem;
-	FItemInInventory TowerHolded = aTowerInventory->HoldedItem;
+	FItemInInventory TowerHolded = InventoryComponent->HoldedItem;
+
+	UE_LOG(LogTemp,Warning, TEXT("CurrentID: %s, TowerHolded ID: %s, Quantity: %d"),*CurrentWeaponID.ToString(), *TowerHolded.ID.ToString(), TowerHolded.Quantity);
 	
 	// 塔始终使用第一个物品栏
 	TowerInventory->UpdateHoldedSlot(0);

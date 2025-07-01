@@ -221,5 +221,6 @@ public:
 
 	UPROPERTY(VisibleAnyWhere,BlueprintReadWrite,Category="Interact")
 	APVZ3DTower* InteractingTower;
-	
+
+	void UpdateMouseSituation(bool IsUsed);
 };

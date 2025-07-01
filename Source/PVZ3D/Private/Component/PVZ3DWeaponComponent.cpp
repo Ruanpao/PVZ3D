@@ -164,6 +164,7 @@ void UPVZ3DWeaponComponent::SetCarriedTowerState(const FTowerState& NewState)
 
 void UPVZ3DWeaponComponent::Interact(bool IsFullTower,bool IsIntheMidLine, bool IsFullLevel , bool IsNearTower, APVZ3DTower* Tower)
 {
+	UE_LOG(LogTemp,Error,TEXT("WeaponComponent: %s"), *GetName());
 	if(FWeaponBasicInfo* FoundHoldedItemInfo = DataTable->FindRow<FWeaponBasicInfo>(CurrentHoldedItem.ID , ""))
 	{
 		if(FoundHoldedItemInfo->ItemType == "Item_Damage" || FoundHoldedItemInfo->ItemType == "Item_Buff")
@@ -180,6 +181,8 @@ void UPVZ3DWeaponComponent::Interact(bool IsFullTower,bool IsIntheMidLine, bool 
 		else if((FoundHoldedItemInfo->ItemType == "None" || FoundHoldedItemInfo->ItemType == "Plant_Attack" || FoundHoldedItemInfo->ItemType == "Plant_Defense" ) && IsNearTower)
 		{
 			ButtonInteraction.Broadcast(false, IsNearTower, IsFullTower ,IsFullLevel , IsIntheMidLine , CurrentHoldedItem);
+			UE_LOG(LogTemp,Error,TEXT("ButtonInteraction.Broadcast: %s , Owner:%s"), *GetName(),*GetOwner()->GetName());
+
 
 
 			UE_LOG(LogWeaponComponent, Warning , TEXT("Interact called with IsFullTower: %s, IsIntheMidLine: %s, IsFullLevel: %s, IsNearTower: %s, HoldedItem ID: %s"),

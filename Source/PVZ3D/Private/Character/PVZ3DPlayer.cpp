@@ -345,6 +345,30 @@ void APVZ3DPlayer::BroadcastTowerInfo(APVZ3DTower* Tower)
 		bTowerHasWeapon, bTowerBaseInMiddle, bTowerWeaponMaxLevel, bIsNearTower, (Tower ? *Tower->GetName() : TEXT("None")));
 }
 
+void APVZ3DPlayer::UpdateMouseSituation(bool IsUsed)
+{
+	if(IsUsed && !IsMouseInputDisabled)
+	{
+		InputComponent->RemoveActionBinding(TEXT("Attack"), IE_Pressed);
+		InputComponent->RemoveActionBinding(TEXT("Attack"), IE_Released);
+		IsMouseInputDisabled = true;
+		Cast<APlayerController>(GetController())->bShowMouseCursor = true;
+		Cast<APlayerController>(GetController())->bEnableClickEvents = true;
+		InputComponent->BindAction(TEXT("PlayerMouseClick"), IE_Pressed, this, &APVZ3DPlayer::PlayerMouseClick);
+		Cast<APlayerController>(GetController())->SetInputMode(FInputModeGameAndUI());
+	}
+	else if(!IsUsed && IsMouseInputDisabled)
+	{
+		InputComponent->RemoveActionBinding(TEXT("PlayerMouseClick"), IE_Pressed);
+		InputComponent->BindAction("Attack", IE_Pressed, WeaponComponent, &UPVZ3DWeaponComponent::StartFire);
+		InputComponent->BindAction("Attack", IE_Released, WeaponComponent, &UPVZ3DWeaponComponent::StopFire);
+		IsMouseInputDisabled = false;
+		Cast<APlayerController>(GetController())->bShowMouseCursor = false;
+		Cast<APlayerController>(GetController())->bEnableClickEvents = false;
+		Cast<APlayerController>(GetController())->SetInputMode(FInputModeGameOnly());
+	}
+}
+
 void APVZ3DPlayer::StartRun()
 {
 	if(GetCharacterMovement()&&!bIsRunning)

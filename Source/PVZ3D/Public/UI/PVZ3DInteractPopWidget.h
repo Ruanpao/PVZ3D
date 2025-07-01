@@ -44,6 +44,9 @@ public:
 	UButton* Button_TakeInHand;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite , Category = "UI" ,  meta = (BindWidget))
+	UButton* Button_Remove;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite , Category = "UI" ,  meta = (BindWidget))
 	UCanvasPanel* CanvasPanel;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite , Category = "UI" ,  meta = (BindWidget))
@@ -62,7 +65,7 @@ public:
 	void OnButton_TakeInHandClicked();
 
 	UFUNCTION(BlueprintCallable)
-	void OnMouseLeave_1();
+	void OnButton_RemoveClicked();
 
 	APVZ3DTower* Tower;
 

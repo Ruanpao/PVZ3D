@@ -36,29 +36,58 @@ void UPVZ3DInteractPopWidget::NativeOnInitialized()
 		Button_TakeInHand->OnClicked.AddDynamic(this, &UPVZ3DInteractPopWidget::OnButton_TakeInHandClicked);
 	}
 
-	if(Button_Construct && Button_Upgrade && Button_Sell && Button_TakeInHand)
+	if(Button_Remove)
+	{
+		Button_Remove->OnClicked.AddDynamic(this, &UPVZ3DInteractPopWidget::OnButton_RemoveClicked);
+	}
+
+	if(Button_Construct && Button_Upgrade && Button_Sell && Button_TakeInHand && Button_Remove)
 	{
 		Button_Construct->SetVisibility(ESlateVisibility::Hidden);
 		Button_Upgrade->SetVisibility(ESlateVisibility::Hidden);
 		Button_Sell->SetVisibility(ESlateVisibility::Hidden);
 		Button_TakeInHand->SetVisibility(ESlateVisibility::Hidden);
+		Button_Remove->SetVisibility(ESlateVisibility::Visible);
 	}
 	
 	
 	WhetherClickedAndNearTower.AddUObject(this, &UPVZ3DInteractPopWidget::RealOnInitialized);
 
-	APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
-	UE_LOG(LogTemp, Warning, TEXT("HOLYJESUS HUDCLICK Tryget"));
-	if (PlayerPawn)
+	TArray<AActor*> PlayerActors;
+	UGameplayStatics::GetAllActorsWithTag(GetWorld(), FName("Player"), PlayerActors);
+
+	UE_LOG(LogTemp,Error,TEXT("WidgetName : %s"), *GetName());
+	UE_LOG(LogTemp, Warning, TEXT("HOLYJESUS HUDCLICK Tryget by Tag"));
+	
+
+	if (PlayerActors.Num() > 0)
 	{
-		UE_LOG(LogTemp,Warning,TEXT("HOLYJESUS HUDCLICK: %s"), *PlayerPawn->GetName());
-		APVZ3DPlayer* Player = Cast<APVZ3DPlayer>(PlayerPawn);
+		AActor* PlayerActor = PlayerActors[0];
+		UE_LOG(LogTemp, Warning, TEXT("HOLYJESUS HUDCLICK: %s"), *PlayerActor->GetName());
+    
+		APVZ3DPlayer* Player = Cast<APVZ3DPlayer>(PlayerActor);
 		if (Player)
 		{
-			UE_LOG(LogTemp,Warning,TEXT("HOLYJESUS Getplayer: %s"), *Player->GetName());
-			Tower=Player->InteractingTower;
-			UE_LOG(LogTemp,Warning,TEXT("HOLYJESUS InteractingTower:%s"), *Tower->GetName());
+			UE_LOG(LogTemp, Warning, TEXT("HOLYJESUS Getplayer: %s"), *Player->GetName());
+			Tower = Player->InteractingTower;
+        
+			if (Tower)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("HOLYJESUS InteractingTower: %s"), *Tower->GetName());
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("HOLYJESUS InteractingTower is nullptr"));
+			}
 		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HOLYJESUS Failed to cast to APVZ3DPlayer"));
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("HOLYJESUS No actors with 'Player' tag found"));
 	}
 	
 }
@@ -175,7 +204,7 @@ void UPVZ3DInteractPopWidget::OnButton_TakeInHandClicked()
 
 }
 
-void UPVZ3DInteractPopWidget::OnMouseLeave_1()
+void UPVZ3DInteractPopWidget::OnButton_RemoveClicked()
 {
 	this->RemoveFromParent();
 }

@@ -27,7 +27,12 @@ void APVZ3DPlayerController::BeginPlay()
 void APVZ3DPlayerController::InitializeHUD()
 {
 	MyHUD = Cast<APVZ3DPlayerHUD>(GetHUD());
+	MyPlayer = Cast<APVZ3DPlayer>(GetPawn());
 
+	if(MyHUD && MyPlayer)
+	{
+		MyHUD->OnMouseSituationChanged.AddUObject(MyPlayer,&APVZ3DPlayer::UpdateMouseSituation);
+	}
 	SetupInputComponent();
 }
 
