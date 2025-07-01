@@ -116,14 +116,10 @@ public:
     void SellTower();
     
 private:
-<<<<<<< Updated upstream
+
     UPVZ3DInventoryComponent* TowerInventory;
     APVZ3DPlayer* Player;
-=======
->>>>>>> Stashed changes
-    FTimerHandle InventoryCheckTimer;
     
-
 
 public:
     virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
@@ -140,14 +136,12 @@ public:
     void LogTowerInventory();
     void LogPlayerInventory();
 
-<<<<<<< Updated upstream
+
 private:
     UPROPERTY(EditAnywhere, Category = "Tower")
     bool bIsBaseInMiddle = false;
-=======
-   
->>>>>>> Stashed changes
-    
+
+
     UPROPERTY(EditAnywhere, Category = "Tower")
     int32 CurrentLevel = 1;
     

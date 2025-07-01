@@ -41,4 +41,7 @@ private:
 
 	UPROPERTY(visibleAnywhere, BlueprintReadOnly, Category = "Animation",meta=(AllowPrivateAccess="true"))
 	float Acceleration;
+
+	UPROPERTY(visibleAnywhere, BlueprintReadOnly, Category = "Animation",meta=(AllowPrivateAccess="true"))
+	bool IsHold;
 };

@@ -42,6 +42,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "AI")
 	void UpdateEnemyControllerinformation();
 
+	UFUNCTION(BlueprintCallable, Category = "AI")
+	void StopBehaviorTree();
+
+	bool IsDeath=false;
 private:
 	AActor* GetTargetActor() const;
 };

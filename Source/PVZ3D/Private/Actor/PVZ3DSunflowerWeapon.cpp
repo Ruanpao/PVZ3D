@@ -12,11 +12,19 @@ APVZ3DSunflowerWeapon::APVZ3DSunflowerWeapon()
     PrimaryActorTick.bCanEverTick = true;
     CurrentDamageMultiplier = 1.0f;
     LastFireTime = 0.0f;
+    ContinuousFireTime = 0.0f;
 }
 
 void APVZ3DSunflowerWeapon::StartFire()
 {
+    if (bIsReloading) //是否换弹
+    {
+        return;
+    }
+    
     Super::StartFire();
+
+    ContinuousFireTime = 0.0f;//开火时归零
     
     if (LaserEffect && WeaponMesh && WeaponMesh->DoesSocketExist(MuzzleSocketName))
     {
@@ -51,6 +59,19 @@ void APVZ3DSunflowerWeapon::StopFire()
 void APVZ3DSunflowerWeapon::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
+
+    //检测是否开火超过四秒
+    if (LaserBeam)
+    {
+        ContinuousFireTime += DeltaTime;
+        
+        // 检查是否到熄火
+        if (ContinuousFireTime >= 4.0f)
+        {
+            HandleOverheat();
+        }
+    }
+    
     UpdateLaserBeam();
 }
 
@@ -114,7 +135,7 @@ void APVZ3DSunflowerWeapon::ApplyContinuousDamage()
 {
     if (!CurrentTarget || IsAmmoEmpty()) return;
 
-    const float DamageToApply = BaseDamagePerSecond * 0.2f * CurrentDamageMultiplier;
+    const float DamageToApply = DamageAmount * 0.2f * CurrentDamageMultiplier;
     UGameplayStatics::ApplyDamage(
         CurrentTarget,
         DamageToApply,
@@ -136,4 +157,13 @@ void APVZ3DSunflowerWeapon::ResetDamageAccumulation()
 {
     CurrentTarget = nullptr;
     CurrentDamageMultiplier = 1.0f;
+}
+
+void APVZ3DSunflowerWeapon::HandleOverheat()
+{
+    StopFire();
+    StartReload();
+    
+    // 重置计时器
+    ContinuousFireTime = 0.0f;
 }

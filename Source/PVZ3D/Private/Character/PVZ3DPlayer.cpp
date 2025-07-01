@@ -19,6 +19,7 @@
 #include "AI/PVZ3DTower.h"
 #include "Engine/OverlapResult.h"
 #include "DrawDebugHelpers.h"
+#include "PVZ3DWeaponComponent.h"
 #include "Interface/UPVZ3DTowerInterface.h"
 
 DEFINE_LOG_CATEGORY_STATIC(PVZ3DPlayerLog, All, All);
@@ -217,6 +218,7 @@ void APVZ3DPlayer::StartAttack() {
 	if (AttackAnimMontage && !bIsAttacking) {
 		PlayAnimMontage(AttackAnimMontage, 1.0f,NAME_None); 
 		bIsAttacking = true;
+		GetCharacterMovement()->MaxWalkSpeed = NormalSpeed;
 	}
 }
 
@@ -224,6 +226,7 @@ void APVZ3DPlayer::StopAttack() {
 	if (AttackAnimMontage && bIsAttacking) {
 		StopAnimMontage(AttackAnimMontage);
 		bIsAttacking = false;
+		GetCharacterMovement()->MaxWalkSpeed = RunningSpeed;
 	}
 }
 

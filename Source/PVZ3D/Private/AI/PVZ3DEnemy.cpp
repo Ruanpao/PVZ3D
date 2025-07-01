@@ -8,6 +8,9 @@
 #include "AI/PVZ3DEnemyController.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Gamemode/PVZ3DGameState.h"
+#include "Character/PVZ3DPlayer.h"
+#include "Component/PVZ3DInventoryComponent.h" 
+#include "Kismet/GameplayStatics.h" 
 
 
 APVZ3DEnemy::APVZ3DEnemy()
@@ -210,12 +213,30 @@ void APVZ3DEnemy::UpdateEnemy()
 
 void APVZ3DEnemy::OnDeath()
 {
+	APVZ3DEnemyController* EnemyController = Cast<APVZ3DEnemyController>(GetController());
+	if (EnemyController)
+	{
+	 	EnemyController->StopBehaviorTree();
+	}
+	
+	
 	PlayAnimMontage(DeathAnimMontage);
 	SetActorEnableCollision(false);
-
+	
 	IsDead=1;
+
+	APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
+	if (APVZ3DPlayer* PlayerCharacter = Cast<APVZ3DPlayer>(PlayerPawn))
+	{
+		UPVZ3DInventoryComponent* InventoryComp = PlayerCharacter->InventoryComponent;
+		if (InventoryComp)
+		{
+			// 增加3金币
+			InventoryComp->AddGold(3);
+		}
+	}
 	
 	SetLifeSpan(5.0f);
-	//if (Controller)
+	
 
 }

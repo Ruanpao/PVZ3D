@@ -28,7 +28,7 @@ public:
     APVZ3DItemDamage();
 
 protected:
-    bool bIsCharging = true;
+    bool bIsCharging =true;
     
     virtual void BeginPlay() override;
     virtual void Tick(float DeltaTime) override;

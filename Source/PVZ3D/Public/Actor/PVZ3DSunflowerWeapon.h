@@ -29,9 +29,6 @@ protected:
 	UNiagaraSystem* HitEffect;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Damage")
-	float BaseDamagePerSecond = 30.0f;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Damage")
 	float DamageMultiplierIncrement = 0.3f;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Damage")
@@ -47,8 +44,10 @@ private:
 	float CurrentDamageMultiplier;
 	float LastFireTime;
 	FTimerHandle DamageTimerHandle;
+	float ContinuousFireTime;//射击时间
 
 	void UpdateLaserBeam();
 	void ApplyContinuousDamage();
 	void ResetDamageAccumulation();
+	void HandleOverheat();//熄火了
 };

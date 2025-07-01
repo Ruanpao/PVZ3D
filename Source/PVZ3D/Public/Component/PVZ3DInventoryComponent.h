@@ -78,4 +78,6 @@ public:
 	void Buy(FName ID , int32 Quantity , int32 Price);
 
 	void UpdateHoldedSlot(int32 Index);
+
+	void AddGold(int32 Amount);
 };

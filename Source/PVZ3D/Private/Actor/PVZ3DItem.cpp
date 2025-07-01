@@ -9,7 +9,7 @@ APVZ3DItem::APVZ3DItem()
 
 	ItemMesh = CreateDefaultSubobject<UStaticMeshComponent>("ItemMesh");
 	RootComponent = ItemMesh;
-    
+	
 }
 
 void APVZ3DItem::BeginPlay()

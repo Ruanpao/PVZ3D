@@ -301,8 +301,7 @@ void APVZ3DTower::BuildTower(FName NewWeaponID)
 	}
 }
 
-<<<<<<< Updated upstream
-=======
+
 void APVZ3DTower::TakeInHandTower()
 {
 	UPVZ3DInventoryComponent* PlayerInventory = Player->InventoryComponent;
@@ -337,7 +336,7 @@ void APVZ3DTower::TakeInHandTower()
 	
 }
 
->>>>>>> Stashed changes
+
 void APVZ3DTower::TowerDied()
 {
 	CurrentWeaponID=FName("0000");

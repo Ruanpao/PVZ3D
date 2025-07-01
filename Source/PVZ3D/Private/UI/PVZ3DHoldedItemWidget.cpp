@@ -8,6 +8,8 @@
 #include "../../CoreTypes/PVZ3DWeaponCoreTypes.h"
 #include "Kismet/GameplayStatics.h"
 
+DEFINE_LOG_CATEGORY_STATIC(LogHoldedItemWidget, All, All);
+
 void UPVZ3DHoldedItemWidget::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
@@ -26,13 +28,14 @@ void UPVZ3DHoldedItemWidget::NativeOnInitialized()
 				if (UPVZ3DInventoryComponent* InventoryComponent = PlayerPawn->FindComponentByClass<UPVZ3DInventoryComponent>())
 				{
 					InventoryComponent->HoldedChanged.AddUObject(this, &UPVZ3DHoldedItemWidget::UpdateHoldedItemWidget);
+				}
+
+				if (UPVZ3DWeaponComponent* WeaponComponent = PlayerPawn->FindComponentByClass<UPVZ3DWeaponComponent>())
+				{
+					WeaponComponent->Reloading.AddUObject(this, &UPVZ3DHoldedItemWidget::CurrentBulletNumChanged);
+					WeaponComponent->Decreasing.AddUObject(this, &UPVZ3DHoldedItemWidget::CurrentBulletNumChanged);
 					break;
 				}
-			}
-
-			if(UPVZ3DWeaponComponent* WeaponComponent = UGameplayStatics::GetPlayerPawn(GetWorld(), 0)->FindComponentByClass<UPVZ3DWeaponComponent>())
-			{
-				WeaponComponent->Reloading.AddUObject(this, &UPVZ3DHoldedItemWidget::CurrentBulletNumChanged);
 			}
 		}
 	}
@@ -62,6 +65,7 @@ void UPVZ3DHoldedItemWidget::UpdateHoldedItemWidget(FItemInInventory HoldedItem)
 			Name = FText::FromName(FoundWeaponInfo->Name);
 			ItemType = FText::FromName(FoundWeaponInfo->ItemType);
 			
+			
 			if(FoundWeaponInfo->ItemType == "None")
 			{
 				BulletNumBox->SetVisibility(ESlateVisibility::Hidden);
@@ -73,6 +77,12 @@ void UPVZ3DHoldedItemWidget::UpdateHoldedItemWidget(FItemInInventory HoldedItem)
 				ItemQuantityBox->SetVisibility(ESlateVisibility::Hidden);
 				
 				MaxBulletNum = FoundWeaponInfo->Clips;
+				CurrentBulletNum = FoundWeaponInfo->Clips;
+			}
+			else if(FoundWeaponInfo->ItemType == "Plant_Defense")
+			{
+				BulletNumBox->SetVisibility(ESlateVisibility::Hidden);
+				ItemQuantityBox->SetVisibility(ESlateVisibility::Hidden);
 			}
 			else if(FoundWeaponInfo->ItemType == "Plant_Defense")
 			{
@@ -92,4 +102,5 @@ void UPVZ3DHoldedItemWidget::CurrentBulletNumChanged(FText NewBulletNum)
 {
 	CurrentBulletNum = NewBulletNum;
 	UE_LOG(LogTemp, Warning, TEXT("CurrentBulletNum Changed: %s"), *CurrentBulletNum.ToString());
+	UE_LOG(LogHoldedItemWidget, Warning, TEXT("CurrentBulletNum Changed: %s"), *CurrentBulletNum.ToString());
 }

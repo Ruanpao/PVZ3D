@@ -299,4 +299,8 @@ void UPVZ3DInventoryComponent::UpdateHoldedSlot(int Index)
 	UE_LOG(LogInventory , Warning , TEXT("HoldedItem Changed, ID : %s , Quantity : %d"), *HoldedItem.ID.ToString(), HoldedItem.Quantity);
 }
 
-
+void UPVZ3DInventoryComponent::AddGold(int32 Amount)
+{
+	Gold += Amount;
+	OnGoldChanged.Broadcast(Gold);
+}

@@ -17,6 +17,8 @@ DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnConsumed , int32 , bool , bool);
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FReloading, FText);
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FDecreasing, FText);
+
 class APVZ3DWeapon;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -30,6 +32,8 @@ public:
 	FOnConsumed OnConsumed;
 
 	FReloading Reloading;
+
+	FDecreasing Decreasing;
 	
 	UPVZ3DWeaponComponent();
 
@@ -86,10 +90,15 @@ public:
 	void SwitchWeapon(FItemInInventory HoldedItem);
 	
 	void DestroyWeapon();
+	
 	void BindSwitchWeapon(UPVZ3DInventoryComponent* InventoryComponent);
 
 	UFUNCTION(BlueprintCallable)
 	void Interact(bool IsFullTower,bool IsIntheMidLine, bool IsFullLevel , bool IsNearTower, APVZ3DTower* Tower);
 
 	void OnReload();
+
+	void Decrease(int32 CurrentBullet);
+
+	bool IsHoldingSomething() const { return CurrentWeapon != nullptr || CurrentItem != nullptr; };
 };

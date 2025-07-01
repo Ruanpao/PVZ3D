@@ -53,10 +53,12 @@ void APVZ3DEnemyController::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
+	if (IsDeath) return;
+	
 	const auto AimActor = GetTargetActor();
 	if (AimActor)
 	{
-		
+		SetFocus(AimActor);
 	}
 	SetFocus(AimActor);
 
@@ -130,4 +132,23 @@ AActor* APVZ3DEnemyController::GetTargetActor() const
 	return Cast<AActor>(GetBlackboardComponent()->GetValueAsObject(TargetKeyName));
 }
 
+void APVZ3DEnemyController::StopBehaviorTree()
+{
+	IsDeath = true;
+    
+	// 停止当前运行的行为树
+	if (BrainComponent)
+	{
+		BrainComponent->StopLogic(TEXT("Enemy died"));
+	}
+    
+	// 清除黑板数据
+	if (GetBlackboardComponent())
+	{
+		GetBlackboardComponent()->ClearValue(TargetKeyName);
+	}
+    
+	// 停止移动
+	StopMovement();
+}
 

@@ -9,9 +9,11 @@ APVZ3DItemDamage::APVZ3DItemDamage()
     PrimaryActorTick.bCanEverTick = true;
     
     // 碰撞设置
-    ItemMesh->SetCollisionProfileName("Projectile");
+    ItemMesh->SetCollisionProfileName("NoCollision");
     ItemMesh->SetGenerateOverlapEvents(true);
     ItemMesh->SetNotifyRigidBodyCollision(true);
+    ItemMesh->SetSimulatePhysics(false);
+    
     
     // 投射物运动组件
     ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>("ProjectileMovement");
@@ -24,6 +26,7 @@ APVZ3DItemDamage::APVZ3DItemDamage()
     ProjectileMovement->SetActive(false);
     ItemMesh->SetUseCCD(true);
     ProjectileMovement->bForceSubStepping = true;
+    
     
 }
 
@@ -81,10 +84,11 @@ void APVZ3DItemDamage::MakeShot()
         ShootDirection.Rotation(),
         SpawnParams
     );
-
+    Item->bIsCharging=false;
     if (Item)
     {
         // 激活并发射炸弹
+        Item->ItemMesh->SetMobility(EComponentMobility::Movable);
         Item->ActivateBomb(GetActorLocation(), ShootDirection,GetOwner(),GetInstigatorController());
     }
    

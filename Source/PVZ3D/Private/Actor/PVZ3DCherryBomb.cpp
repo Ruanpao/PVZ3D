@@ -19,6 +19,9 @@ APVZ3DCherryBomb::APVZ3DCherryBomb()
 	ProjectileMovement->ProjectileGravityScale = ProjectileGravity / 980.0f;
 
 	ItemMesh->OnComponentHit.AddDynamic(this, &APVZ3DCherryBomb::OnHit);
+
+	ItemMesh->SetSimulatePhysics(false);
+	ItemMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision); // 显式禁用碰撞
 	
 }
 
