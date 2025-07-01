@@ -40,6 +40,7 @@ void UPVZ3DInteractPopWidget::NativeOnInitialized()
 	{
 		Button_Remove->OnClicked.AddDynamic(this, &UPVZ3DInteractPopWidget::OnButton_RemoveClicked);
 	}
+
 	if(Button_Construct && Button_Upgrade && Button_Sell && Button_TakeInHand && Button_Remove)
 	{
 		Button_Construct->SetVisibility(ESlateVisibility::Hidden);
@@ -205,7 +206,6 @@ void UPVZ3DInteractPopWidget::OnButton_TakeInHandClicked()
 
 void UPVZ3DInteractPopWidget::OnButton_RemoveClicked()
 {
-	UE_LOG(LogTemp ,Error , TEXT("123"));
 	this->RemoveFromParent();
 }
 

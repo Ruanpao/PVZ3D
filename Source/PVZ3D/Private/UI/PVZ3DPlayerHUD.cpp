@@ -159,7 +159,6 @@ void APVZ3DPlayerHUD::RemoveRequest(int32 Index)
 		if(UPVZ3DDisposalPopWidget* DisposalPopWidgetInstance = Cast<UPVZ3DDisposalPopWidget>(DisposalPopWidget))
 		{
 			DisposalPopWidgetInstance->Remove_2.AddUObject(this, &APVZ3DPlayerHUD::RemoveRequest_2);
-			DisposalPopWidgetInstance->NumChanged1.AddUObject(this, &APVZ3DPlayerHUD::UpdateMouseSituation);
 		}
 	}
 	

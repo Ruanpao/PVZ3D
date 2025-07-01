@@ -167,7 +167,6 @@ void APVZ3DWeapon::DecreaseAmmo()
 
 	if(IsClipEmpty()&&!IsAmmoEmpty())
 	{
-		UE_LOG(LogWeapon , Error , TEXT("123"));
 		StartReload();
 	}
 }
