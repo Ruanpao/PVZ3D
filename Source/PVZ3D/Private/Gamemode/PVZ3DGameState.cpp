@@ -105,11 +105,12 @@ void APVZ3DGameState::OnHomeDeath()
     UE_LOG(LogTemp, Warning, TEXT("GAMESTATE: Home has been destroyed!"));
 }
 
-void APVZ3DGameState::UpdateTotalTime(int32 NewTotalTime)
+void APVZ3DGameState::UpdateTotalTime(float NewTotalTime)
 {
     TotalTime = NewTotalTime;
-}
 
+    OnTotalTimeChanged.Broadcast(TotalTime);
+}
 
 void APVZ3DGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {

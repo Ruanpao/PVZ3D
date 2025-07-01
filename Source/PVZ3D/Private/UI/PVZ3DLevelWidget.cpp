@@ -15,6 +15,8 @@ void UPVZ3DLevelWidget::NativePreConstruct()
 			GameState->OnTotalWavesChanged.AddUObject(this, &UPVZ3DLevelWidget::UpdateTotalWaves);
 
 			GameState->OnRemaningEnemiesChanged.AddUObject(this, &UPVZ3DLevelWidget::UpdateRemainingEnemy);
+
+			GameState->OnTotalTimeChanged.AddUObject(this, &UPVZ3DLevelWidget::UpdateTotalTime);
 		}
 	
 }
@@ -33,3 +35,27 @@ void UPVZ3DLevelWidget::UpdateTotalWaves(int32 NewTotalWaves)
 {
 	TotalWaves = NewTotalWaves;
 }
+
+void UPVZ3DLevelWidget::UpdateTotalTime(float NewTotalTime)
+{
+	TotalTime = NewTotalTime;
+	RemainingTime = TotalTime;
+	RemainingTimePercent = RemainingTime / TotalTime;
+
+	FTimerManager& TimerManager = GetWorld()->GetTimerManager();
+	TimerManager.SetTimer(TimerHandleRemaining ,this , &UPVZ3DLevelWidget::UpdateRemainingTime , 1.0f, true);
+}
+
+void UPVZ3DLevelWidget::UpdateRemainingTime()
+{
+	if(RemainingTime >= 0.0f)
+	{
+		RemainingTime -= 1.0f;
+	}
+	else if(RemainingTime == 0.0f)
+	{
+		GetWorld()->GetTimerManager().ClearTimer(TimerHandleRemaining);
+	}
+	RemainingTimePercent = RemainingTime / TotalTime;
+}
+
