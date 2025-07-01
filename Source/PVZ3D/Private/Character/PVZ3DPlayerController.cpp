@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "Character/PVZ3DPlayerController.h"
 #include "Character/PVZ3DPlayer.h"
 #include "PVZ3DWeaponComponent.h"
@@ -29,13 +26,19 @@ void APVZ3DPlayerController::BeginPlay()
 void APVZ3DPlayerController::InitializeHUD()
 {
 	MyHUD = Cast<APVZ3DPlayerHUD>(GetHUD());
+
 	MyPlayer = Cast<APVZ3DPlayer>(GetPawn());
 
 	if(MyHUD && MyPlayer)
 	{
 		MyHUD->OnMouseSituationChanged.AddUObject(MyPlayer,&APVZ3DPlayer::UpdateMouseSituation);
 	}
+
 	SetupInputComponent();
+}
+
+void APVZ3DPlayerController::SetupInputComponent()
+{
 	Super::SetupInputComponent();
 	
 	if(InputComponent && MyHUD)
@@ -61,8 +64,4 @@ void APVZ3DPlayerController::ToggleShopVisibility()
 		MyHUD->ShopVisibility();
 	}
 }
-
-
-
-	
 

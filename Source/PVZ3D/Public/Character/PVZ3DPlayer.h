@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -227,4 +225,5 @@ public:
 	APVZ3DTower* InteractingTower;
 
 	void UpdateMouseSituation(bool IsUsed);
+
 };
