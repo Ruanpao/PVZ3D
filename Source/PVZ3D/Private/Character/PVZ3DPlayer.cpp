@@ -20,7 +20,6 @@
 #include "AI/PVZ3DTower.h"
 #include "Engine/OverlapResult.h"
 #include "DrawDebugHelpers.h"
-#include "PVZ3DWeaponComponent.h"
 #include "Interface/UPVZ3DTowerInterface.h"
 
 DEFINE_LOG_CATEGORY_STATIC(PVZ3DPlayerLog, All, All);
