@@ -1,6 +1,7 @@
 #pragma once
 #include "Engine/DataTable.h"
 #include "Actor/PVZ3DWeapon.h"
+#include "Actor/PVZ3DItem.h"
 #include "Actor/PVZ3DBullet.h"
 #include "PVZ3DWeaponCoreTypes.generated.h"
 
@@ -35,6 +36,9 @@ struct FWeaponBasicInfo : public FTableRowBase
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="WeaponInfo")
 	TSubclassOf<class APVZ3DWeapon> WeaponClass = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="WeaponInfo")
+	TSubclassOf<class APVZ3DItem> ItemClass = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="WeaponInfo")
 	TSubclassOf<class APVZ3DBullet> BulletClass = nullptr;

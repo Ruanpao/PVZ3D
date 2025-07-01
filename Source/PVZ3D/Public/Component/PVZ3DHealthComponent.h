@@ -9,6 +9,7 @@
 
 DECLARE_MULTICAST_DELEGATE(FOnDeath)
 DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnHealthChanged ,float,float,float)
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnBuffApplied, float, Amount, float, Duration);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class PVZ3D_API UPVZ3DHealthComponent : public UActorComponent
@@ -16,6 +17,9 @@ class PVZ3D_API UPVZ3DHealthComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(BlueprintAssignable, Category = "Health")
+	FOnBuffApplied OnBuffApplied;
+	
 	UPVZ3DHealthComponent();
 
 	float GetCurrentHealth() const {return CurrentHealth;}
@@ -24,14 +28,28 @@ public:
 
 	void SetMaxHealth(float NewMaxHealth) {MaxHealth=NewMaxHealth;}
 
+	void SetCurrentHealth(float NewCurrentHealth) 
+	{
+		CurrentHealth = FMath::Clamp(NewCurrentHealth, 0.0f, MaxHealth);
+		OnHealthChanged.Broadcast(CurrentHealth, MaxHealth, GetHealthPercent());
+	}
+
 	float GetHealthPercent() const {return CurrentHealth / MaxHealth;}
 	
 	UFUNCTION(BlueprintCallable)
 	bool IsDead() const {return CurrentHealth <= 0.0f;}
+
+	UFUNCTION(BlueprintCallable, Category = "Health")
+	void ResetHealth();
 	
 	FOnDeath OnDeath;
 	
 	FOnHealthChanged OnHealthChanged;
+
+	UFUNCTION()
+	void HandleBuffApplied(float Amount, float Duration);
+
+	void ApplyInstantHeal(float Amount, float Delay);
 	
 protected:
 
@@ -61,8 +79,6 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "InstantHeal")
 	int InstantHeal_TimeDelay_Count = 0;
-	
-	
 	
 	virtual void BeginPlay() override;
 

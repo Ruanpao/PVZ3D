@@ -5,6 +5,7 @@
 #include "Character/PVZ3DPlayer.h"
 #include"AI/PVZ3DEnemy.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Component/PVZ3DWeaponComponent.h"
 
 void UPVZ3DAnimInstance::NativeInitializeAnimation()
 {
@@ -24,6 +25,7 @@ void UPVZ3DAnimInstance::UpdateAnim(float DeltaTime)
 		
 		Velocity = PlayerVelocity.Size2D();
 		Direction = PVZ3DPlayer->GetMovementDirection();
+		
 		IsInAir = PVZ3DPlayer->GetCharacterMovement()->IsFalling();
 		Acceleration =PVZ3DPlayer->GetCharacterMovement()->GetCurrentAcceleration().Size();
 		if( Velocity > 0.1f )
@@ -33,6 +35,15 @@ void UPVZ3DAnimInstance::UpdateAnim(float DeltaTime)
 		else
 		{
 			IsMove =false;
+		}
+
+		if (UPVZ3DWeaponComponent* WeaponComp = PVZ3DPlayer->FindComponentByClass<UPVZ3DWeaponComponent>())
+		{
+			IsHold = WeaponComp->IsHoldingSomething(); // 更新 IsHold
+		}
+		else
+		{
+			IsHold = false; // 如果没有 WeaponComponent，默认不持有
 		}
 	}
 

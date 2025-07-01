@@ -1,4 +1,4 @@
-﻿,EnemyID,Icon,EnemyName,WeaponID,MaxHealth,BehaviourTreeID,Vecolity,AttackRange,AggroValue,TeamID
-0000,0000,None,普通僵尸,0,1000,1,100,1000,0,4
-0001,0001,None,占位僵尸1,1,2000,1,200,1000,0,4
-0002,0002,None,占位僵尸2,2,1500,2,1000,0,10,5
+﻿,EnemyID,Icon,EnemyName,WeaponID,MaxHealth,BehaviourTreeID,Vecolity,AttackRange,AggroValue,Damage,AttackInterval,TeamID
+0000,0000,None,普通僵尸,0,1000,1,100,1000,0,10,2,4
+0001,0001,None,占位僵尸1,1,2000,1,200,1000,0,10,1,4
+0002,0002,None,占位僵尸2,2,1500,2,1000,0,10,10,3,5

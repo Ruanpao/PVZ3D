@@ -109,6 +109,14 @@ void APVZ3DPeaWeapon::MakeShot()
 		return;
 	}
 
+	// 当前弹夹为空时触发重新装弹
+    if(IsClipEmpty() && !IsAmmoEmpty())
+    {
+        StartReload();  // 触发重新装弹
+        StopFire();
+        return;
+    }
+	
 	FVector TraceStart, TraceEnd;
 	if(!GetTraceData(TraceStart, TraceEnd))
 	{
@@ -129,7 +137,8 @@ void APVZ3DPeaWeapon::MakeShot()
 	Projectile->ActivateProjectile(
 		GetMuzzleWorldLocation(),
 		ShootDirection.Rotation(),
-		ShootDirection
+		ShootDirection,
+		DamageAmount
 	);
 	
 	Projectile->IgnoreActor(GetOwner());

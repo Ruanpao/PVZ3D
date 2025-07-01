@@ -20,17 +20,52 @@ void UPVZ3DInventoryComponent::BeginPlay()
 	Super::BeginPlay();
 
 	UpdateSlot();
+	UE_LOG(LogInventory, Warning, TEXT("Nakamura 00 Slot 数组大小: %d"), Slot.Num());
 
 	HoldedItem = Slot[0];
 
-	if(APVZ3DPlayerHUD* HUD = Cast<APVZ3DPlayerHUD>(UGameplayStatics::GetPlayerController(this,0)->GetHUD()))
+	AActor* OwnerActor = GetOwner();
+	if (!OwnerActor)
 	{
-		HUD->Buy.AddUObject(this, &UPVZ3DInventoryComponent::Buy);
-
-		HUD->OnHoledSlotChanged.AddUObject(this, &UPVZ3DInventoryComponent::UpdateHoldedSlot);
-
-		HUD->RemoveItem.AddUObject(this, &UPVZ3DInventoryComponent::RemoveFromInventory);
+		UE_LOG(LogInventory, Error, TEXT("Inventory has no owner actor!"));
+		return;
 	}
+    
+	// 检查 Owner 是否带有 "Player" 标签
+	if (OwnerActor->ActorHasTag(FName("Player")))
+	{
+		// 确保 Owner 是 Pawn（玩家角色）
+		if (APawn* PlayerPawn = Cast<APawn>(OwnerActor))
+		{
+			// 获取玩家控制器
+			APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);
+			if (PlayerController && PlayerController->GetPawn() == PlayerPawn)
+			{
+				// 获取 HUD 并绑定委托（仅玩家 Inventory 执行）
+				if (APVZ3DPlayerHUD* HUD = Cast<APVZ3DPlayerHUD>(PlayerController->GetHUD()))
+				{
+					HUD->Buy.AddUObject(this, &UPVZ3DInventoryComponent::Buy);
+					HUD->OnHoledSlotChanged.AddUObject(this, &UPVZ3DInventoryComponent::UpdateHoldedSlot);
+					HUD->RemoveItem.AddUObject(this, &UPVZ3DInventoryComponent::RemoveFromInventory);
+                    
+					UE_LOG(LogInventory, Log, TEXT("Player Inventory bound to HUD successfully"));
+				}
+			}
+		}
+	}
+	else
+	{
+		UE_LOG(LogInventory, Log, TEXT("This is not a player inventory, skipping HUD binding"));
+	}
+	//
+	// if(APVZ3DPlayerHUD* HUD = Cast<APVZ3DPlayerHUD>(UGameplayStatics::GetPlayerController(this,0)->GetHUD()))
+	// {
+	// 	HUD->Buy.AddUObject(this, &UPVZ3DInventoryComponent::Buy);
+	//
+	// 	HUD->OnHoledSlotChanged.AddUObject(this, &UPVZ3DInventoryComponent::UpdateHoldedSlot);
+	//
+	// 	HUD->RemoveItem.AddUObject(this, &UPVZ3DInventoryComponent::RemoveFromInventory);
+	// }//Eriko
 }
 
 bool UPVZ3DInventoryComponent::AddToInventory(const FName Item_ID, int32 Quantity)
@@ -41,6 +76,8 @@ bool UPVZ3DInventoryComponent::AddToInventory(const FName Item_ID, int32 Quantit
 
 	while(LocalQuantityRemaining > 0 && !LocalHasFailed)
 	{
+		UE_LOG(LogInventory, Warning, TEXT("Nakamura 03 ID: %s , Quantity: %d"), *Item_ID.ToString(), LocalQuantityRemaining);
+
 		FFindSlot FindSlotResult = FindSlot(Item_ID);
 		
 		if(FindSlotResult.FindSlot)
@@ -88,6 +125,8 @@ FFindSlot UPVZ3DInventoryComponent::FindSlot(FName Item_ID)
 	
 	for (int32 index = 0 ; index < SlotSize ; index++)
 	{
+		UE_LOG(LogInventory, Warning, TEXT("Nakamura 04 Index:%d, slotsize:%d"),index, SlotSize);
+
 		if(Item_ID == Slot[index].ID)
 		{
 			if(FItemBasicInfo* FoundItemInfo = Datatable->FindRow<FItemBasicInfo>(Item_ID , ""))
@@ -260,4 +299,8 @@ void UPVZ3DInventoryComponent::UpdateHoldedSlot(int Index)
 	UE_LOG(LogInventory , Warning , TEXT("HoldedItem Changed, ID : %s , Quantity : %d"), *HoldedItem.ID.ToString(), HoldedItem.Quantity);
 }
 
-
+void UPVZ3DInventoryComponent::AddGold(int32 Amount)
+{
+	Gold += Amount;
+	OnGoldChanged.Broadcast(Gold);
+}

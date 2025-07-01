@@ -21,4 +21,7 @@ struct FWavesInfo : public FTableRowBase
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="WavesInfo")
 	float SpawnInterval = 1.0f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="WavesInfo")
+	float TimeLimit = 100.0f;
 };

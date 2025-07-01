@@ -23,14 +23,30 @@ APVZ3DWeapon::APVZ3DWeapon()
 
 	WeaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>("WeaponMesh");
 	SetRootComponent(WeaponMesh);
+	
+}
+
+void APVZ3DWeapon::SetAttribute(float Damage, float Distance, float ReloadTime, float Clips)
+{
+	DamageAmount = Damage;
+	
+	TraceMaxDistance = Distance;
+	CurrentAmmo.ReloadTime = ReloadTime;
+	if(Clips)
+	{
+		DefaultAmmo.Bullets = Clips;
+	}
+	else
+	{
+		DefaultAmmo.Bullets = 30;
+	}
+	CurrentAmmo = DefaultAmmo;
 }
 
 void APVZ3DWeapon::BeginPlay()
 {
 	Super::BeginPlay();
 	check(WeaponMesh);
-
-	CurrentAmmo = DefaultAmmo;
 	
 	bIsReloading =false;
 }
@@ -131,7 +147,7 @@ void APVZ3DWeapon::MakeHit(FHitResult& HitResult, const FVector& TraceStart, FVe
 		CollisionParams.AddIgnoredActor(Tower);
 	}
 	
-	GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECollisionChannel::ECC_Visibility, CollisionParams);
+	GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECollisionChannel::ECC_GameTraceChannel1, CollisionParams);
 
 }
 
@@ -147,6 +163,12 @@ void APVZ3DWeapon::DecreaseAmmo()
 {
 	CurrentAmmo.Bullets--;
 	LogAmmo();
+
+	if(!DefaultAmmo.Infinite)
+	{
+		UE_LOG(LogWeapon , Warning , TEXT("123 , %d"),CurrentAmmo.Bullets);
+		Decrease.Broadcast(CurrentAmmo.Bullets);
+	}
 
 	if(IsClipEmpty()&&!IsAmmoEmpty())
 	{
@@ -213,4 +235,8 @@ void APVZ3DWeapon::Reload()
 {
 	bIsReloading = false;
 	ChangeClip();
+
+	UE_LOG(LogWeapon , Warning , TEXT("Reloaded! Current Ammo: %d Bullets, %d Clips"), CurrentAmmo.Bullets, CurrentAmmo.Clips);
+	
+	OnReload.Broadcast();
 }

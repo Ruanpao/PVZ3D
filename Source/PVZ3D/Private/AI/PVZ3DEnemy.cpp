@@ -6,7 +6,11 @@
 #include "Components/TextRenderComponent.h"		//测试血量
 #include "PVZ3D/CoreTypes/PVZ3DEnemyCoreTypes.h"
 #include "AI/PVZ3DEnemyController.h"
-
+#include "GameFramework/CharacterMovementComponent.h"
+#include "Gamemode/PVZ3DGameState.h"
+#include "Character/PVZ3DPlayer.h"
+#include "Component/PVZ3DInventoryComponent.h" 
+#include "Kismet/GameplayStatics.h" 
 
 
 APVZ3DEnemy::APVZ3DEnemy()
@@ -39,13 +43,18 @@ void APVZ3DEnemy::BeginPlay()
 	RouteManager= Cast<APVZ3DRouteManager>(UGameplayStatics::GetActorOfClass(GetWorld(), APVZ3DRouteManager::StaticClass()));
 	if(RouteManager)
 	{
-		//UE_LOG(LogTemp, Warning, TEXT("RouteManager found!"));
-		//UE_LOG(LogTemp, Warning, TEXT("RouteManager: %d"), RouteManager->GetRouteNodesByID(1)[0]->OrderIndex);
+		UE_LOG(LogTemp, Warning, TEXT("RouteManager found!"));
+		UE_LOG(LogTemp, Warning, TEXT("RouteManager: %d"), RouteManager->GetRouteNodesByID(1)[0]->OrderIndex);
+
 	}
 	CurrentRouteNodes=RouteManager->GetRouteNodesByID(RouteID);
-	//UE_LOG(LogTemp, Warning, TEXT("CurrentRouteNodes: %d"), CurrentRouteNodes[0]->OrderIndex);
+	if (CurrentRouteNodes[0]!=nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("CurrentRouteNodes: %d"), CurrentRouteNodes[0]->OrderIndex);
+	}
 
-	//UpdateEnemyImformation();
+	
+	UpdateEnemyImformation();
 
 	check(HealthComponent);
 	check(HealthTextComponent);
@@ -53,6 +62,13 @@ void APVZ3DEnemy::BeginPlay()
 	OnHealthChanged(HealthComponent->GetCurrentHealth(),HealthComponent->GetMaxHealth(),HealthComponent->GetHealthPercent());
 	HealthComponent->OnDeath.AddUObject(this, &APVZ3DEnemy::OnDeath);
 	HealthComponent->OnHealthChanged.AddUObject(this, &APVZ3DEnemy::OnHealthChanged);
+
+	APVZ3DGameState* GameState = Cast<APVZ3DGameState>(GetWorld()->GetGameState());
+	if (GameState && HealthComponent)
+	{
+		// 绑定OnDeath事件到GameState的处理函数
+		HealthComponent->OnDeath.AddUObject(GameState, &APVZ3DGameState::EnemyDead);
+	}
 }
 
 void APVZ3DEnemy::OnHealthChanged(float CurrentHealth, float MaxHealth, float HealthPercent)
@@ -163,6 +179,9 @@ void APVZ3DEnemy::UpdateEnemyImformation()//通过EnemyID更新敌人信息
 			EnemyBehaviorTreeID = Row->BehaviourTreeID;
 			HealthComponent->SetMaxHealth(Row->MaxHealth);
 			Vecolity = Row->Vecolity;
+			GetCharacterMovement()->MaxWalkSpeed =Vecolity;
+			AttackDamage=Row->Damage;
+			AttackInterval=Row->AttackInterval;
 			UE_LOG(LogTemp, Warning, TEXT("PVZ3DEnemy.cpp update row"));
 			//UE_LOG(LogTemp, Warning, TEXT("CurrentWeaponID: %s"), *CurrentWeaponID.ToString());
 			//UE_LOG(LogTemp, Warning, TEXT("AttackRange: %f"), AttackRange);
@@ -194,12 +213,30 @@ void APVZ3DEnemy::UpdateEnemy()
 
 void APVZ3DEnemy::OnDeath()
 {
+	APVZ3DEnemyController* EnemyController = Cast<APVZ3DEnemyController>(GetController());
+	if (EnemyController)
+	{
+	 	EnemyController->StopBehaviorTree();
+	}
+	
+	
 	PlayAnimMontage(DeathAnimMontage);
 	SetActorEnableCollision(false);
-
+	
 	IsDead=1;
+
+	APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
+	if (APVZ3DPlayer* PlayerCharacter = Cast<APVZ3DPlayer>(PlayerPawn))
+	{
+		UPVZ3DInventoryComponent* InventoryComp = PlayerCharacter->InventoryComponent;
+		if (InventoryComp)
+		{
+			// 增加3金币
+			InventoryComp->AddGold(3);
+		}
+	}
 	
 	SetLifeSpan(5.0f);
-	//if (Controller)
+	
 
 }

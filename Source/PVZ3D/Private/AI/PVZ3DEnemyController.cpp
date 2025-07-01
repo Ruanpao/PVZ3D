@@ -53,10 +53,12 @@ void APVZ3DEnemyController::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
+	if (IsDeath) return;
+	
 	const auto AimActor = GetTargetActor();
 	if (AimActor)
 	{
-		
+		SetFocus(AimActor);
 	}
 	SetFocus(AimActor);
 
@@ -110,15 +112,15 @@ void APVZ3DEnemyController::UpdateEnemyControllerinformation()
 		SetGenericTeamId(EnemyTeamID);
 
 		//按照表的数据设置敌人的行为树以及Controller阵营
-		if(EnemyTeamID==FGenericTeamId(4))
+		if(EnemyTeamID==FGenericTeamId(4))//4近战
 		{
 			FriendlyTeamID={FGenericTeamId(3),FGenericTeamId(4),FGenericTeamId(5)};
-			HostileTeamID={FGenericTeamId(1),FGenericTeamId(2)};
+			HostileTeamID={FGenericTeamId(1),FGenericTeamId(2),FGenericTeamId(6)};
 		}
 		if(EnemyTeamID==FGenericTeamId(5))
 		{
 			FriendlyTeamID={FGenericTeamId(4),FGenericTeamId(5)};
-			HostileTeamID={FGenericTeamId(1),FGenericTeamId(2),FGenericTeamId(3)};
+			HostileTeamID={FGenericTeamId(1),FGenericTeamId(2),FGenericTeamId(3),FGenericTeamId(6)};
 		}
 	}
 	UE_LOG(LogTemp, Warning, TEXT("EnemyController update done"));
@@ -130,4 +132,23 @@ AActor* APVZ3DEnemyController::GetTargetActor() const
 	return Cast<AActor>(GetBlackboardComponent()->GetValueAsObject(TargetKeyName));
 }
 
+void APVZ3DEnemyController::StopBehaviorTree()
+{
+	IsDeath = true;
+    
+	// 停止当前运行的行为树
+	if (BrainComponent)
+	{
+		BrainComponent->StopLogic(TEXT("Enemy died"));
+	}
+    
+	// 清除黑板数据
+	if (GetBlackboardComponent())
+	{
+		GetBlackboardComponent()->ClearValue(TargetKeyName);
+	}
+    
+	// 停止移动
+	StopMovement();
+}
 

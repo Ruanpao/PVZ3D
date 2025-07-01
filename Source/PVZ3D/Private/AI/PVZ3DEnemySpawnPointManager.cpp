@@ -14,6 +14,7 @@ APVZ3DEnemySpawnPointManager::APVZ3DEnemySpawnPointManager()
     TotalEnemiesInWave = 0;        // int类型
     SpawnedEnemiesCount = 0;       // int类型
     CurrentRouteID = 0;            // int类型
+    TotalWaves = 0;
 }
 
 void APVZ3DEnemySpawnPointManager::BeginPlay()
@@ -28,7 +29,7 @@ void APVZ3DEnemySpawnPointManager::BeginDestroy()
     Super::BeginDestroy();
     if (GetWorld())
     {
-        GetWorldTimerManager().ClearTimer(TimerHandle_SpawnNextEnemy);
+        GetWorldTimerManager().ClearTimer(TimerHandle_WaveTimeout);
     }
 }
 
@@ -68,6 +69,17 @@ void APVZ3DEnemySpawnPointManager::LoadWaveDataFromDataTable()
     UE_LOG(LogTemp, Warning, TEXT("Loaded %d wave rows, grouped into %d routes"), 
            AllWaveRows.Num(), RouteWaves.Num());
 
+    int MaxWaveID = 0;
+    for (FWaveDataRow* Row : AllWaveRows)
+    {
+        if (Row)
+        {
+            MaxWaveID = FMath::Max(MaxWaveID, Row->WaveID);
+        }
+    }
+    TotalWaves = MaxWaveID;
+    TotalWavesChanged.Broadcast(TotalWaves); // 广播总波数
+
     // 分配数据给SpawnPoint
     if (EnemySpawnPoint1)
     {
@@ -100,17 +112,17 @@ void APVZ3DEnemySpawnPointManager::NextWave()
         return;
     }
     
-    int MaxWaveID = 0;
-    for (FWaveDataRow* Row : AllWaveRows)
+    if (CurrentWaveID >= TotalWaves)
     {
-        if (Row) MaxWaveID = FMath::Max(MaxWaveID, Row->WaveID);
+        UE_LOG(LogTemp, Warning, TEXT("No more waves available (TotalWaves = %d)"), TotalWaves);
+        return;
     }
     
     int NextWaveID = CurrentWaveID + 1;
-    if (NextWaveID <= MaxWaveID) 
-        StartWave(NextWaveID);
-    else 
-        UE_LOG(LogTemp, Warning, TEXT("No more waves available"));
+    StartWave(NextWaveID);
+
+    CurrentWaveChanged.Broadcast(CurrentWaveID);
+    TotalEnemiesInWaveChanged.Broadcast(TotalEnemiesInWave);
 }
 
 void APVZ3DEnemySpawnPointManager::StartWave(int WaveID)
@@ -146,6 +158,24 @@ void APVZ3DEnemySpawnPointManager::StartWave(int WaveID)
     
     UE_LOG(LogTemp, Warning, TEXT("Starting Wave %d with %d enemies"), WaveID, TotalEnemiesInWave);
 
+    float CurrentWaveTimeLimit = GetCurrentWaveTimeLimit(WaveID);
+    if (CurrentWaveTimeLimit <= 0.0f)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Wave %d has invalid TimeLimit, using default 10s"), WaveID);
+        CurrentWaveTimeLimit = 10.0f;
+    }
+
+    CurrentWaveTimeLimitChanged.Broadcast(CurrentWaveTimeLimit);
+
+    GetWorldTimerManager().SetTimer(
+    TimerHandle_WaveTimeout, 
+    this, 
+    &APVZ3DEnemySpawnPointManager::OnWaveTimeLimitReached, 
+    CurrentWaveTimeLimit, 
+    false
+);
+
+
     // 让SpawnPoint开始生成敌人
     if (EnemySpawnPoint1)
     {
@@ -158,10 +188,37 @@ void APVZ3DEnemySpawnPointManager::StartWave(int WaveID)
     }
 }
 
+void APVZ3DEnemySpawnPointManager::ForceNextWave()
+{
+    if (!bIsSpawning)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("ForceNextWave: Not spawning, ignoring."));
+        return;
+    }
+
+    UE_LOG(LogTemp, Warning, TEXT("Forcing next wave (Wave %d)"), CurrentWaveID);
+    
+    // 标记波结束
+    bIsSpawning = false;
+    bCanNextWave = true;
+    GetWorldTimerManager().ClearTimer(TimerHandle_WaveTimeout); // 清除定时器
+    
+    // 触发下一波（若未到最后一波）
+    if (CurrentWaveID < TotalWaves)
+    {
+        NextWave();
+    }
+    else
+    {
+        OnWaveSpawnComplete();
+    }
+}
+
 void APVZ3DEnemySpawnPointManager::OnWaveSpawnComplete()
 {
     bIsSpawning = false;
     bCanNextWave = true;
+    GetWorldTimerManager().ClearTimer(TimerHandle_WaveTimeout); // 清除定时器
     UE_LOG(LogTemp, Warning, TEXT("Wave %d completed!"), CurrentWaveID);
 }
 
@@ -169,4 +226,39 @@ int APVZ3DEnemySpawnPointManager::GetUniqueTimerKeySuffix()
 {
     static int Suffix = 0;
     return ++Suffix; // 返回int类型
+}
+float APVZ3DEnemySpawnPointManager::GetCurrentWaveTimeLimit(int WaveID)
+{
+    for (FWaveDataRow* Row : AllWaveRows)
+    {
+        if (Row && Row->WaveID == WaveID)
+        {
+            return Row->TimeLimit;
+        }
+    }
+    return 0.0f; // 未找到时返回0（外部需处理默认值）
+}
+
+void APVZ3DEnemySpawnPointManager::OnWaveTimeLimitReached()
+{
+    if (!bIsSpawning)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Wave timeout: Not spawning, ignoring."));
+        return;
+    }
+
+    UE_LOG(LogTemp, Warning, TEXT("Wave %d time limit reached (%.1f s)"), 
+           CurrentWaveID, 
+           GetWorldTimerManager().GetTimerElapsed(TimerHandle_WaveTimeout));
+
+    if (CurrentWaveID < TotalWaves)
+    {
+        // 非最后一波 → 强制下一波
+        ForceNextWave();
+    }
+    else
+    {
+        // 最后一波 → 标记完成
+        OnWaveSpawnComplete();
+    }
 }

@@ -13,6 +13,12 @@ UPVZ3DHealthComponent::UPVZ3DHealthComponent()
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
+void UPVZ3DHealthComponent::ResetHealth()
+{
+	CurrentHealth = MaxHealth; 
+	OnHealthChanged.Broadcast(CurrentHealth, MaxHealth, 1.0f); 
+}
+
 
 // Called when the game starts
 void UPVZ3DHealthComponent::BeginPlay()
@@ -107,4 +113,32 @@ void  UPVZ3DHealthComponent::HealUpdate()
 void UPVZ3DHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+}
+
+void UPVZ3DHealthComponent::HandleBuffApplied(float Amount, float Duration)
+{
+    
+	if (Duration > 0.0f)
+	{
+		// 持续治疗
+		SteadyHeal.IsSteadyHeal = true;
+		SteadyHeal.SteadyHeal_Amount = Amount;
+		SteadyHeal.SteadyHeal_Time = Duration;
+		SteadyHeal_Time_Count = 0;
+	}
+	else
+	{
+		ApplyInstantHeal(Amount, Duration);
+	}
+}
+
+void UPVZ3DHealthComponent::ApplyInstantHeal(float Amount, float Delay)
+{
+	UE_LOG(LogHealthComponent, Warning, TEXT("Applying instant heal: Amount=%.1f, Delay=%.1f"), Amount, Delay);
+    
+	// 设置即时治疗
+	InstantHeal.IsInstantHeal = true;
+	InstantHeal.InstantHeal_Amount = Amount;
+	InstantHeal.InstantHeal_TimeDelay = Delay;
+	InstantHeal_TimeDelay_Count = 0; // 重置计时器
 }
