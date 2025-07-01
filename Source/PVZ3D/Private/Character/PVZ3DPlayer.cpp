@@ -16,6 +16,11 @@
 #include "Gamemode/PVZ3DGamemode.h"
 #include "Kismet/GameplayStatics.h"
 #include "Actor/PVZ3DPlayerSpawnPoint.h"
+#include "AI/PVZ3DTower.h"
+#include "Engine/OverlapResult.h"
+#include "DrawDebugHelpers.h"
+#include "PVZ3DWeaponComponent.h"
+#include "Interface/UPVZ3DTowerInterface.h"
 
 DEFINE_LOG_CATEGORY_STATIC(PVZ3DPlayerLog, All, All);
 
@@ -51,6 +56,17 @@ APVZ3DPlayer::APVZ3DPlayer()
 	WeaponComponent = CreateDefaultSubobject<UPVZ3DWeaponComponent>("WeaponComponent");
 
 	GetCharacterMovement()->MaxWalkSpeed = NormalSpeed;
+	
+	bTowerHasWeapon = false;
+	bTowerBaseInMiddle = false;
+	bTowerWeaponMaxLevel = false;
+	bIsNearTower = false;
+	CurrentTower = nullptr;
+
+	TowerClass = APVZ3DTower::StaticClass();
+
+	Tags.Add(FName("Player"));
+
 }
 
 void APVZ3DPlayer::BeginPlay()
@@ -90,9 +106,11 @@ void APVZ3DPlayer::BeginPlay()
 	{
 		// 正确绑定事件（注意函数指针语法）
 		InventoryComponent->HoldedChanged.AddUObject(this, &APVZ3DPlayer::OnHoldedItemChanged);
+
+		WeaponComponent->OnConsumed.AddUObject(InventoryComponent, &UPVZ3DInventoryComponent::RemoveFromInventory);
 	}
 
-
+	WeaponComponent->BindSwitchWeapon(InventoryComponent);
 	
 }
 
@@ -124,12 +142,15 @@ void APVZ3DPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 		PlayerInputComponent->BindAction("SwitchToStack8" , IE_Pressed , this , &APVZ3DPlayer::SwitchToStack8);
 		PlayerInputComponent->BindAction("SwitchToStack9" , IE_Pressed , this , &APVZ3DPlayer::SwitchToStack9);
 		PlayerInputComponent->BindAction("SwitchToStack10" , IE_Pressed , this , &APVZ3DPlayer::SwitchToStack10);
-		
+
+		PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &APVZ3DPlayer::Interact);
+
 		
 		if (WeaponComponent && PlayerInputComponent)
 		{
 			PlayerInputComponent->BindAction("Attack", IE_Pressed, WeaponComponent, &UPVZ3DWeaponComponent::StartFire);
 			PlayerInputComponent->BindAction("Attack", IE_Released, WeaponComponent, &UPVZ3DWeaponComponent::StopFire);
+			PlayerInputComponent->BindAction("Reload", IE_Released, WeaponComponent, &UPVZ3DWeaponComponent::OnReload);
 		}
 	}
 	else
@@ -197,6 +218,7 @@ void APVZ3DPlayer::StartAttack() {
 	if (AttackAnimMontage && !bIsAttacking) {
 		PlayAnimMontage(AttackAnimMontage, 1.0f,NAME_None); 
 		bIsAttacking = true;
+		GetCharacterMovement()->MaxWalkSpeed = NormalSpeed;
 	}
 }
 
@@ -204,6 +226,7 @@ void APVZ3DPlayer::StopAttack() {
 	if (AttackAnimMontage && bIsAttacking) {
 		StopAnimMontage(AttackAnimMontage);
 		bIsAttacking = false;
+		GetCharacterMovement()->MaxWalkSpeed = RunningSpeed;
 	}
 }
 
@@ -215,6 +238,112 @@ UPVZ3DWeaponComponent* APVZ3DPlayer::GetWeaponComponent() const
 void APVZ3DPlayer::Interact()
 {
 	Super::Interact();
+	CurrentTower = FindNearestTowerInRange();
+
+	if (CurrentTower)
+	{
+		// bIsNearTower = true;
+		// bTowerHasWeapon = CurrentTower->HasWeapon(); // 假设Tower有此函数
+		// bTowerBaseInMiddle = CurrentTower->IsTowerBaseInMiddle();
+		// bTowerWeaponMaxLevel = CurrentTower->IsWeaponMaxLevel();
+	}
+	else
+	{
+		bIsNearTower = false;
+	}
+
+	BroadcastTowerInfo(CurrentTower);
+}
+APVZ3DTower* APVZ3DPlayer::FindNearestTowerInRange()
+{
+	TArray<FOverlapResult> Overlaps;
+	FCollisionShape Sphere = FCollisionShape::MakeSphere(InteractionRange);
+    
+	// 创建碰撞查询参数
+	FCollisionObjectQueryParams ObjectQueryParams;
+	ObjectQueryParams.AddObjectTypesToQuery(ECollisionChannel::ECC_WorldDynamic);
+	ObjectQueryParams.AddObjectTypesToQuery(ECC_Pawn);
+    
+	// 创建碰撞查询选项
+	FCollisionQueryParams QueryParams;
+	QueryParams.AddIgnoredActor(this); // 忽略玩家自身
+	QueryParams.bTraceComplex = false;
+	QueryParams.bReturnPhysicalMaterial = false;
+    
+	// 执行重叠检测（注意：无论是否有结果，都会填充Overlaps数组）
+	GetWorld()->OverlapMultiByObjectType(
+		Overlaps,
+		GetActorLocation(),
+		FQuat::Identity,
+		ObjectQueryParams,
+		Sphere,
+		QueryParams
+	);
+
+	UE_LOG(LogTemp, Warning, TEXT("Found %d overlapping actors"), Overlaps.Num());
+
+	APVZ3DTower* NearestTower = nullptr;
+	float MinDistance = FLT_MAX;
+
+	// 遍历重叠结果，找到最近的塔
+	for (const FOverlapResult& Overlap : Overlaps)
+	{
+		APVZ3DTower* Tower = Cast<APVZ3DTower>(Overlap.GetActor());
+		if (Tower && Tower->IsValidLowLevel())
+		{
+			float Distance = FVector::Dist(GetActorLocation(), Tower->GetActorLocation());
+			if (Distance < MinDistance)
+			{
+				MinDistance = Distance;
+				NearestTower = Tower;
+			}
+		}
+	}
+
+	// 调试可视化
+	if (GetWorld()->IsGameWorld())
+	{
+		DrawDebugSphere(
+			GetWorld(),
+			GetActorLocation(),
+			InteractionRange,
+			32,
+			NearestTower ? FColor::Green : FColor::Red,
+			false,
+			1.0f
+		);
+	}
+
+	return NearestTower;
+}
+
+void APVZ3DPlayer::BroadcastTowerInfo(APVZ3DTower* Tower)
+{
+	if (!Tower)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Tower is null"));
+		bIsNearTower = false;
+		OnTowerInteraction.Broadcast(false, false, false, false, nullptr);
+		return;
+	}
+    
+	// 通过接口检查塔有效性
+	if (!Tower || !Tower->GetClass()->ImplementsInterface(UPVZ3DTowerInterface::StaticClass()))
+	{
+		bIsNearTower = false;
+		OnTowerInteraction.Broadcast(false, false, false, false, nullptr);
+		return;
+	}
+    
+	IPVZ3DTowerInterface* TowerInterface = Cast<IPVZ3DTowerInterface>(Tower);
+	bTowerHasWeapon = IPVZ3DTowerInterface::Execute_HasWeapon(TowerInterface->_getUObject());
+	bTowerBaseInMiddle = IPVZ3DTowerInterface::Execute_IsTowerBaseInMiddle(TowerInterface->_getUObject());
+	bTowerWeaponMaxLevel = IPVZ3DTowerInterface::Execute_IsWeaponMaxLevel(TowerInterface->_getUObject());
+	bIsNearTower = true;
+    
+	OnTowerInteraction.Broadcast(bTowerHasWeapon, bTowerBaseInMiddle, bTowerWeaponMaxLevel, bIsNearTower, Tower);
+	UE_LOG(LogTemp,Warning, TEXT("BroadcastTowerInfo: bTowerHasWeapon: %d, bTowerBaseInMiddle: %d, bTowerWeaponMaxLevel: %d, bIsNearTower: %d, Tower: %s"),
+		bTowerHasWeapon, bTowerBaseInMiddle, bTowerWeaponMaxLevel, bIsNearTower, (Tower ? *Tower->GetName() : TEXT("None")));
 }
 
 void APVZ3DPlayer::StartRun()
@@ -222,7 +351,7 @@ void APVZ3DPlayer::StartRun()
 	if(GetCharacterMovement()&&!bIsRunning)
 	{
 		bIsRunning = true;
-		GetCharacterMovement()->MaxWalkSpeed = RunningSpeed;	
+		GetCharacterMovement()->MaxWalkSpeed = RunningSpeed;
 	}
 }
 

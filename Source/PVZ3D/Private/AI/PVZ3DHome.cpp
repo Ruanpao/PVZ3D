@@ -57,6 +57,9 @@ APVZ3DHome::APVZ3DHome()
 	HealthTextComponent->SetupAttachment(GetRootComponent());
 
 	HealthComponent->SetMaxHealth(HomeMaxHealth); // 设置初始血量
+
+	Tags.Add(FName("Home"));
+
 }
 
 void APVZ3DHome::Tick(float DeltaTime)

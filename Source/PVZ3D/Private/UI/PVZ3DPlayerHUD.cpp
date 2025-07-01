@@ -9,6 +9,12 @@
 #include "Blueprint/UserWidget.h"
 #include "UI/PVZ3DDisposalPopWidget.h"
 
+#include "Component/PVZ3DWeaponComponent.h"
+#include "Character/PVZ3DPlayerController.h"
+#include "Character/PVZ3DPlayer.h"
+#include "UI/PVZ3DInteractPopWidget.h"
+
+
 DEFINE_LOG_CATEGORY_STATIC(LogHUD, All, All);
 
 void APVZ3DPlayerHUD::DrawHUD()
@@ -16,11 +22,27 @@ void APVZ3DPlayerHUD::DrawHUD()
 	Super::DrawHUD();
 
 	DrawCrossHair();
+	
+	if (APlayerController* PlayerController = GetOwningPlayerController())
+	{
+		if (APVZ3DPlayer* PlayerCharacter = Cast<APVZ3DPlayer>(PlayerController->GetPawn()))
+		{
+			if (UPVZ3DWeaponComponent* WeaponComponent = PlayerCharacter->FindComponentByClass<UPVZ3DWeaponComponent>())
+			{
+				WeaponComponent->ButtonInteraction.AddUObject(this, &APVZ3DPlayerHUD::CreateInteractPopWidget);
+			}
+		}
+	}
 }
 
 void APVZ3DPlayerHUD::BeginPlay()
 {
 	Super::BeginPlay();
+
+
+
+	
+	
 	auto PlayerDetailWidget = CreateWidget<UUserWidget>(GetWorld(), PlayerDetailWidgetClass);
 	
 	auto LevelWidget = CreateWidget<UUserWidget>(GetWorld(), LevelWidgetClass);
@@ -31,7 +53,7 @@ void APVZ3DPlayerHUD::BeginPlay()
 
 	InventoryInformationWidget = CreateWidget<UUserWidget>(GetWorld(), InventoryInformationWidgetClass);
 
-	//InventoryMainWidget = CreateWidget<UUserWidget>(GetWorld(), InventoryMainWidgetClass);
+	InventoryMainWidget = CreateWidget<UUserWidget>(GetWorld(), InventoryMainWidgetClass);
 	
 	if(PlayerDetailWidget)
 	{
@@ -154,6 +176,20 @@ void APVZ3DPlayerHUD::DrawCrossHair()
 	DrawLine(Center.Min, Center.Max - HalfLineSize, Center.Min, Center.Max + HalfLineSize, LineColor,LineThickness);
 }
 
+void APVZ3DPlayerHUD::CreateInteractPopWidget(bool IsClicked, bool IsNearTower, bool IsFullTower , bool IsFullLevel , bool IsIntheMidLine , FItemInInventory HoldedItem)
+{
+	InteractPopWidget = CreateWidget<UUserWidget>(GetWorld(), InteractPopWidgetClass);
 
+	if(InteractPopWidget)
+	{
+		if(UPVZ3DInteractPopWidget* InteractPopWidgetInstance = Cast<UPVZ3DInteractPopWidget>(InteractPopWidget))
+		{
+			InteractPopWidgetInstance->SendHoldedItem.Broadcast(HoldedItem);
+			InteractPopWidgetInstance->WhetherClickedAndNearTower.Broadcast(IsClicked, IsNearTower, IsFullTower, IsFullLevel, IsIntheMidLine);
+		}
+
+		InteractPopWidget->AddToViewport();
+	}
+}
 
 

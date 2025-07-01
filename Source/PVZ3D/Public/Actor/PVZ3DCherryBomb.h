@@ -14,12 +14,13 @@ class PVZ3D_API APVZ3DCherryBomb : public APVZ3DItemDamage
 	
 public:	
 	APVZ3DCherryBomb();
+	virtual void BeginPlay() override;
 
 	// 开火函数（按压使用键）
-	virtual void StartFire() override;
+	virtual void StartUse() override;
     
 	// 停火函数（松手投掷）
-	virtual void StopFire() override;
+	virtual void StopUse() override;
     
 	// 投掷炸弹
 	virtual void MakeShot() override;
@@ -32,11 +33,12 @@ public:
     
 	// 碰撞处理
 	UFUNCTION()
-	virtual void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit) override;
+	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
     
 	// 激活炸弹
 	virtual void ActivateBomb(FVector Location, FVector Direction, AActor* NewWeaponOwner, AController* NewWeaponInstigator) override;
     
 	// 停用炸弹
 	virtual void DeactivateBomb() override;
+	
 };

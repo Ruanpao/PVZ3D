@@ -11,6 +11,9 @@
 
 class USkeletalMeshComponent;
 
+DECLARE_MULTICAST_DELEGATE(FOnReload);
+DECLARE_MULTICAST_DELEGATE_OneParam(FDecrease ,int32);
+
 USTRUCT(BlueprintType)
 struct FAmmoData
 {
@@ -34,7 +37,11 @@ class PVZ3D_API APVZ3DWeapon : public AActor
 {
 	GENERATED_BODY()
 	
-public:	
+public:
+	FOnReload OnReload;
+
+	FDecrease Decrease;
+	
 	APVZ3DWeapon();
 
 	virtual void StartFire();
@@ -44,7 +51,9 @@ public:
 	virtual bool CanReload() const;
 
 	USkeletalMeshComponent* GetWeaponMesh() const { return WeaponMesh; }
-	
+
+	void SetAttribute(float Damage,float Distance,float ReloadTime,float Clips);
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -63,7 +72,7 @@ protected:
 	float DamageAmount = 100.0f;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite,Category="Weapon")
-	FAmmoData DefaultAmmo{150,100,false};
+	FAmmoData DefaultAmmo{150,1000,false};
 	
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category="Animation")
 	UAnimMontage*ReloadAnimMontage;
@@ -84,6 +93,8 @@ protected:
 	void LogAmmo();
 
 	bool bIsReloading = false;
+
+	float BulletDamage = 0.0f;
 private:
 	FTimerHandle ShotTimerHandle;
 
